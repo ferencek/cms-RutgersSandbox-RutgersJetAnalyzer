@@ -29,7 +29,11 @@ def main():
 
   parser.add_option("-n", "--no_creation",
                     action="store_true", dest="no_creation", default=False,
-                    help="Create the necessary configuration files and skip the job creation (This parameter is optional)")
+                    help="Create the necessary configuration files and skip the creation of CRAB jobs (This parameter is optional)")
+
+  parser.add_option("--fnal",
+                    action="store_true", dest="fnal", default=False,
+                    help="This switch is mandatory for storing output at FNAL")
 
   (options, args) = parser.parse_args()
 
@@ -110,9 +114,14 @@ def main():
     else:
       crab_cfg_content = re.sub('CFG_PARAMETERS','noprint',crab_cfg_content)
     crab_cfg_content = re.sub('WORKING_DIR',os.path.join(main_workdir,dataset),crab_cfg_content)
+    crab_cfg_content = re.sub('STORAGE_ELEMENT',('T3_US_FNALLPC' if options.fnal else 'ruhex-osgce.rutgers.edu'),crab_cfg_content)
+    if options.fnal:
+      crab_cfg_content = re.sub('storage_path','#storage_path',crab_cfg_content)
     publication_name = line_elements[9] + (('_' + line_elements[4]) if line_elements[4] != '-' else '')
-    crab_cfg_content = re.sub('REMOTE_DIR', os.getenv('LOGNAME') + '/' + line_elements[0].split('/')[1 ] + '/' + publication_name,crab_cfg_content)
+    crab_cfg_content = re.sub('REMOTE_DIR', ( '' if options.fnal else '/store/' + os.getenv('LOGNAME') ) + '/' + line_elements[0].split('/')[1 ] + '/' + publication_name,crab_cfg_content)
     crab_cfg_content = re.sub('PUBLICATION_NAME',publication_name,crab_cfg_content)
+    if options.fnal:
+      crab_cfg_content = re.sub('dont_check_proxy','#dont_check_proxy',crab_cfg_content)
 
     # create a CRAB cfg file
     crab_cfg_name = os.path.join(cfg_files_dir,dataset + '_crab.cfg')

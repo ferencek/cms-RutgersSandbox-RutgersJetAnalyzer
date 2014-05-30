@@ -67,6 +67,19 @@ Arguments = $(Process) DUMMY_OUTPUTDIR DUMMY_PARAMS
 Queue DUMMY_NJOBS
 """
 
+jdl_template_fnal = """universe = vanilla
+Requirements = Memory >= 199 && OpSys == "LINUX" && (Arch != "DUMMY" )
+Should_Transfer_Files = YES
+WhenToTransferOutput = ON_EXIT
+Notification = never
+x509userproxy = $ENV(X509_USER_PROXY)
+Executable = DUMMY_OUTPUTDIR/CMSSW.sh
+Output = condor_$(Cluster)_$(Process).stdout
+Error = condor_$(Cluster)_$(Process).stderr
+Log = condor_$(Cluster)_$(Process).log
+Arguments = $(Process) DUMMY_OUTPUTDIR DUMMY_PARAMS
+Queue DUMMY_NJOBS
+"""
 
 bash_template = """#!/bin/bash
 
@@ -104,6 +117,45 @@ echo "Finished at $END_TIME"
 exit $exitcode
 """
 
+bash_template_fnal = """#!/bin/bash
+
+CONDOR_PROCESS=$1
+OUTPUTDIR=$2
+PARAMS=$3
+
+START_TIME=`/bin/date`
+echo "Started at $START_TIME"
+echo ""
+
+export SCRAM_ARCH=slc5_amd64_gcc462
+source /uscmst1/prod/sw/cms/shrc prod
+cd $OUTPUTDIR
+eval `scramv1 runtime -sh`
+
+# change to Condor scratch directory
+cd ${_CONDOR_SCRATCH_DIR}
+
+# define output log file
+LOG="CMSSW_Job_${CONDOR_PROCESS}.log"
+# separate individual input parameters
+PARAMS_MOD=${PARAMS//,/ }
+
+# rewrite cfg file with input parameters applied
+python ${OUTPUTDIR}/CMSSW_cfg.py outFilename=CMSSW_Job_${CONDOR_PROCESS}.root \\
+useExternalInput=True externalInput=${OUTPUTDIR}/input/files_${CONDOR_PROCESS}.txt \\
+dumpPythonCfg=CMSSW_Job_${CONDOR_PROCESS}_cfg.py \\
+$PARAMS_MOD
+
+echo "Running CMSSW job $CONDOR_PROCESS using the following input parameters: $PARAMS_MOD"
+cmsRun -j CMSSW_Job_${CONDOR_PROCESS}_fjr.xml -p CMSSW_Job_${CONDOR_PROCESS}_cfg.py > $LOG 2>&1
+exitcode=$?
+
+echo ""
+END_TIME=`/bin/date`
+echo "Finished at $END_TIME"
+exit $exitcode
+"""
+
 
 usage = """Usage: %prog [-m MATCH] -i INPUTDIR -c CMSSW_CFG -o OUTPUTDIR -n NJOBS [-p PARAMS -f 1.0 --create-only]\n
 Example: ./createAndSubmitJobs.py -i /cms/ferencek/store/ferencek/WWtoAnything_ptmin500_TuneZ2Star_8TeV-pythia6-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1_PATTuple_v2/6950c4b6452599a829ed09f6192c8cf5/ -c rutgersjetanalyzer_cfg.py -o WW_dir -n 50 -p maxEvents=-1,reportEvery=100,wantSummary=True"""
@@ -121,6 +173,7 @@ def main():
     parser.add_option('-p', '--params', metavar='PARAMS', action='store', dest='params', default='1.0', help='Comma separated list of job input parameters (Optional)')
     parser.add_option('-f', '--fraction', metavar='FRACTION', action='store', dest='fraction', default='1.0', help='Fraction of files to be processed. Default value is 1 (This parameter is optional)')
     parser.add_option('--create-only', action="store_true", dest="create_only", default=False, help="Create the necessary configuration files but skip the job submission (This parameter is optional)")
+    parser.add_option('--fnal', action="store_true", dest="fnal", default=False, help="This switch is mandatory if submitting jobs at FNAL")
 
     (options, args) = parser.parse_args(args=None)
 
@@ -182,32 +235,40 @@ def main():
     shutil.copyfile(options.cmssw_cfg,os.path.join(outputmain,'CMSSW_cfg.py'))
     # create jdl file
     jdl_file = open(os.path.join(outputmain,'CMSSW.jdl'),'w')
-    jdl_content = re.sub('DUMMY_OUTPUTDIR',outputmain,jdl_template)
+    jdl_content = jdl_template
+    if options.fnal:
+        jdl_content = jdl_template_fnal
+    jdl_content = re.sub('DUMMY_OUTPUTDIR',outputmain,jdl_content)
     jdl_content = re.sub('DUMMY_NJOBS',str(ijobmax),jdl_content)
     jdl_content = re.sub('DUMMY_PARAMS',params,jdl_content)
     jdl_file.write(jdl_content)
     jdl_file.close()
     # create Bash script
     bash_script = open(os.path.join(outputmain,'CMSSW.sh'),'w')
-    bash_script.write(bash_template)
+    bash_content = bash_template
+    if options.fnal:
+        bash_content = bash_template_fnal
+    bash_script.write(bash_content)
     bash_script.close()
     os.system('chmod +x '+ os.path.join(outputmain,'CMSSW.sh'))
     ################################################
     ifile = 0
     for ijob in range(ijobmax):
 	# prepare the list of input files
-	inputfiles = 'file:' + filelist[ifile]
+	inputfiles = (filelist[ifile].replace('/eos/uscms/store/user/','root://cmsxrootd-site.fnal.gov//store/user/') if options.fnal else 'file:' + filelist[ifile])
 	for i in range(filesperjob-1):
 	    if ifile>(numfiles-2):
 	        break
 	    ifile = ifile + 1
-	    inputfiles += ('\nfile:' + filelist[ifile])
+	    inputfiles += ( '\n' + (filelist[ifile].replace('/eos/uscms/store/user/','root://cmsxrootd-site.fnal.gov//store/user/') if options.fnal else 'file:' + filelist[ifile]) )
 	ifile = ifile + 1
 	
 	# create a text file containing input files
 	open(os.path.join(outputmain,'input','files_' + str(ijob) + '.txt'),'w').write(inputfiles)
 	
     if not options.create_only:
+      if options.fnal:
+        os.chdir(os.path.join(outputmain,'output'))
       # submit Condor jobs
       os.system('condor_submit ' + os.path.join(outputmain,'CMSSW.jdl'))
 
