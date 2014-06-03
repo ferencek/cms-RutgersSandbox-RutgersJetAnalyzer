@@ -117,11 +117,6 @@ options.register('runOnTopBkg', False,
     VarParsing.varType.bool,
     "Run on top background"
 )
-options.register('csvDiscriminator', 'combinedSecondaryVertexBJetTags',
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.string,
-    "CSV discriminator name"
-)
 options.register('useSVClustering', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -793,7 +788,6 @@ process.jetAnalyzerCA8FatJets_PrunedSubjets = cms.EDAnalyzer('RutgersJetAnalyzer
     JetAbsEtaMax              = cms.double(1.5),
     JetMassMin                = cms.double(75.),
     JetMassMax                = cms.double(135.),
-    Bdiscriminator            = cms.string(options.csvDiscriminator),
     DoJetFlavor               = cms.bool(False),
     JetFlavorPdgIds           = cms.vint32(5)
 )
@@ -819,7 +813,6 @@ process.jetAnalyzerCA8FatJets_FilteredSubjets = cms.EDAnalyzer('RutgersJetAnalyz
     JetAbsEtaMax              = cms.double(1.5),
     JetMassMin                = cms.double(75.),
     JetMassMax                = cms.double(135.),
-    Bdiscriminator            = cms.string(options.csvDiscriminator),
     DoJetFlavor               = cms.bool(False),
     JetFlavorPdgIds           = cms.vint32(5)
 )
@@ -845,7 +838,6 @@ process.jetAnalyzerCA8FatJets_MDBDRSFilteredSubjets = cms.EDAnalyzer('RutgersJet
     JetAbsEtaMax              = cms.double(1.5),
     JetMassMin                = cms.double(75.),
     JetMassMax                = cms.double(135.),
-    Bdiscriminator            = cms.string(options.csvDiscriminator),
     DoJetFlavor               = cms.bool(False),
     JetFlavorPdgIds           = cms.vint32(5)
 )
@@ -871,7 +863,6 @@ process.jetAnalyzerCA8FatJets_KtBDRSFilteredSubjets = cms.EDAnalyzer('RutgersJet
     JetAbsEtaMax              = cms.double(1.5),
     JetMassMin                = cms.double(75.),
     JetMassMax                = cms.double(135.),
-    Bdiscriminator            = cms.string(options.csvDiscriminator),
     DoJetFlavor               = cms.bool(False),
     JetFlavorPdgIds           = cms.vint32(5)
 )
@@ -897,7 +888,6 @@ process.jetAnalyzerCA8FatJets_KtSubjets = cms.EDAnalyzer('RutgersJetAnalyzer',
     JetAbsEtaMax              = cms.double(1.5),
     JetMassMin                = cms.double(75.),
     JetMassMax                = cms.double(135.),
-    Bdiscriminator            = cms.string(options.csvDiscriminator),
     DoJetFlavor               = cms.bool(False),
     JetFlavorPdgIds           = cms.vint32(5)
 )
