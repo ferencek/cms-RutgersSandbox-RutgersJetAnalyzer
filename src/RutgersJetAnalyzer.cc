@@ -44,6 +44,10 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "RecoBTau/JetTagComputer/interface/JetTagComputer.h"
+#include "RecoBTau/JetTagComputer/interface/JetTagComputerRecord.h"
+#include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputer.h"
+#include "DataFormats/BTauReco/interface/TaggingVariable.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TProfile.h"
@@ -230,8 +234,10 @@ private:
     TH1F *h1_JetJBPDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMinCSVDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMaxCSVDiscr_BosonMatched_JetMass;
+    TH1F *h1_JetHybridCSVDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass;
+    TH1F *h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMinJPDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMaxJPDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMinJBPDiscr_BosonMatched_JetMass;
@@ -242,10 +248,12 @@ private:
     TH2F *h2_JetPt_JetCSV_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMinCSV_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass;
+    TH2F *h2_JetPt_JetHybridCSV_BosonMatched_JetMass;
     // IVFCSV plots
     TH2F *h2_JetPt_JetIVFCSV_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass;
+    TH2F *h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass;
     // JP plots
     TH2F *h2_JetPt_JetJP_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMinJP_BosonMatched_JetMass;
@@ -469,8 +477,10 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h1_JetJBPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetJBPDiscr_BosonMatched_JetMass",";Jet JBP Discr;",100,0.,10.);
     h1_SubJetMinCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinCSVDiscr_BosonMatched_JetMass",";Subjet min CSV Discr;",100,0.,1.);
     h1_SubJetMaxCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxCSVDiscr_BosonMatched_JetMass",";Subjet max CSV Discr;",100,0.,1.);
+    h1_JetHybridCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetHybridCSVDiscr_BosonMatched_JetMass",";Jet Hybrid CSV Discr;",100,0.,1.);
     h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass",";Subjet min IVFCSV Discr;",100,0.,1.);
     h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass",";Subjet max IVFCSV Discr;",100,0.,1.);
+    h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass",";Jet Hybrid IVFCSV Discr;",100,0.,1.);
     h1_SubJetMinJPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinJPDiscr_BosonMatched_JetMass",";Subjet min JP Discr;",100,0.,2.);
     h1_SubJetMaxJPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxJPDiscr_BosonMatched_JetMass",";Subjet max JP Discr;",100,0.,2.);
     h1_SubJetMinJBPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinJBPDiscr_BosonMatched_JetMass",";Subjet min JBP Discr;",100,0.,10.);
@@ -480,10 +490,12 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h2_JetPt_JetCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
     h2_JetPt_SubJetMinCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet min CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
     h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet max CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
+    h2_JetPt_JetHybridCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetHybridCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet Hybrid CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
 
     h2_JetPt_JetIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet IVFCSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
     h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet min IVFCSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
     h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet max IVFCSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
+    h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet Hybrid IVFCSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
 
     h2_JetPt_JetJP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetJP_BosonMatched_JetMass",";p_{T} [GeV];Jet JP Discr",ptBins,ptMin,ptMax,100,0.,2.);
     h2_JetPt_SubJetMinJP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinJP_BosonMatched_JetMass",";p_{T} [GeV];Subjet min JP Discr",ptBins,ptMin,ptMax,100,0.,2.);
@@ -644,6 +656,12 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     iEvent.getByLabel(pvTag,PVs);
 
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", trackBuilder);
+
+    edm::ESHandle<JetTagComputer> computerHandle;
+    iSetup.get<JetTagComputerRecord>().get( "combinedSecondaryVertex", computerHandle );
+
+    const GenericMVAJetTagComputer *computer = dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
+    computer->passEventSetup(iSetup);
 
 
     double eventWeight = 1.;
@@ -1225,6 +1243,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       double subJet1_JP_discr = -999., subJet2_JP_discr = -999.;
       double subJet1_JBP_discr = -999., subJet2_JBP_discr = -999.;
       double ak5Jet_CSV_discr = -999., ak5Jet1_CSV_discr = -999., ak5Jet2_CSV_discr = -999.;
+      int subjet1_CSV_VtxType = -1, subjet2_CSV_VtxType = -1, subjet1_IVFCSV_VtxType = -1, subjet2_IVFCSV_VtxType = -1;
       if( subjets.size()>1 )
       {
         subJet1_CSV_discr = subjets.at(0)->bDiscriminator("combinedSecondaryVertexBJetTags");
@@ -1238,6 +1257,40 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
         subJet1_JBP_discr = subjets.at(0)->bDiscriminator("jetBProbabilityBJetTags");
         subJet2_JBP_discr = subjets.at(1)->bDiscriminator("jetBProbabilityBJetTags");
+
+        // Determine vertex types
+        // SubJet1 CSV
+        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1CSV;
+        JetTagComputer::TagInfoHelper helperSubJet1CSV(baseTagInfosSubJet1CSV);
+        baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
+        baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("secondaryVertex") );
+        // SubJet1 CSV TaggingVariables
+        reco::TaggingVariableList varsSubJet1CSV = computer->taggingVariables(helperSubJet1CSV);
+        if(varsSubJet1CSV.checkTag(reco::btau::vertexCategory)) subjet1_CSV_VtxType = int(varsSubJet1CSV.get(reco::btau::vertexCategory));
+        // SubJet2 CSV
+        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2CSV;
+        JetTagComputer::TagInfoHelper helperSubJet2CSV(baseTagInfosSubJet2CSV);
+        baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
+        baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("secondaryVertex") );
+        // SubJet2 CSV TaggingVariables
+        reco::TaggingVariableList varsSubJet2CSV = computer->taggingVariables(helperSubJet2CSV);
+        if(varsSubJet2CSV.checkTag(reco::btau::vertexCategory)) subjet2_CSV_VtxType = int(varsSubJet2CSV.get(reco::btau::vertexCategory));
+        // SubJet1 IVFCSV
+        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1IVFCSV;
+        JetTagComputer::TagInfoHelper helperSubJet1IVFCSV(baseTagInfosSubJet1IVFCSV);
+        baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
+        baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
+        // SubJet1 IVFCSV TaggingVariables
+        reco::TaggingVariableList varsSubJet1IVFCSV = computer->taggingVariables(helperSubJet1IVFCSV);
+        if(varsSubJet1IVFCSV.checkTag(reco::btau::vertexCategory)) subjet1_IVFCSV_VtxType = int(varsSubJet1IVFCSV.get(reco::btau::vertexCategory));
+        // SubJet2 IVFCSV
+        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2IVFCSV;
+        JetTagComputer::TagInfoHelper helperSubJet2IVFCSV(baseTagInfosSubJet2IVFCSV);
+        baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
+        baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
+        // SubJet2 IVFCSV TaggingVariables
+        reco::TaggingVariableList varsSubJet2IVFCSV = computer->taggingVariables(helperSubJet2IVFCSV);
+        if(varsSubJet2IVFCSV.checkTag(reco::btau::vertexCategory)) subjet2_IVFCSV_VtxType = int(varsSubJet2IVFCSV.get(reco::btau::vertexCategory));
       }
       if( matchedAK5Jets.size()>0 )
         ak5Jet_CSV_discr = matchedAK5Jets.at(sortedMatchedAK5JetsIdx.back())->bDiscriminator("combinedSecondaryVertexBJetTags");
@@ -1246,18 +1299,22 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         ak5Jet1_CSV_discr = matchedAK5Jets.at(sortedMatchedAK5JetsIdx.back())->bDiscriminator("combinedSecondaryVertexBJetTags");
         ak5Jet2_CSV_discr = matchedAK5Jets.at(sortedMatchedAK5JetsIdx.at(matchedAK5Jets.size()-2))->bDiscriminator("combinedSecondaryVertexBJetTags");
       }
-      double minSubJet_CSV_discr = std::min(subJet1_CSV_discr, subJet2_CSV_discr);
-      double maxSubJet_CSV_discr = std::max(subJet1_CSV_discr, subJet2_CSV_discr);
-      double minSubJet_IVFCSV_discr = std::min(subJet1_IVFCSV_discr, subJet2_IVFCSV_discr);
-      double maxSubJet_IVFCSV_discr = std::max(subJet1_IVFCSV_discr, subJet2_IVFCSV_discr);
-      double minSubJet_JP_discr = std::min(subJet1_JP_discr, subJet2_JP_discr);
-      double maxSubJet_JP_discr = std::max(subJet1_JP_discr, subJet2_JP_discr);
-      double minSubJet_JBP_discr = std::min(subJet1_JBP_discr, subJet2_JBP_discr);
-      double maxSubJet_JBP_discr = std::max(subJet1_JBP_discr, subJet2_JBP_discr);
+      double subJet_minCSV_discr = std::min(subJet1_CSV_discr, subJet2_CSV_discr);
+      double subJet_maxCSV_discr = std::max(subJet1_CSV_discr, subJet2_CSV_discr);
+      double subJet_minIVFCSV_discr = std::min(subJet1_IVFCSV_discr, subJet2_IVFCSV_discr);
+      double subJet_maxIVFCSV_discr = std::max(subJet1_IVFCSV_discr, subJet2_IVFCSV_discr);
+      double subJet_minJP_discr = std::min(subJet1_JP_discr, subJet2_JP_discr);
+      double subJet_maxJP_discr = std::max(subJet1_JP_discr, subJet2_JP_discr);
+      double subJet_minJBP_discr = std::min(subJet1_JBP_discr, subJet2_JBP_discr);
+      double subJet_maxJBP_discr = std::max(subJet1_JBP_discr, subJet2_JBP_discr);
       double minAK5Jets_CSV_discr = std::min(ak5Jet1_CSV_discr, ak5Jet2_CSV_discr);
       double jet_DoubleB_discr = it->bDiscriminator("doubleSecondaryVertexHighEffBJetTags");
+      // Vertex types defined in DataFormats/BTauReco/interface/VertexTypes.h
+      //std::cout << subjet1_CSV_VtxType << " " << subjet2_CSV_VtxType << " " << subjet1_IVFCSV_VtxType << " " << subjet2_IVFCSV_VtxType << std::endl;
+      double jet_HybridCSV_discr = ( (subjet1_CSV_VtxType == 2 && subjet2_CSV_VtxType == 2) ? jet_CSV_discr : subJet_minCSV_discr );
+      double jet_HybridIVFCSV_discr = ( (subjet1_IVFCSV_VtxType == 2 && subjet2_IVFCSV_VtxType == 2) ? jet_IVFCSV_discr : subJet_minIVFCSV_discr );
 
-      if( minSubJet_CSV_discr>0.244 )
+      if( subJet_minCSV_discr>0.244 )
       {
         if( bHadronMatchSubjet1 != genParticles->end() && bHadronMatchSubjet2 != genParticles->end() )
           h2_JetPt_SameMatchedBhadron_BosonMatched_SubJetMinCSVL->Fill(jetPt, ( bHadronMatchSubjet1 == bHadronMatchSubjet2 ? 1. : 0. ), eventWeight);
@@ -1440,31 +1497,35 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h1_JetIVFCSVDiscr_BosonMatched_JetMass->Fill( jet_IVFCSV_discr, eventWeight);
       h1_JetJPDiscr_BosonMatched_JetMass->Fill( jet_JP_discr, eventWeight);
       h1_JetJBPDiscr_BosonMatched_JetMass->Fill( jet_JBP_discr, eventWeight);
-      h1_SubJetMinCSVDiscr_BosonMatched_JetMass->Fill( minSubJet_CSV_discr, eventWeight);
-      h1_SubJetMaxCSVDiscr_BosonMatched_JetMass->Fill( maxSubJet_CSV_discr, eventWeight);
-      h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass->Fill( minSubJet_IVFCSV_discr, eventWeight);
-      h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass->Fill( maxSubJet_IVFCSV_discr, eventWeight);
-      h1_SubJetMinJPDiscr_BosonMatched_JetMass->Fill( minSubJet_JP_discr, eventWeight);
-      h1_SubJetMaxJPDiscr_BosonMatched_JetMass->Fill( maxSubJet_JP_discr, eventWeight);
-      h1_SubJetMinJBPDiscr_BosonMatched_JetMass->Fill( minSubJet_JBP_discr, eventWeight);
-      h1_SubJetMaxJBPDiscr_BosonMatched_JetMass->Fill( maxSubJet_JBP_discr, eventWeight);
+      h1_SubJetMinCSVDiscr_BosonMatched_JetMass->Fill( subJet_minCSV_discr, eventWeight);
+      h1_SubJetMaxCSVDiscr_BosonMatched_JetMass->Fill( subJet_maxCSV_discr, eventWeight);
+      h1_JetHybridCSVDiscr_BosonMatched_JetMass->Fill( jet_HybridCSV_discr, eventWeight);
+      h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass->Fill( subJet_minIVFCSV_discr, eventWeight);
+      h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass->Fill( subJet_maxIVFCSV_discr, eventWeight);
+      h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass->Fill( jet_HybridIVFCSV_discr, eventWeight);
+      h1_SubJetMinJPDiscr_BosonMatched_JetMass->Fill( subJet_minJP_discr, eventWeight);
+      h1_SubJetMaxJPDiscr_BosonMatched_JetMass->Fill( subJet_maxJP_discr, eventWeight);
+      h1_SubJetMinJBPDiscr_BosonMatched_JetMass->Fill( subJet_minJBP_discr, eventWeight);
+      h1_SubJetMaxJBPDiscr_BosonMatched_JetMass->Fill( subJet_maxJBP_discr, eventWeight);
       h1_JetDoubleBDiscr_BosonMatched_JetMass->Fill( jet_DoubleB_discr, eventWeight);
 
       h2_JetPt_JetCSV_BosonMatched_JetMass->Fill(jetPt, jet_CSV_discr, eventWeight);
-      h2_JetPt_SubJetMinCSV_BosonMatched_JetMass->Fill(jetPt, minSubJet_CSV_discr, eventWeight);
-      h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass->Fill(jetPt, maxSubJet_CSV_discr, eventWeight);
+      h2_JetPt_SubJetMinCSV_BosonMatched_JetMass->Fill(jetPt, subJet_minCSV_discr, eventWeight);
+      h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass->Fill(jetPt, subJet_maxCSV_discr, eventWeight);
+      h2_JetPt_JetHybridCSV_BosonMatched_JetMass->Fill(jetPt, jet_HybridCSV_discr, eventWeight);
 
       h2_JetPt_JetIVFCSV_BosonMatched_JetMass->Fill(jetPt, jet_IVFCSV_discr, eventWeight);
-      h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass->Fill(jetPt, minSubJet_IVFCSV_discr, eventWeight);
-      h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass->Fill(jetPt, maxSubJet_IVFCSV_discr, eventWeight);
+      h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass->Fill(jetPt, subJet_minIVFCSV_discr, eventWeight);
+      h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass->Fill(jetPt, subJet_maxIVFCSV_discr, eventWeight);
+      h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass->Fill(jetPt, jet_HybridIVFCSV_discr, eventWeight);
 
       h2_JetPt_JetJP_BosonMatched_JetMass->Fill(jetPt, jet_JP_discr, eventWeight);
-      h2_JetPt_SubJetMinJP_BosonMatched_JetMass->Fill(jetPt, minSubJet_JP_discr, eventWeight);
-      h2_JetPt_SubJetMaxJP_BosonMatched_JetMass->Fill(jetPt, maxSubJet_JP_discr, eventWeight);
+      h2_JetPt_SubJetMinJP_BosonMatched_JetMass->Fill(jetPt, subJet_minJP_discr, eventWeight);
+      h2_JetPt_SubJetMaxJP_BosonMatched_JetMass->Fill(jetPt, subJet_maxJP_discr, eventWeight);
 
       h2_JetPt_JetJBP_BosonMatched_JetMass->Fill(jetPt, jet_JBP_discr, eventWeight);
-      h2_JetPt_SubJetMinJBP_BosonMatched_JetMass->Fill(jetPt, minSubJet_JBP_discr, eventWeight);
-      h2_JetPt_SubJetMaxJBP_BosonMatched_JetMass->Fill(jetPt, maxSubJet_JBP_discr, eventWeight);
+      h2_JetPt_SubJetMinJBP_BosonMatched_JetMass->Fill(jetPt, subJet_minJBP_discr, eventWeight);
+      h2_JetPt_SubJetMaxJBP_BosonMatched_JetMass->Fill(jetPt, subJet_maxJBP_discr, eventWeight);
 
       h2_JetPt_AK5JetCSV_BosonMatched_JetMass->Fill(jetPt, ak5Jet_CSV_discr, eventWeight);
       h2_JetPt_AK5JetMinCSV_BosonMatched_JetMass->Fill(jetPt, minAK5Jets_CSV_discr, eventWeight);
@@ -1478,27 +1539,27 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       if( jet_JBP_discr>1.33 )     h1_JetPt_BosonMatched_JetMass_JBPL->Fill(jetPt, eventWeight);
       if( jet_JBP_discr>2.55 )     h1_JetPt_BosonMatched_JetMass_JBPM->Fill(jetPt, eventWeight);
 
-      if( minSubJet_CSV_discr>0.244 )
+      if( subJet_minCSV_discr>0.244 )
       {
         h1_JetPt_BosonMatched_JetMass_SubJetMinCSVL->Fill(jetPt, eventWeight);
         if( bHadronMatchSubjet1 != genParticles->end() && bHadronMatchSubjet2 != genParticles->end() )
           h2_JetPt_SameMatchedBhadron_BosonMatched_JetMass_SubJetMinCSVL->Fill(jetPt, ( bHadronMatchSubjet1 == bHadronMatchSubjet2 ? 1. : 0. ), eventWeight);
       }
-      if( maxSubJet_CSV_discr>0.244 )    h1_JetPt_BosonMatched_JetMass_SubJetMaxCSVL->Fill(jetPt, eventWeight);
-      if( minSubJet_CSV_discr>0.679 )    h1_JetPt_BosonMatched_JetMass_SubJetMinCSVM->Fill(jetPt, eventWeight);
-      if( maxSubJet_CSV_discr>0.679 )    h1_JetPt_BosonMatched_JetMass_SubJetMaxCSVM->Fill(jetPt, eventWeight);
-      if( minSubJet_IVFCSV_discr>0.244 ) h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVL->Fill(jetPt, eventWeight);
-      if( maxSubJet_IVFCSV_discr>0.244 ) h1_JetPt_BosonMatched_JetMass_SubJetMaxIVFCSVL->Fill(jetPt, eventWeight);
-      if( minSubJet_IVFCSV_discr>0.679 ) h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVM->Fill(jetPt, eventWeight);
-      if( maxSubJet_IVFCSV_discr>0.679 ) h1_JetPt_BosonMatched_JetMass_SubJetMaxIVFCSVM->Fill(jetPt, eventWeight);
-      if( minSubJet_JP_discr>0.275 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJPL->Fill(jetPt, eventWeight);
-      if( maxSubJet_JP_discr>0.275 )     h1_JetPt_BosonMatched_JetMass_SubJetMaxJPL->Fill(jetPt, eventWeight);
-      if( minSubJet_JP_discr>0.545 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJPM->Fill(jetPt, eventWeight);
-      if( maxSubJet_JP_discr>0.545 )     h1_JetPt_BosonMatched_JetMass_SubJetMaxJPM->Fill(jetPt, eventWeight);
-      if( minSubJet_JBP_discr>1.33 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJBPL->Fill(jetPt, eventWeight);
-      if( maxSubJet_JBP_discr>1.33 )     h1_JetPt_BosonMatched_JetMass_SubJetMaxJBPL->Fill(jetPt, eventWeight);
-      if( minSubJet_JBP_discr>2.55 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJBPM->Fill(jetPt, eventWeight);
-      if( maxSubJet_JBP_discr>2.55 )     h1_JetPt_BosonMatched_JetMass_SubJetMaxJBPM->Fill(jetPt, eventWeight);
+      if( subJet_maxCSV_discr>0.244 )    h1_JetPt_BosonMatched_JetMass_SubJetMaxCSVL->Fill(jetPt, eventWeight);
+      if( subJet_minCSV_discr>0.679 )    h1_JetPt_BosonMatched_JetMass_SubJetMinCSVM->Fill(jetPt, eventWeight);
+      if( subJet_maxCSV_discr>0.679 )    h1_JetPt_BosonMatched_JetMass_SubJetMaxCSVM->Fill(jetPt, eventWeight);
+      if( subJet_minIVFCSV_discr>0.244 ) h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVL->Fill(jetPt, eventWeight);
+      if( subJet_maxIVFCSV_discr>0.244 ) h1_JetPt_BosonMatched_JetMass_SubJetMaxIVFCSVL->Fill(jetPt, eventWeight);
+      if( subJet_minIVFCSV_discr>0.679 ) h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVM->Fill(jetPt, eventWeight);
+      if( subJet_maxIVFCSV_discr>0.679 ) h1_JetPt_BosonMatched_JetMass_SubJetMaxIVFCSVM->Fill(jetPt, eventWeight);
+      if( subJet_minJP_discr>0.275 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJPL->Fill(jetPt, eventWeight);
+      if( subJet_maxJP_discr>0.275 )     h1_JetPt_BosonMatched_JetMass_SubJetMaxJPL->Fill(jetPt, eventWeight);
+      if( subJet_minJP_discr>0.545 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJPM->Fill(jetPt, eventWeight);
+      if( subJet_maxJP_discr>0.545 )     h1_JetPt_BosonMatched_JetMass_SubJetMaxJPM->Fill(jetPt, eventWeight);
+      if( subJet_minJBP_discr>1.33 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJBPL->Fill(jetPt, eventWeight);
+      if( subJet_maxJBP_discr>1.33 )     h1_JetPt_BosonMatched_JetMass_SubJetMaxJBPL->Fill(jetPt, eventWeight);
+      if( subJet_minJBP_discr>2.55 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJBPM->Fill(jetPt, eventWeight);
+      if( subJet_maxJBP_discr>2.55 )     h1_JetPt_BosonMatched_JetMass_SubJetMaxJBPM->Fill(jetPt, eventWeight);
       if( jet_DoubleB_discr>0. )         h1_JetPt_BosonMatched_JetMass_DoubleB->Fill(jetPt, eventWeight);
 
       if(dRsubjets>=0. && dRsubjets<0.2)
@@ -1584,8 +1645,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       //h2_JetMass_nTracks_Pt[suffix]->Fill(jetMass, nTracks, eventWeight);
       //h2_JetMass_nSelectedTracks_Pt[suffix]->Fill(jetMass, nSelectedTracks, eventWeight);
       //h2_JetMass_tau2tau1_Pt[suffix]->Fill(jetMass, tau2overtau1, eventWeight);
-      //h2_JetMass_SubJetMinCSV_Pt[suffix]->Fill(jetMass, minSubJet_CSV_discr, eventWeight);
-      //h2_JetMass_SubJetMaxCSV_Pt[suffix]->Fill(jetMass, maxSubJet_CSV_discr, eventWeight);
+      //h2_JetMass_SubJetMinCSV_Pt[suffix]->Fill(jetMass, subJet_minCSV_discr, eventWeight);
+      //h2_JetMass_SubJetMaxCSV_Pt[suffix]->Fill(jetMass, subJet_maxCSV_discr, eventWeight);
       //h2_JetMass_TrackJetWidth_Pt[suffix]->Fill(jetMass, trackJetWidth, eventWeight);
       //h2_JetMass_SelectedTrackJetWidth_Pt[suffix]->Fill(jetMass, selectedTrackJetWidth, eventWeight);
       //h2_JetMass_maxdRTracks_Pt[suffix]->Fill(jetMass, maxdRTracks, eventWeight);
@@ -1594,9 +1655,9 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       //h2_nTracks_tau2tau1_Pt[suffix]->Fill(nTracks, tau2overtau1, eventWeight);
       //h2_nSelectedTracks_tau2tau1_Pt[suffix]->Fill(nSelectedTracks, tau2overtau1, eventWeight);
 
-      //h2_nTracks_SubJetMinCSV_Pt[suffix]->Fill(nTracks, minSubJet_CSV_discr, eventWeight);
-      //h2_nSelectedTracks_SubJetMinCSV_Pt[suffix]->Fill(nSelectedTracks, minSubJet_CSV_discr, eventWeight);
-      //h2_tau2tau1_SubJetMinCSV_Pt[suffix]->Fill(tau2overtau1, minSubJet_CSV_discr, eventWeight);
+      //h2_nTracks_SubJetMinCSV_Pt[suffix]->Fill(nTracks, subJet_minCSV_discr, eventWeight);
+      //h2_nSelectedTracks_SubJetMinCSV_Pt[suffix]->Fill(nSelectedTracks, subJet_minCSV_discr, eventWeight);
+      //h2_tau2tau1_SubJetMinCSV_Pt[suffix]->Fill(tau2overtau1, subJet_minCSV_discr, eventWeight);
       for(unsigned i=0; i<jetPtBins; ++i)
       {
         if( jetPt>(jetPtMin + jetPtBinWidth*i) && jetPt<=(jetPtMin + jetPtBinWidth*(i+1)) )
@@ -1609,8 +1670,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
           //h2_JetMass_nTracks_Pt[suffix]->Fill(jetMass, nTracks, eventWeight);
           //h2_JetMass_nSelectedTracks_Pt[suffix]->Fill(jetMass, nSelectedTracks, eventWeight);
           //h2_JetMass_tau2tau1_Pt[suffix]->Fill(jetMass, tau2overtau1, eventWeight);
-          //h2_JetMass_SubJetMinCSV_Pt[suffix]->Fill(jetMass, minSubJet_CSV_discr, eventWeight);
-          //h2_JetMass_SubJetMaxCSV_Pt[suffix]->Fill(jetMass, maxSubJet_CSV_discr, eventWeight);
+          //h2_JetMass_SubJetMinCSV_Pt[suffix]->Fill(jetMass, subJet_minCSV_discr, eventWeight);
+          //h2_JetMass_SubJetMaxCSV_Pt[suffix]->Fill(jetMass, subJet_maxCSV_discr, eventWeight);
           //h2_JetMass_TrackJetWidth_Pt[suffix]->Fill(jetMass, trackJetWidth, eventWeight);
           //h2_JetMass_SelectedTrackJetWidth_Pt[suffix]->Fill(jetMass, selectedTrackJetWidth, eventWeight);
           //h2_JetMass_maxdRTracks_Pt[suffix]->Fill(jetMass, maxdRTracks, eventWeight);
@@ -1619,9 +1680,9 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
           //h2_nTracks_tau2tau1_Pt[suffix]->Fill(nTracks, tau2overtau1, eventWeight);
           //h2_nSelectedTracks_tau2tau1_Pt[suffix]->Fill(nSelectedTracks, tau2overtau1, eventWeight);
 
-          //h2_nTracks_SubJetMinCSV_Pt[suffix]->Fill(nTracks, minSubJet_CSV_discr, eventWeight);
-          //h2_nSelectedTracks_SubJetMinCSV_Pt[suffix]->Fill(nSelectedTracks, minSubJet_CSV_discr, eventWeight);
-          //h2_tau2tau1_SubJetMinCSV_Pt[suffix]->Fill(tau2overtau1, minSubJet_CSV_discr, eventWeight);
+          //h2_nTracks_SubJetMinCSV_Pt[suffix]->Fill(nTracks, subJet_minCSV_discr, eventWeight);
+          //h2_nSelectedTracks_SubJetMinCSV_Pt[suffix]->Fill(nSelectedTracks, subJet_minCSV_discr, eventWeight);
+          //h2_tau2tau1_SubJetMinCSV_Pt[suffix]->Fill(tau2overtau1, subJet_minCSV_discr, eventWeight);
         }
       }
       if( jetPt>(jetPtMin+jetPtBinWidth*jetPtBins))
@@ -1634,8 +1695,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         //h2_JetMass_nTracks_Pt[suffix]->Fill(jetMass, nTracks, eventWeight);
         //h2_JetMass_nSelectedTracks_Pt[suffix]->Fill(jetMass, nSelectedTracks, eventWeight);
         //h2_JetMass_tau2tau1_Pt[suffix]->Fill(jetMass, tau2overtau1, eventWeight);
-        //h2_JetMass_SubJetMinCSV_Pt[suffix]->Fill(jetMass, minSubJet_CSV_discr, eventWeight);
-        //h2_JetMass_SubJetMaxCSV_Pt[suffix]->Fill(jetMass, maxSubJet_CSV_discr, eventWeight);
+        //h2_JetMass_SubJetMinCSV_Pt[suffix]->Fill(jetMass, subJet_minCSV_discr, eventWeight);
+        //h2_JetMass_SubJetMaxCSV_Pt[suffix]->Fill(jetMass, subJet_maxCSV_discr, eventWeight);
         //h2_JetMass_TrackJetWidth_Pt[suffix]->Fill(jetMass, trackJetWidth, eventWeight);
         //h2_JetMass_SelectedTrackJetWidth_Pt[suffix]->Fill(jetMass, selectedTrackJetWidth, eventWeight);
         //h2_JetMass_maxdRTracks_Pt[suffix]->Fill(jetMass, maxdRTracks, eventWeight);
@@ -1644,9 +1705,9 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         //h2_nTracks_tau2tau1_Pt[suffix]->Fill(nTracks, tau2overtau1, eventWeight);
         //h2_nSelectedTracks_tau2tau1_Pt[suffix]->Fill(nSelectedTracks, tau2overtau1, eventWeight);
 
-        //h2_nTracks_SubJetMinCSV_Pt[suffix]->Fill(nTracks, minSubJet_CSV_discr, eventWeight);
-        //h2_nSelectedTracks_SubJetMinCSV_Pt[suffix]->Fill(nSelectedTracks, minSubJet_CSV_discr, eventWeight);
-        //h2_tau2tau1_SubJetMinCSV_Pt[suffix]->Fill(tau2overtau1, minSubJet_CSV_discr, eventWeight);
+        //h2_nTracks_SubJetMinCSV_Pt[suffix]->Fill(nTracks, subJet_minCSV_discr, eventWeight);
+        //h2_nSelectedTracks_SubJetMinCSV_Pt[suffix]->Fill(nSelectedTracks, subJet_minCSV_discr, eventWeight);
+        //h2_tau2tau1_SubJetMinCSV_Pt[suffix]->Fill(tau2overtau1, subJet_minCSV_discr, eventWeight);
       }
 
       // mass drop
