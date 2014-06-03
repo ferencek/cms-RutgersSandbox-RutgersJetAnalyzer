@@ -1077,14 +1077,14 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         }
 
         if( subjets.size()<2 )
-          edm::LogError("TooFewSubjets") << "Less than two subjets (" << subjets.size() << ") found.";
+          edm::LogWarning("TooFewSubjets") << "Less than two subjets (" << subjets.size() << ") found.";
         else
         {
           if( subJetMode=="Kt" || subJetMode=="Pruned" )
           {
             if( subjets.size()>2 )
             {
-              edm::LogError("TooManySubjets") << "More than two subjets found. Will take the two subjets closest to the jet axis.";
+              edm::LogWarning("TooManySubjets") << "More than two subjets found. Will take the two subjets closest to the jet axis.";
               std::sort(subjets.begin(), subjets.end(), orderBydR(&(*it)));
               subjets.erase(subjets.begin()+2,subjets.end());
               //for(unsigned i=0; i<subjets.size(); ++i)
