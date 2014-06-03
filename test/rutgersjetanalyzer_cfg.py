@@ -970,6 +970,7 @@ if options.doBTagging:
     process.secondaryVertexTagInfosAOD.trackSelection.jetDeltaRMax = cms.double(options.jetRadius)   # default is 0.3
     process.secondaryVertexTagInfosAOD.vertexCuts.maxDeltaRToJetAxis = cms.double(options.jetRadius) # default is 0.5
     # Set the jet-SV dR to the jet radius
+    process.inclusiveSecondaryVertexFinderTagInfosAOD.vertexCuts.maxDeltaRToJetAxis = cms.double(options.jetRadius) # default is 0.5
     process.inclusiveSecondaryVertexFinderTagInfosAOD.extSVDeltaRToJet = cms.double(options.jetRadius) # default is 0.3
     # Set the JP track dR cut to the jet radius
     process.jetProbabilityCA8 = process.jetProbability.clone( deltaR = cms.double(options.jetRadius) ) # default is 0.3
