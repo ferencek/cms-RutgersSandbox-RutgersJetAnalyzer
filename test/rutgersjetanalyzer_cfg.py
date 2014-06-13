@@ -127,6 +127,11 @@ options.register('useSVMomentum', False,
     VarParsing.varType.bool,
     "Use SV momentum"
 )
+options.register('useRadionCuts', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use cuts optimized for Radion samples"
+)
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
 
@@ -191,15 +196,9 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(options
 ## Input files
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        # 'file:patTuple_PF2PAT_v2.root'
-        # 'file:/cms/ferencek/store/ferencek/WWtoAnything_ptmin500_TuneZ2Star_8TeV-pythia6-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1_PATTuple_v2/6950c4b6452599a829ed09f6192c8cf5/patTuple_PF2PAT_v2_1_2_NZA.root'
-        'file:/cms/ferencek/store/skaplan/BprimeBprimeToBHBHinc_M-1000_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1_PATTuple_v2/6950c4b6452599a829ed09f6192c8cf5/patTuple_PF2PAT_v2_1_1_bnp.root'
-        #'file:/cms/ferencek/store/skaplan/BprimeBprimeToBHBHinc_M-1500_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1_PATTuple_v2/6950c4b6452599a829ed09f6192c8cf5/patTuple_PF2PAT_v2_1_1_djM.root'
-        #'file:/cms/ferencek/store/ferencek/TprimeToBWinc_M-1000_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1_PATTuple_v2/6950c4b6452599a829ed09f6192c8cf5/patTuple_PF2PAT_v2_1_1_9ZZ.root'
-        #'file:/cms/ferencek/store/ferencek/BprimeBprimeToBZBZinc_M-1200_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1_PATTuple_v2/6950c4b6452599a829ed09f6192c8cf5/patTuple_PF2PAT_v2_1_1_vSQ.root'
-        #'file:/cms/ferencek/store/ferencek/TprimeToTHinc_M-1700_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1_PATTuple_v2/6950c4b6452599a829ed09f6192c8cf5/patTuple_PF2PAT_v2_1_1_gMe.root'
-        #'file:/cms/ferencek/store/ferencek/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1_PATTuple_v2/6950c4b6452599a829ed09f6192c8cf5/patTuple_PF2PAT_v2_1_1_mRj.root'
-        #'file:/cms/ferencek/store/ferencek/RadionToHHTo4B_M-1500_TuneZ2star_8TeV-nm-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1_PATTuple_v2/6950c4b6452599a829ed09f6192c8cf5/patTuple_PF2PAT_v2_1_1_fdQ.root'
+        # /RadionToHH_4b_M-600_TuneZ2star_8TeV-Madgraph_pythia6/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+        'root://cmsxrootd-site.fnal.gov//store/user/ferencek/noreplica/RadionToHH_4b_M-600_TuneZ2star_8TeV-Madgraph_pythia6/Summer12_DR53X-PU_S10_START53_V19-v1_PATTuple_v3/patTuple_PF2PAT_v3_1_1_jHR.root'
+        #'file:/cms/ferencek/store/ferencek/RadionToHH_4b_M-600_TuneZ2star_8TeV-Madgraph_pythia6/Summer12_DR53X-PU_S10_START53_V19-v1_PATTuple_v3/patTuple_PF2PAT_v3_1_1_jHR.root'
     )
 )
 # If using external input files
@@ -994,6 +993,10 @@ for m in getattr(process,'jetAnalyzerSequence').moduleNames():
         setattr( getattr(process,m), 'ApplyBosonIsolation', cms.bool(False) )
     if options.useEventWeight:
         setattr( getattr(process,m), 'UseEventWeight', cms.bool(True) )
+    if options.useRadionCuts:
+        setattr( getattr(process,m), 'JetPtMin',   cms.double(200.) )
+        setattr( getattr(process,m), 'JetMassMin', cms.double(90.) )
+        setattr( getattr(process,m), 'JetMassMax', cms.double(150.) )
 
 #-------------------------------------
 ## Path definition
