@@ -25,7 +25,8 @@ Options:
   -t CRAB_CFG_TEMPLATE, --crab_cfg_template=CRAB_CFG_TEMPLATE
                         CRAB configuration file template
   -n, --no_creation     Create the necessary configuration files and skip the
-                        job creation (This parameter is optional)
+                        creation of CRAB jobs (This parameter is optional)
+  --fnal                This switch is mandatory for storing output at FNAL
 
 The -w (--main_workdir) parameter defines the name of the main working directory, the -d (--dataset_list)
 parameter specifies the location of a text file containing a list of datasets to be processed, the -c (--cmssw_cfg)
