@@ -938,10 +938,172 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       if( !isRightFlavor ) continue;
 
 
+      // find a matching groomed jet
+      bool groomedBasicJetMatchFound = false;
+      PatJetCollection::const_iterator groomedBasicJetMatch;
+      // try to find matching groomed fat jet
+      double dR = jetRadius;
+      for(PatJetCollection::const_iterator gbjIt = groomedBasicJets->begin(); gbjIt != groomedBasicJets->end(); ++gbjIt)
+      {
+        double dR_temp = reco::deltaR( it->p4(), gbjIt->p4() );
+        if( dR_temp < dR )
+        {
+          dR = dR_temp;
+          groomedBasicJetMatch = gbjIt;
+          groomedBasicJetMatchFound = true;
+        }
+      }
+      // vector of pointers to subjets
+      std::vector<const pat::Jet*> subjets;
+      if( useSubJets )
+      {
+        //std::cout << "number of subjets: " << groomedBasicJetMatch->numberOfDaughters() << std::endl;
+        //std::cout << "jet pt: " << it->correctedJet("Uncorrected").p4().pt() << " eta=" << it->correctedJet("Uncorrected").p4().eta() << " phi=" << it->correctedJet("Uncorrected").p4().phi() << " nd=" << it->numberOfDaughters() << std::endl;
+        //std::cout << "groomed basic jet pt: " << groomedBasicJetMatch->p4().pt() << " eta=" << groomedBasicJetMatch->p4().eta() << " phi=" << groomedBasicJetMatch->p4().phi() << std::endl;
+        if ( groomedBasicJetMatchFound )
+        {
+          for(unsigned d=0; d<groomedBasicJetMatch->numberOfDaughters(); ++d)
+          {
+            //std::cout << "subjet " << d << ": pt=" << groomedBasicJetMatch->daughter(d)->p4().pt()  << " eta=" << groomedBasicJetMatch->daughter(d)->p4().eta()  << " phi=" << groomedBasicJetMatch->daughter(d)->p4().phi() << std::endl;
+            const reco::Candidate *subjet =  groomedBasicJetMatch->daughter(d);
+            const pat::Jet *patsubjet = dynamic_cast<const pat::Jet*>(subjet);
+            subjets.push_back(patsubjet);
+          }
+        }
+
+        if( subjets.size()<2 )
+          edm::LogWarning("TooFewSubjets") << "Less than two subjets (" << subjets.size() << ") found.";
+        else
+        {
+          if( subJetMode=="Kt" || subJetMode=="Pruned" )
+          {
+            if( subjets.size()>2 )
+            {
+              edm::LogWarning("TooManySubjets") << "More than two subjets found. Will take the two subjets closest to the jet axis.";
+              std::sort(subjets.begin(), subjets.end(), orderBydR(&(*it)));
+              subjets.erase(subjets.begin()+2,subjets.end());
+              //for(unsigned i=0; i<subjets.size(); ++i)
+                //std::cout << "dR(jet,subjet) for subjet" << i << ": " << reco::deltaR( it->p4(), subjets.at(i)->p4() ) << std::endl;
+            }
+            // sort subjets by uncorrected Pt
+            std::sort(subjets.begin(), subjets.end(), orderByPt("Uncorrected"));
+            //for(unsigned i=0; i<subjets.size(); ++i)
+              //std::cout << "Uncorrected Pt for subjet" << i << ": " << subjets.at(i)->correctedJet("Uncorrected").pt() << std::endl;
+          }
+          else if( subJetMode=="Filtered" )
+          {
+            // sort subjets by uncorrected Pt
+            std::sort(subjets.begin(), subjets.end(), orderByPt("Uncorrected"));
+            //for(unsigned i=0; i<subjets.size(); ++i)
+              //std::cout << "Uncorrected Pt for subjet" << i << ": " << subjets.at(i)->correctedJet("Uncorrected").pt() << std::endl;
+          }
+          else
+            edm::LogError("IllegalSubJetMode") << "Allowed subjet modes are Kt, Pruned, and Filtered.";
+        }
+      }
+
+      // vector of pointers to matching AK5 jets (matching radius is 0.6)
+      std::vector<const pat::Jet*> matchedAK5Jets;
+      if( useAK5Jets )
+      {
+        for(PatJetCollection::const_iterator jIt = ak5Jets->begin(); jIt != ak5Jets->end(); ++jIt)
+        {
+          double dR_temp = reco::deltaR( it->p4(), jIt->p4() );
+          if( dR_temp < 0.6 ) matchedAK5Jets.push_back(&(*jIt));
+        }
+      }
+      // sort matched AK5 jets by increasing b-tag discriminator
+      std::vector<unsigned> sortedMatchedAK5JetsIdx;
+      if( matchedAK5Jets.size()>1 )
+      {
+        std::multimap<double, unsigned> sortedMatchedAK5Jets;
+        for(unsigned i = 0; i<matchedAK5Jets.size(); ++i)
+          sortedMatchedAK5Jets.insert(std::make_pair(matchedAK5Jets.at(i)->bDiscriminator("combinedSecondaryVertexBJetTags"), i));
+
+        for(std::multimap<double, unsigned>::const_iterator it = sortedMatchedAK5Jets.begin(); it != sortedMatchedAK5Jets.end(); ++it)
+          sortedMatchedAK5JetsIdx.push_back(it->second);
+      }
+      else if (matchedAK5Jets.size()==1 )
+        sortedMatchedAK5JetsIdx.push_back(0);
+
+      // Determine CSV vertex types for the jet and its subjets
+      // Vertex types defined in DataFormats/BTauReco/interface/VertexTypes.h)
+      //-----------------------------------------------------------
+      /*
+      * enum VertexType {RecoVertex=0, PseudoVertex=1, NoVertex=2, UndefVertex=99 };
+      *
+      * Type of secondary vertex found in jet:
+      *  - RecoVertex   : a secondary vertex has been fitted from
+      *                   a selection of tracks
+      *  - PseudoVertex : no RecoVertex has been found but tracks
+      *                   with significant impact parameter could be
+      *                   combined to a "pseudo" vertex
+      *  - NoVertex     : neither of the above attemps were successfull
+      *  - NotDefined   : if anything went wrong, set to this value
+      */
+      //-----------------------------------------------------------
+      int jet_CSV_VtxType = -1, jet_IVFCSV_VtxType = -1;
+      // Jet CSV
+      std::vector<const reco::BaseTagInfo*>  baseTagInfosJetCSV;
+      JetTagComputer::TagInfoHelper helperJetCSV(baseTagInfosJetCSV);
+      baseTagInfosJetCSV.push_back( it->tagInfoTrackIP("impactParameter") );
+      baseTagInfosJetCSV.push_back( it->tagInfoSecondaryVertex("secondaryVertex") );
+      // Jet CSV TaggingVariables
+      reco::TaggingVariableList varsJetCSV = computer->taggingVariables(helperJetCSV);
+      if(varsJetCSV.checkTag(reco::btau::vertexCategory)) jet_CSV_VtxType = int(varsJetCSV.get(reco::btau::vertexCategory));
+      // Jet IVFCSV
+      std::vector<const reco::BaseTagInfo*>  baseTagInfosJetIVFCSV;
+      JetTagComputer::TagInfoHelper helperJetIVFCSV(baseTagInfosJetIVFCSV);
+      baseTagInfosJetIVFCSV.push_back( it->tagInfoTrackIP("impactParameter") );
+      baseTagInfosJetIVFCSV.push_back( it->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
+      // Jet IVFCSV TaggingVariables
+      reco::TaggingVariableList varsJetIVFCSV = computer->taggingVariables(helperJetIVFCSV);
+      if(varsJetIVFCSV.checkTag(reco::btau::vertexCategory)) jet_IVFCSV_VtxType = int(varsJetIVFCSV.get(reco::btau::vertexCategory));
+      //std::cout << jet_CSV_VtxType << " " << jet_IVFCSV_VtxType << std::endl;
+
+      int subjet1_CSV_VtxType = -1, subjet2_CSV_VtxType = -1, subjet1_IVFCSV_VtxType = -1, subjet2_IVFCSV_VtxType = -1;
+      if( subjets.size()>1 )
+      {
+        // SubJet1 CSV
+        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1CSV;
+        JetTagComputer::TagInfoHelper helperSubJet1CSV(baseTagInfosSubJet1CSV);
+        baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
+        baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("secondaryVertex") );
+        // SubJet1 CSV TaggingVariables
+        reco::TaggingVariableList varsSubJet1CSV = computer->taggingVariables(helperSubJet1CSV);
+        if(varsSubJet1CSV.checkTag(reco::btau::vertexCategory)) subjet1_CSV_VtxType = int(varsSubJet1CSV.get(reco::btau::vertexCategory));
+        // SubJet2 CSV
+        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2CSV;
+        JetTagComputer::TagInfoHelper helperSubJet2CSV(baseTagInfosSubJet2CSV);
+        baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
+        baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("secondaryVertex") );
+        // SubJet2 CSV TaggingVariables
+        reco::TaggingVariableList varsSubJet2CSV = computer->taggingVariables(helperSubJet2CSV);
+        if(varsSubJet2CSV.checkTag(reco::btau::vertexCategory)) subjet2_CSV_VtxType = int(varsSubJet2CSV.get(reco::btau::vertexCategory));
+        // SubJet1 IVFCSV
+        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1IVFCSV;
+        JetTagComputer::TagInfoHelper helperSubJet1IVFCSV(baseTagInfosSubJet1IVFCSV);
+        baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
+        baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
+        // SubJet1 IVFCSV TaggingVariables
+        reco::TaggingVariableList varsSubJet1IVFCSV = computer->taggingVariables(helperSubJet1IVFCSV);
+        if(varsSubJet1IVFCSV.checkTag(reco::btau::vertexCategory)) subjet1_IVFCSV_VtxType = int(varsSubJet1IVFCSV.get(reco::btau::vertexCategory));
+        // SubJet2 IVFCSV
+        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2IVFCSV;
+        JetTagComputer::TagInfoHelper helperSubJet2IVFCSV(baseTagInfosSubJet2IVFCSV);
+        baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
+        baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
+        // SubJet2 IVFCSV TaggingVariables
+        reco::TaggingVariableList varsSubJet2IVFCSV = computer->taggingVariables(helperSubJet2IVFCSV);
+        if(varsSubJet2IVFCSV.checkTag(reco::btau::vertexCategory)) subjet2_IVFCSV_VtxType = int(varsSubJet2IVFCSV.get(reco::btau::vertexCategory));
+      }
+      //std::cout << subjet1_CSV_VtxType << " " << subjet2_CSV_VtxType << " " << subjet1_IVFCSV_VtxType << " " << subjet2_IVFCSV_VtxType << std::endl;
+
+      // fill jet pT and eta histograms
       h1_JetPt->Fill(jetPt, eventWeight);
       h1_JetEta->Fill(it->eta(), eventWeight);
 
-
+      // get groomed jet mass
       double jetMass = it->userFloat("caPFJetsCHSPrunedMass");
 
       h2_JetPt_JetPtOverGenJetPt->Fill(jetPt, (it->genJet()!=0 ? jetPt/(it->genJet()->pt()) : -10.), eventWeight);
@@ -1017,96 +1179,6 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         suffix = Form("%.0ftoInf",(jetPtMin+jetPtBinWidth*jetPtBins));
         h2_nPV_JetMass_Pt[suffix]->Fill(nPV, jetMass, eventWeight);
       }
-
-
-      bool groomedBasicJetMatchFound = false;
-      PatJetCollection::const_iterator groomedBasicJetMatch;
-      // try to find matching groomed fat jet
-      double dR = jetRadius;
-      for(PatJetCollection::const_iterator gbjIt = groomedBasicJets->begin(); gbjIt != groomedBasicJets->end(); ++gbjIt)
-      {
-        double dR_temp = reco::deltaR( it->p4(), gbjIt->p4() );
-        if( dR_temp < dR )
-        {
-          dR = dR_temp;
-          groomedBasicJetMatch = gbjIt;
-          groomedBasicJetMatchFound = true;
-        }
-      }
-      // vector of pointers to subjets
-      std::vector<const pat::Jet*> subjets;
-      if( useSubJets )
-      {
-        //std::cout << "number of subjets: " << groomedBasicJetMatch->numberOfDaughters() << std::endl;
-        //std::cout << "jet pt: " << it->correctedJet("Uncorrected").p4().pt() << " eta=" << it->correctedJet("Uncorrected").p4().eta() << " phi=" << it->correctedJet("Uncorrected").p4().phi() << " nd=" << it->numberOfDaughters() << std::endl;
-        //std::cout << "groomed basic jet pt: " << groomedBasicJetMatch->p4().pt() << " eta=" << groomedBasicJetMatch->p4().eta() << " phi=" << groomedBasicJetMatch->p4().phi() << std::endl;
-        if ( groomedBasicJetMatchFound )
-        {
-          for(unsigned d=0; d<groomedBasicJetMatch->numberOfDaughters(); ++d)
-          {
-            //std::cout << "subjet " << d << ": pt=" << groomedBasicJetMatch->daughter(d)->p4().pt()  << " eta=" << groomedBasicJetMatch->daughter(d)->p4().eta()  << " phi=" << groomedBasicJetMatch->daughter(d)->p4().phi() << std::endl;
-            const reco::Candidate *subjet =  groomedBasicJetMatch->daughter(d);
-            const pat::Jet *patsubjet = dynamic_cast<const pat::Jet*>(subjet);
-            subjets.push_back(patsubjet);
-          }
-        }
-
-        if( subjets.size()<2 )
-          edm::LogWarning("TooFewSubjets") << "Less than two subjets (" << subjets.size() << ") found.";
-        else
-        {
-          if( subJetMode=="Kt" || subJetMode=="Pruned" )
-          {
-            if( subjets.size()>2 )
-            {
-              edm::LogWarning("TooManySubjets") << "More than two subjets found. Will take the two subjets closest to the jet axis.";
-              std::sort(subjets.begin(), subjets.end(), orderBydR(&(*it)));
-              subjets.erase(subjets.begin()+2,subjets.end());
-              //for(unsigned i=0; i<subjets.size(); ++i)
-                //std::cout << "dR(jet,subjet) for subjet" << i << ": " << reco::deltaR( it->p4(), subjets.at(i)->p4() ) << std::endl;
-            }
-            // sort subjets by uncorrected Pt
-            std::sort(subjets.begin(), subjets.end(), orderByPt("Uncorrected"));
-            //for(unsigned i=0; i<subjets.size(); ++i)
-              //std::cout << "Uncorrected Pt for subjet" << i << ": " << subjets.at(i)->correctedJet("Uncorrected").pt() << std::endl;
-          }
-          else if( subJetMode=="Filtered" )
-          {
-            // sort subjets by uncorrected Pt
-            std::sort(subjets.begin(), subjets.end(), orderByPt("Uncorrected"));
-            //for(unsigned i=0; i<subjets.size(); ++i)
-              //std::cout << "Uncorrected Pt for subjet" << i << ": " << subjets.at(i)->correctedJet("Uncorrected").pt() << std::endl;
-          }
-          else
-            edm::LogError("IllegalSubJetMode") << "Allowed subjet modes are Kt, Pruned, and Filtered.";
-        }
-      }
-
-
-      // vector of pointers to matching AK5 jets (matching radius is 0.6)
-      std::vector<const pat::Jet*> matchedAK5Jets;
-      if( useAK5Jets )
-      {
-        for(PatJetCollection::const_iterator jIt = ak5Jets->begin(); jIt != ak5Jets->end(); ++jIt)
-        {
-          double dR_temp = reco::deltaR( it->p4(), jIt->p4() );
-          if( dR_temp < 0.6 ) matchedAK5Jets.push_back(&(*jIt));
-        }
-      }
-      // sort matched AK5 jets by increasing b-tag discriminator
-      std::vector<unsigned> sortedMatchedAK5JetsIdx;
-      if( matchedAK5Jets.size()>1 )
-      {
-        std::multimap<double, unsigned> sortedMatchedAK5Jets;
-        for(unsigned i = 0; i<matchedAK5Jets.size(); ++i)
-          sortedMatchedAK5Jets.insert(std::make_pair(matchedAK5Jets.at(i)->bDiscriminator("combinedSecondaryVertexBJetTags"), i));
-
-        for(std::multimap<double, unsigned>::const_iterator it = sortedMatchedAK5Jets.begin(); it != sortedMatchedAK5Jets.end(); ++it)
-          sortedMatchedAK5JetsIdx.push_back(it->second);
-      }
-      else if (matchedAK5Jets.size()==1 )
-        sortedMatchedAK5JetsIdx.push_back(0);
-
 
       // find the closest b hadron to the fat jet, the two subjets, and the matched AK5 jets
       double mindRfatjet = 999., mindRsubjet1 = 999., mindRsubjet2 = 999., mindRak5jet = 999., mindRak5jet1 = 999., mindRak5jet2 = 999.;
@@ -1200,7 +1272,6 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       double subJet1_JP_discr = -999., subJet2_JP_discr = -999.;
       double subJet1_JBP_discr = -999., subJet2_JBP_discr = -999.;
       double ak5Jet_CSV_discr = -999., ak5Jet1_CSV_discr = -999., ak5Jet2_CSV_discr = -999.;
-      int subjet1_CSV_VtxType = -1, subjet2_CSV_VtxType = -1, subjet1_IVFCSV_VtxType = -1, subjet2_IVFCSV_VtxType = -1;
       if( subjets.size()>1 )
       {
         subJet1_CSV_discr = subjets.at(0)->bDiscriminator("combinedSecondaryVertexBJetTags");
@@ -1214,40 +1285,6 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
         subJet1_JBP_discr = subjets.at(0)->bDiscriminator("jetBProbabilityBJetTags");
         subJet2_JBP_discr = subjets.at(1)->bDiscriminator("jetBProbabilityBJetTags");
-
-        // Determine vertex types
-        // SubJet1 CSV
-        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1CSV;
-        JetTagComputer::TagInfoHelper helperSubJet1CSV(baseTagInfosSubJet1CSV);
-        baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
-        baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("secondaryVertex") );
-        // SubJet1 CSV TaggingVariables
-        reco::TaggingVariableList varsSubJet1CSV = computer->taggingVariables(helperSubJet1CSV);
-        if(varsSubJet1CSV.checkTag(reco::btau::vertexCategory)) subjet1_CSV_VtxType = int(varsSubJet1CSV.get(reco::btau::vertexCategory));
-        // SubJet2 CSV
-        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2CSV;
-        JetTagComputer::TagInfoHelper helperSubJet2CSV(baseTagInfosSubJet2CSV);
-        baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
-        baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("secondaryVertex") );
-        // SubJet2 CSV TaggingVariables
-        reco::TaggingVariableList varsSubJet2CSV = computer->taggingVariables(helperSubJet2CSV);
-        if(varsSubJet2CSV.checkTag(reco::btau::vertexCategory)) subjet2_CSV_VtxType = int(varsSubJet2CSV.get(reco::btau::vertexCategory));
-        // SubJet1 IVFCSV
-        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1IVFCSV;
-        JetTagComputer::TagInfoHelper helperSubJet1IVFCSV(baseTagInfosSubJet1IVFCSV);
-        baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
-        baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
-        // SubJet1 IVFCSV TaggingVariables
-        reco::TaggingVariableList varsSubJet1IVFCSV = computer->taggingVariables(helperSubJet1IVFCSV);
-        if(varsSubJet1IVFCSV.checkTag(reco::btau::vertexCategory)) subjet1_IVFCSV_VtxType = int(varsSubJet1IVFCSV.get(reco::btau::vertexCategory));
-        // SubJet2 IVFCSV
-        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2IVFCSV;
-        JetTagComputer::TagInfoHelper helperSubJet2IVFCSV(baseTagInfosSubJet2IVFCSV);
-        baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
-        baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
-        // SubJet2 IVFCSV TaggingVariables
-        reco::TaggingVariableList varsSubJet2IVFCSV = computer->taggingVariables(helperSubJet2IVFCSV);
-        if(varsSubJet2IVFCSV.checkTag(reco::btau::vertexCategory)) subjet2_IVFCSV_VtxType = int(varsSubJet2IVFCSV.get(reco::btau::vertexCategory));
       }
       if( matchedAK5Jets.size()>0 )
         ak5Jet_CSV_discr = matchedAK5Jets.at(sortedMatchedAK5JetsIdx.back())->bDiscriminator("combinedSecondaryVertexBJetTags");
@@ -1266,8 +1303,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       double subJet_maxJBP_discr = std::max(subJet1_JBP_discr, subJet2_JBP_discr);
       double minAK5Jets_CSV_discr = std::min(ak5Jet1_CSV_discr, ak5Jet2_CSV_discr);
       double jet_DoubleB_discr = it->bDiscriminator("doubleSecondaryVertexHighEffBJetTags");
-      // Vertex types defined in DataFormats/BTauReco/interface/VertexTypes.h
-      //std::cout << subjet1_CSV_VtxType << " " << subjet2_CSV_VtxType << " " << subjet1_IVFCSV_VtxType << " " << subjet2_IVFCSV_VtxType << std::endl;
+      // Define hybrid discriminator if both subjets belong to the NoVertex type
       double jet_HybridCSV_discr = ( (subjet1_CSV_VtxType == 2 && subjet2_CSV_VtxType == 2) ? jet_CSV_discr : subJet_minCSV_discr );
       double jet_HybridIVFCSV_discr = ( (subjet1_IVFCSV_VtxType == 2 && subjet2_IVFCSV_VtxType == 2) ? jet_IVFCSV_discr : subJet_minIVFCSV_discr );
 
