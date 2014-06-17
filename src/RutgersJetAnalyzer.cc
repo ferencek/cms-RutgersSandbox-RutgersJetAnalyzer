@@ -123,9 +123,7 @@ private:
     const bool             useUncorrMassForMassDrop;
     const bool             doJetFlavor;
     const std::vector<int> jetFlavorPdgIds;
-    const bool             useAltGSPbDef;
-    const bool             findGluonSplitting;
-    const bool             findMatrixElement;
+    const bool             useGSPFlavor;
     const bool             eventDisplayPrintout;
 
     edm::Service<TFileService> fs;
@@ -350,9 +348,7 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
   useUncorrMassForMassDrop( iConfig.exists("UseUncorrMassForMassDrop") ? iConfig.getParameter<bool>("UseUncorrMassForMassDrop") : true ),
   doJetFlavor(iConfig.getParameter<bool>("DoJetFlavor")),
   jetFlavorPdgIds(iConfig.getParameter<std::vector<int> >("JetFlavorPdgIds")),
-  useAltGSPbDef( iConfig.exists("UseAltGSPbDef") ? iConfig.getParameter<bool>("UseAltGSPbDef") : false ),
-  findGluonSplitting( iConfig.exists("FindGluonSplitting") ? iConfig.getParameter<bool>("FindGluonSplitting") : false ),
-  findMatrixElement( iConfig.exists("FindMatrixElement") ? iConfig.getParameter<bool>("FindMatrixElement") : false ),
+  useGSPFlavor( iConfig.exists("UseGSPFlavor") ? iConfig.getParameter<bool>("UseGSPFlavor") : true ),
   eventDisplayPrintout( iConfig.exists("EventDisplayPrintout") ? iConfig.getParameter<bool>("EventDisplayPrintout") : false )
 
 {
@@ -684,27 +680,6 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     // map to vectors of pointers to boson decay products
     std::map<const reco::GenParticle*,std::vector<const reco::Candidate*> > decayProducts;
 
-    bool isGluonSplitting = false;
-    bool isMatrixElement = false;
-    if( findGluonSplitting || findMatrixElement )
-    {
-      bool bFoundS3Quark = false;
-      bool bFoundS2Quark = false;
-      for(reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end(); ++it)
-      {
-        if( abs(it->pdgId()) == 5 && it->status()==3 ) bFoundS3Quark = true;
-        if( abs(it->pdgId()) == 5 && it->status()==2 ) { bFoundS2Quark = true; break; } // no need to continue looping after status=2 b quarks has been found
-      }
-      // if no status 3 b quark but status 2
-      if( (!bFoundS3Quark) && bFoundS2Quark) isGluonSplitting = true;
-      // if status 3 b quark found
-      if( bFoundS3Quark ) isMatrixElement = true;
-    }
-
-    // skip event if it does not pass the selection
-    if( (findGluonSplitting && !isGluonSplitting) || (findMatrixElement && !isMatrixElement) ) return;
-
-
     if( doBosonMatching )
     {
       int bPrimeCount = 0;
@@ -936,32 +911,14 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       {
         int jetFlavor = it->partonFlavour();
 
-        if( useAltGSPbDef ) // use alternative gluon splitting b-jet definition based on the number of b hadrons inside the jet cone
+        if( useGSPFlavor ) // use gluon splitting b-jet flavor based on the number of b hadrons inside the jet cone
         {
-          int nMatchedBHadrons = 0;
-          std::vector<const reco::GenParticle*> matchedBHadrons;
-          for(reco::GenParticleCollection::const_iterator gpIt = genParticles->begin(); gpIt != genParticles->end(); ++gpIt)
-          {
-            int id = abs(gpIt->pdgId());
-            // skip GenParticle if not b hadron
-            if ( !((id/100)%10 == 5 || (id/1000)%10 == 5) ) continue;
+          const reco::GenParticleRefVector & bHadrons = it->jetFlavourInfo().getbHadrons();
 
-            // check if any of daughters is also b hadron
-            bool hasBHadronDaughter = false;
-            for(unsigned i=0; i<gpIt->numberOfDaughters(); ++i)
-            {
-              int dId = abs(gpIt->daughter(i)->pdgId());
-              if ( (dId/100)%10 == 5 || (dId/1000)%10 == 5 ) { hasBHadronDaughter = true; break; }
-            }
-            if( hasBHadronDaughter ) continue; // skip excited b hadrons that have other b hadrons as daughters
-
-            if( reco::deltaR( it->p4(), gpIt->p4() ) < jetRadius ) { ++nMatchedBHadrons; matchedBHadrons.push_back(&(*gpIt)); }
-          }
-          //std::cout << "nMatchedBHadrons: " << nMatchedBHadrons << std::endl;
-          if( nMatchedBHadrons>=2 )
+          if( bHadrons.size()>=2 )
           {
             jetFlavor = 85; // custom jet flavor code for gluon splitting b jets
-            h2_JetPt_dRmatchedBhadrons_GSPbJets->Fill( jetPt, reco::deltaR( matchedBHadrons.at(0)->p4(), matchedBHadrons.at(1)->p4() ), eventWeight );
+            h2_JetPt_dRmatchedBhadrons_GSPbJets->Fill( jetPt, reco::deltaR( bHadrons.at(0)->p4(), bHadrons.at(1)->p4() ), eventWeight );
           }
         }
 
