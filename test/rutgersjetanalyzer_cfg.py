@@ -199,6 +199,13 @@ process.source = cms.Source("PoolSource",
         # /RadionToHH_4b_M-600_TuneZ2star_8TeV-Madgraph_pythia6/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
         'root://cmsxrootd-site.fnal.gov//store/user/ferencek/noreplica/RadionToHH_4b_M-600_TuneZ2star_8TeV-Madgraph_pythia6/Summer12_DR53X-PU_S10_START53_V19-v1_PATTuple_v3/patTuple_PF2PAT_v3_1_1_jHR.root'
         #'file:/cms/ferencek/store/ferencek/RadionToHH_4b_M-600_TuneZ2star_8TeV-Madgraph_pythia6/Summer12_DR53X-PU_S10_START53_V19-v1_PATTuple_v3/patTuple_PF2PAT_v3_1_1_jHR.root'
+
+        # /BprimeBprimeToBHBHinc_M-1000_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
+        #'root://cmsxrootd-site.fnal.gov//store/user/ferencek/noreplica/BprimeBprimeToBHBHinc_M-1000_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1_PATTuple_v3/patTuple_PF2PAT_v3_1_1_pex.root'
+        #'file:/cms/ferencek/store/ferencek/BprimeBprimeToBHBHinc_M-1000_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1_PATTuple_v3/patTuple_PF2PAT_v3_1_1_pex.root'
+
+        # /QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+        #'root://cmsxrootd-site.fnal.gov//store/user/ferencek/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1_PATTuple_v3/patTuple_PF2PAT_v3_1_1_4hf.root'
     )
 )
 # If using external input files
