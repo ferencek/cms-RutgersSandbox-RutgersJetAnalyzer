@@ -124,6 +124,8 @@ private:
     const bool             doJetFlavor;
     const std::vector<int> jetFlavorPdgIds;
     const bool             useGSPFlavor;
+    const bool             useVtxType;
+    const std::string      vtxType;
     const bool             eventDisplayPrintout;
 
     edm::Service<TFileService> fs;
@@ -349,6 +351,8 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
   doJetFlavor(iConfig.getParameter<bool>("DoJetFlavor")),
   jetFlavorPdgIds(iConfig.getParameter<std::vector<int> >("JetFlavorPdgIds")),
   useGSPFlavor( iConfig.exists("UseGSPFlavor") ? iConfig.getParameter<bool>("UseGSPFlavor") : true ),
+  useVtxType( iConfig.exists("UseVtxType") ? iConfig.getParameter<bool>("UseVtxType") : false ),
+  vtxType( iConfig.exists("VtxType") ? iConfig.getParameter<std::string>("VtxType") : "" ),
   eventDisplayPrintout( iConfig.exists("EventDisplayPrintout") ? iConfig.getParameter<bool>("EventDisplayPrintout") : false )
 
 {
@@ -1098,6 +1102,14 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         if(varsSubJet2IVFCSV.checkTag(reco::btau::vertexCategory)) subjet2_IVFCSV_VtxType = int(varsSubJet2IVFCSV.get(reco::btau::vertexCategory));
       }
       //std::cout << subjet1_CSV_VtxType << " " << subjet2_CSV_VtxType << " " << subjet1_IVFCSV_VtxType << " " << subjet2_IVFCSV_VtxType << std::endl;
+
+      // skip the jet if it does not belong to the requested vertex type
+      if( useVtxType )
+      {
+        if( vtxType=="RecoVertex" && !(jet_IVFCSV_VtxType==0 && subjet1_IVFCSV_VtxType==0 && subjet2_IVFCSV_VtxType==0) ) continue;
+        else if( vtxType=="PseudoVertex" && !(jet_IVFCSV_VtxType==1) ) continue;
+        else if( vtxType=="NoVertex" && !(jet_IVFCSV_VtxType==2 && (subjet1_IVFCSV_VtxType==2 || subjet1_IVFCSV_VtxType==-1) && (subjet2_IVFCSV_VtxType==2 || subjet2_IVFCSV_VtxType==-1)) ) continue;
+      }
 
       // fill jet pT and eta histograms
       h1_JetPt->Fill(jetPt, eventWeight);

@@ -132,6 +132,11 @@ options.register('useRadionCuts', False,
     VarParsing.varType.bool,
     "Use cuts optimized for Radion samples"
 )
+options.register('useVtxTypes', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use vertex types to select jets"
+)
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
 
@@ -916,6 +921,66 @@ process.jetAnalyzerSequence = cms.Sequence(
     + process.jetAnalyzerCAFatJets_KtBDRSFilteredSubjets
     + process.jetAnalyzerCAFatJets_KtSubjets
 )
+
+## If vertex types enabled
+if options.useVtxTypes:
+    ## RecoVertex
+    process.jetAnalyzerCAFatJets_PrunedSubjets_RecoVtx = process.jetAnalyzerCAFatJets_PrunedSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('RecoVertex')
+    )
+    process.jetAnalyzerCAFatJets_FilteredSubjets_RecoVtx = process.jetAnalyzerCAFatJets_FilteredSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('RecoVertex')
+    )
+    process.jetAnalyzerCAFatJets_MDBDRSFilteredSubjets_RecoVtx = process.jetAnalyzerCAFatJets_MDBDRSFilteredSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('RecoVertex')
+    )
+    process.jetAnalyzerCAFatJets_KtBDRSFilteredSubjets_RecoVtx = process.jetAnalyzerCAFatJets_KtBDRSFilteredSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('RecoVertex')
+    )
+    process.jetAnalyzerCAFatJets_KtSubjets_RecoVtx = process.jetAnalyzerCAFatJets_KtSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('RecoVertex')
+    )
+    ## NoVertex
+    process.jetAnalyzerCAFatJets_PrunedSubjets_NoVtx = process.jetAnalyzerCAFatJets_PrunedSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('NoVertex')
+    )
+    process.jetAnalyzerCAFatJets_FilteredSubjets_NoVtx = process.jetAnalyzerCAFatJets_FilteredSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('NoVertex')
+    )
+    process.jetAnalyzerCAFatJets_MDBDRSFilteredSubjets_NoVtx = process.jetAnalyzerCAFatJets_MDBDRSFilteredSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('NoVertex')
+    )
+    process.jetAnalyzerCAFatJets_KtBDRSFilteredSubjets_NoVtx = process.jetAnalyzerCAFatJets_KtBDRSFilteredSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('NoVertex')
+    )
+    process.jetAnalyzerCAFatJets_KtSubjets_NoVtx = process.jetAnalyzerCAFatJets_KtSubjets.clone(
+        UseVtxType = cms.bool(True),
+        VtxType    = cms.string('NoVertex')
+    )
+    ## VtxType jet analyzer sequence
+    process.jetAnalyzerSequence_VtxType = cms.Sequence(
+        process.jetAnalyzerCAFatJets_PrunedSubjets_RecoVtx
+        + process.jetAnalyzerCAFatJets_FilteredSubjets_RecoVtx
+        + process.jetAnalyzerCAFatJets_MDBDRSFilteredSubjets_RecoVtx
+        + process.jetAnalyzerCAFatJets_KtBDRSFilteredSubjets_RecoVtx
+        + process.jetAnalyzerCAFatJets_KtSubjets_RecoVtx
+        + process.jetAnalyzerCAFatJets_PrunedSubjets_NoVtx
+        + process.jetAnalyzerCAFatJets_FilteredSubjets_NoVtx
+        + process.jetAnalyzerCAFatJets_MDBDRSFilteredSubjets_NoVtx
+        + process.jetAnalyzerCAFatJets_KtBDRSFilteredSubjets_NoVtx
+        + process.jetAnalyzerCAFatJets_KtSubjets_NoVtx
+    )
+    ## Combined jet analyzer sequence
+    process.jetAnalyzerSequence = cms.Sequence( process.jetAnalyzerSequence + process.jetAnalyzerSequence_VtxType )
 
 #-------------------------------------
 ## If using explicit jet-track association
