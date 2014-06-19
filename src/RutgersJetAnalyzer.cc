@@ -1276,7 +1276,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
       // get b-tag discriminators
       double jet_CSV_discr = it->bDiscriminator("combinedSecondaryVertexBJetTags");
-      double jet_IVFCSV_discr = it->bDiscriminator("combinedInclusiveSecondaryVertexBJetTags");
+      double jet_IVFCSV_discr = it->bDiscriminator("combinedSecondaryVertexV2BJetTags");
       double jet_JP_discr = it->bDiscriminator("jetProbabilityBJetTags");
       double jet_JBP_discr = it->bDiscriminator("jetBProbabilityBJetTags");
       double subJet1_CSV_discr = -999., subJet2_CSV_discr = -999.;
@@ -1289,8 +1289,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         subJet1_CSV_discr = subjets.at(0)->bDiscriminator("combinedSecondaryVertexBJetTags");
         subJet2_CSV_discr = subjets.at(1)->bDiscriminator("combinedSecondaryVertexBJetTags");
 
-        subJet1_IVFCSV_discr = subjets.at(0)->bDiscriminator("combinedInclusiveSecondaryVertexBJetTags");
-        subJet2_IVFCSV_discr = subjets.at(1)->bDiscriminator("combinedInclusiveSecondaryVertexBJetTags");
+        subJet1_IVFCSV_discr = subjets.at(0)->bDiscriminator("combinedSecondaryVertexV2BJetTags");
+        subJet2_IVFCSV_discr = subjets.at(1)->bDiscriminator("combinedSecondaryVertexV2BJetTags");
 
         subJet1_JP_discr = subjets.at(0)->bDiscriminator("jetProbabilityBJetTags");
         subJet2_JP_discr = subjets.at(1)->bDiscriminator("jetProbabilityBJetTags");
