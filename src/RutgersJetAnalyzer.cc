@@ -1315,9 +1315,16 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       double subJet_maxJBP_discr = std::max(subJet1_JBP_discr, subJet2_JBP_discr);
       double minAK5Jets_CSV_discr = std::min(ak5Jet1_CSV_discr, ak5Jet2_CSV_discr);
       double jet_DoubleB_discr = it->bDiscriminator("doubleSecondaryVertexHighEffBJetTags");
-      // Define hybrid discriminator if both subjets belong to the NoVertex type
-      double jet_HybridCSV_discr = ( (subjet1_CSV_VtxType == 2 && subjet2_CSV_VtxType == 2) ? jet_CSV_discr : subJet_minCSV_discr );
-      double jet_HybridIVFCSV_discr = ( (subjet1_IVFCSV_VtxType == 2 && subjet2_IVFCSV_VtxType == 2) ? jet_IVFCSV_discr : subJet_minIVFCSV_discr );
+      // Define hybrid CSV discriminator
+      double jet_HybridCSV_discr = subJet_minCSV_discr;
+      if( (subjet1_CSV_VtxType==2 || subjet1_CSV_VtxType==-1) && (subjet2_CSV_VtxType==2 || subjet2_CSV_VtxType==-1) ) jet_HybridCSV_discr = jet_CSV_discr;
+      else if( subjet1_CSV_VtxType==-1 && !(subjet2_CSV_VtxType==2 || subjet2_CSV_VtxType==-1) ) jet_HybridCSV_discr = ( jet_CSV_VtxType!=-1 ? std::min(jet_CSV_discr,subJet2_CSV_discr) : subJet2_CSV_discr );
+      else if( !(subjet1_CSV_VtxType==2 || subjet1_CSV_VtxType==-1) && subjet2_CSV_VtxType==-1 ) jet_HybridCSV_discr = ( jet_CSV_VtxType!=-1 ? std::min(jet_CSV_discr,subJet1_CSV_discr) : subJet1_CSV_discr );
+      // Define hybrid IVFCSV discriminator
+      double jet_HybridIVFCSV_discr = subJet_minIVFCSV_discr;
+      if( (subjet1_IVFCSV_VtxType==2 || subjet1_IVFCSV_VtxType==-1) && (subjet2_IVFCSV_VtxType==2 || subjet2_IVFCSV_VtxType==-1) ) jet_HybridIVFCSV_discr = jet_IVFCSV_discr;
+      else if( subjet1_IVFCSV_VtxType==-1 && !(subjet2_IVFCSV_VtxType==2 || subjet2_IVFCSV_VtxType==-1) ) jet_HybridIVFCSV_discr = ( jet_IVFCSV_VtxType!=-1 ? std::min(jet_IVFCSV_discr,subJet2_IVFCSV_discr) : subJet2_IVFCSV_discr );
+      else if( !(subjet1_IVFCSV_VtxType==2 || subjet1_IVFCSV_VtxType==-1) && subjet2_IVFCSV_VtxType==-1 ) jet_HybridIVFCSV_discr = ( jet_IVFCSV_VtxType!=-1 ? std::min(jet_IVFCSV_discr,subJet1_IVFCSV_discr) : subJet1_IVFCSV_discr );
 
       if( subJet_minCSV_discr>0.244 )
       {
