@@ -471,31 +471,31 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched = fs->make<TH2F>("h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
     h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched_JetMass",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
 
-    h1_JetCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetCSVDiscr_BosonMatched_JetMass",";Jet CSV Discr;",100,0.,1.);
-    h1_JetIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetIVFCSVDiscr_BosonMatched_JetMass",";Jet IVFCSV Discr;",100,0.,1.);
+    h1_JetCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetCSVDiscr_BosonMatched_JetMass",";Jet CSV Discr;",404,0.,1.01);
+    h1_JetIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetIVFCSVDiscr_BosonMatched_JetMass",";Jet IVFCSV Discr;",404,0.,1.01);
     h1_JetJPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetJPDiscr_BosonMatched_JetMass",";Jet JP Discr;",100,0.,2.);
     h1_JetJBPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetJBPDiscr_BosonMatched_JetMass",";Jet JBP Discr;",100,0.,10.);
-    h1_SubJetMinCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinCSVDiscr_BosonMatched_JetMass",";Subjet min CSV Discr;",100,0.,1.);
-    h1_SubJetMaxCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxCSVDiscr_BosonMatched_JetMass",";Subjet max CSV Discr;",100,0.,1.);
-    h1_JetHybridCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetHybridCSVDiscr_BosonMatched_JetMass",";Jet Hybrid CSV Discr;",100,0.,1.);
-    h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass",";Subjet min IVFCSV Discr;",100,0.,1.);
-    h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass",";Subjet max IVFCSV Discr;",100,0.,1.);
-    h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass",";Jet Hybrid IVFCSV Discr;",100,0.,1.);
+    h1_SubJetMinCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinCSVDiscr_BosonMatched_JetMass",";Subjet min CSV Discr;",404,0.,1.01);
+    h1_SubJetMaxCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxCSVDiscr_BosonMatched_JetMass",";Subjet max CSV Discr;",404,0.,1.01);
+    h1_JetHybridCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetHybridCSVDiscr_BosonMatched_JetMass",";Jet Hybrid CSV Discr;",404,0.,1.01);
+    h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass",";Subjet min IVFCSV Discr;",404,0.,1.01);
+    h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass",";Subjet max IVFCSV Discr;",404,0.,1.01);
+    h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass",";Jet Hybrid IVFCSV Discr;",404,0.,1.01);
     h1_SubJetMinJPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinJPDiscr_BosonMatched_JetMass",";Subjet min JP Discr;",100,0.,2.);
     h1_SubJetMaxJPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxJPDiscr_BosonMatched_JetMass",";Subjet max JP Discr;",100,0.,2.);
     h1_SubJetMinJBPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinJBPDiscr_BosonMatched_JetMass",";Subjet min JBP Discr;",100,0.,10.);
     h1_SubJetMaxJBPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxJBPDiscr_BosonMatched_JetMass",";Subjet max JBP Discr;",100,0.,10.);
     h1_JetDoubleBDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetDoubleBDiscr_BosonMatched_JetMass",";Jet DoubleB Discr;",100,0.,10.);
 
-    h2_JetPt_JetCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
-    h2_JetPt_SubJetMinCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet min CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
-    h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet max CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
-    h2_JetPt_JetHybridCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetHybridCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet Hybrid CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
+    h2_JetPt_JetCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
+    h2_JetPt_SubJetMinCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet min CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
+    h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet max CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
+    h2_JetPt_JetHybridCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetHybridCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet Hybrid CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
 
-    h2_JetPt_JetIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet IVFCSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
-    h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet min IVFCSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
-    h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet max IVFCSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
-    h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet Hybrid IVFCSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
+    h2_JetPt_JetIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet IVFCSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
+    h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet min IVFCSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
+    h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet max IVFCSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
+    h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet Hybrid IVFCSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
 
     h2_JetPt_JetJP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetJP_BosonMatched_JetMass",";p_{T} [GeV];Jet JP Discr",ptBins,ptMin,ptMax,100,0.,2.);
     h2_JetPt_SubJetMinJP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinJP_BosonMatched_JetMass",";p_{T} [GeV];Subjet min JP Discr",ptBins,ptMin,ptMax,100,0.,2.);
@@ -505,18 +505,18 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h2_JetPt_SubJetMinJBP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinJBP_BosonMatched_JetMass",";p_{T} [GeV];Subjet min JBP Discr",ptBins,ptMin,ptMax,100,0.,10.);
     h2_JetPt_SubJetMaxJBP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxJBP_BosonMatched_JetMass",";p_{T} [GeV];Subjet max JBP Discr",ptBins,ptMin,ptMax,100,0.,10.);
 
-    h2_JetPt_AK5JetCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_AK5JetCSV_BosonMatched_JetMass",";p_{T} [GeV];AK5 Jet CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
-    h2_JetPt_AK5JetMinCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_AK5JetMinCSV_BosonMatched_JetMass",";p_{T} [GeV];AK5 Jets min CSV Discr",ptBins,ptMin,ptMax,100,0.,1.);
+    h2_JetPt_AK5JetCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_AK5JetCSV_BosonMatched_JetMass",";p_{T} [GeV];AK5 Jet CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
+    h2_JetPt_AK5JetMinCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_AK5JetMinCSV_BosonMatched_JetMass",";p_{T} [GeV];AK5 Jets min CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
 
-    h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0to0p2   = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0to0p2",  ";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,1.,100,0.,1.);
-    h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p2to0p4 = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p2to0p4",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,1.,100,0.,1.);
-    h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p4to0p6 = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p4to0p6",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,1.,100,0.,1.);
-    h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p6to0p8 = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p6to0p8",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,1.,100,0.,1.);
+    h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0to0p2   = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0to0p2",  ";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
+    h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p2to0p4 = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p2to0p4",";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
+    h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p4to0p6 = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p4to0p6",";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
+    h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p6to0p8 = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p6to0p8",";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
 
-    h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0to0p2   = fs->make<TH2F>("h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0to0p2",  ";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,1.,100,0.,1.);
-    h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p2to0p4 = fs->make<TH2F>("h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p2to0p4",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,1.,100,0.,1.);
-    h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p4to0p6 = fs->make<TH2F>("h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p4to0p6",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,1.,100,0.,1.);
-    h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p6to0p8 = fs->make<TH2F>("h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p6to0p8",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,1.,100,0.,1.);
+    h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0to0p2   = fs->make<TH2F>("h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0to0p2",  ";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
+    h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p2to0p4 = fs->make<TH2F>("h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p2to0p4",";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
+    h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p4to0p6 = fs->make<TH2F>("h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p4to0p6",";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
+    h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p6to0p8 = fs->make<TH2F>("h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets0p6to0p8",";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
 
     h2_SubJet1JP_SubJet2JP_BosonMatched_JetMass_dRsubjets0to0p2   = fs->make<TH2F>("h2_SubJet1JP_SubJet2JP_BosonMatched_JetMass_dRsubjets0to0p2",  ";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,2.,100,0.,2.);
     h2_SubJet1JP_SubJet2JP_BosonMatched_JetMass_dRsubjets0p2to0p4 = fs->make<TH2F>("h2_SubJet1JP_SubJet2JP_BosonMatched_JetMass_dRsubjets0p2to0p4",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,2.,100,0.,2.);
