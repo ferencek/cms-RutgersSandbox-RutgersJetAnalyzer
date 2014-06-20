@@ -18,43 +18,88 @@
 using namespace std;
 
 
-TGraph* getEfficiencyCurve(const string& fFileS1, const string& fFileB1,const string& fPlot,const double fXMin, const double fXMax)
+TGraph* getEfficiencyCurve(const string& fFileS1, const string& fFileB1,const string& fPlot1,const string& fPlot2,const double fXMin, const double fXMax)
 {
   //get files and histograms
   TFile *file_S1  = new TFile(fFileS1.c_str());
   TFile *file_B1 = new TFile(fFileB1.c_str());
 
-  TH2 *h2_S_1 = (TH2*)file_S1->Get(fPlot.c_str());
-  TH2 *h2_B_1 = (TH2*)file_B1->Get(fPlot.c_str());
+  TH2 *h2_S_1 = (TH2*)file_S1->Get(fPlot1.c_str());
+  TH2 *h2_B_1 = (TH2*)file_B1->Get(fPlot2.c_str());
+
+  int nBins = h2_S_1->GetYaxis()->GetNbins();
+  int overflow = nBins+1;
+  int wideBin = nBins/20;
+  int normalBin = nBins/100;
+  int extraBins = nBins/normalBin-100;
+  int fineBin = nBins/400;
+  bool useFineBinning = false;
+  if(nBins>400) useFineBinning = true;
 
   //total jet count for denominator of efficiency calculation
-  double denom_S_1 = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),0,101);
-  double denom_B_1 = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),0,101);
+  double denom_S_1 = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),0,overflow);
+  double denom_B_1 = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),0,overflow);
 
-  TGraph *g_eff_1 = new TGraph(29);
+  int nPoints = 29+extraBins;
+  if(useFineBinning) nPoints = 32+extraBins;
 
-  for(int i = 0; i<5; ++i)
+  TGraph *g_eff_1 = new TGraph(nPoints);
+
+  for(int i = 1; i<=5; ++i)
   {
-    double num_S = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),101-i,101);
-    double num_B = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),101-i,101);
+    double num_S = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),1+(i-1)*normalBin,overflow);
+    double num_B = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),1+(i-1)*normalBin,overflow);
 
-    g_eff_1->SetPoint(i,(num_S/denom_S_1),(num_B/denom_B_1));
+    g_eff_1->SetPoint(i-1,(num_S/denom_S_1),(num_B/denom_B_1));
   }
-  for(int i = 1; i<20; ++i)
+  for(int i = 6; i<=23; ++i)
   {
-    double num_S = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),101-(i*5),101);
-    double num_B = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),101-(i*5),101);
+    double num_S = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+(i-6)*wideBin,overflow);
+    double num_B = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+(i-6)*wideBin,overflow);
 
-    g_eff_1->SetPoint(i+4,(num_S/denom_S_1),(num_B/denom_B_1));
+    g_eff_1->SetPoint(i-1,(num_S/denom_S_1),(num_B/denom_B_1));
   }
-  for(int i = 1; i<6; ++i)
+  if(useFineBinning)
   {
-    double num_S = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),6-i,101);
-    double num_B = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),6-i,101);
+    for(int i = 24; i<=27; ++i)
+    {
+      double num_S = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+18*wideBin+(i-24)*normalBin,overflow);
+      double num_B = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+18*wideBin+(i-24)*normalBin,overflow);
 
-    g_eff_1->SetPoint(i+23,(num_S/denom_S_1),(num_B/denom_B_1));
+      g_eff_1->SetPoint(i-1,(num_S/denom_S_1),(num_B/denom_B_1));
+    }
+    for(int i = 28; i<=31; ++i)
+    {
+      double num_S = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+18*wideBin+4*normalBin+(i-28)*fineBin,overflow);
+      double num_B = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+18*wideBin+4*normalBin+(i-28)*fineBin,overflow);
+
+      g_eff_1->SetPoint(i-1,(num_S/denom_S_1),(num_B/denom_B_1));
+    }
+    for(int i = 32; i<=(32+extraBins); ++i)
+    {
+      double num_S = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+18*wideBin+4*normalBin+4*fineBin+(i-32)*normalBin,overflow);
+      double num_B = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+18*wideBin+4*normalBin+4*fineBin+(i-32)*normalBin,overflow);
+
+      g_eff_1->SetPoint(i-1,(num_S/denom_S_1),(num_B/denom_B_1));
+    }
   }
+  else
+  {
+    for(int i = 24; i<=(29+extraBins); ++i)
+    {
+      double num_S = h2_S_1->Integral(h2_S_1->GetXaxis()->FindBin(fXMin),h2_S_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+18*wideBin+(i-24)*normalBin,overflow);
+      double num_B = h2_B_1->Integral(h2_B_1->GetXaxis()->FindBin(fXMin),h2_B_1->GetXaxis()->FindBin(fXMax),1+5*normalBin+18*wideBin+(i-24)*normalBin,overflow);
+
+      g_eff_1->SetPoint(i-1,(num_S/denom_S_1),(num_B/denom_B_1));
+    }
+  }
+
   return g_eff_1;
+}
+
+TGraph* getEfficiencyCurve(const string& fFileS1, const string& fFileB1, const string& fPlot, const double fXMin, const double fXMax)
+{
+  return getEfficiencyCurve(fFileS1, fFileB1, fPlot, fPlot, fXMin, fXMax);
 }
 
 void formatGraph(TGraph* graph, int graphNum)
@@ -67,12 +112,12 @@ void formatGraph(TGraph* graph, int graphNum)
   graph->SetLineWidth(2);
 }
 
-std::string getHistName(std::string grooming = "Pruned",std::string algo = "CSV", bool subjetPlot = false)
+std::string getHistName(const std::string & grooming = "Pruned", const std::string & algo = "CSV", const bool subjetPlot = false, const std::string & postfix = "", const std::string & size = "")
 {
   if (!subjetPlot)
-    return "jetAnalyzerCA8FatJets_"+grooming+"Subjets/h2_JetPt_Jet"+algo+"_BosonMatched_JetMass";
+    return "jetAnalyzerCA"+size+"FatJets_"+grooming+"Subjets" + (postfix != "" ? "_" + postfix : "") + "/h2_JetPt_Jet"+algo+"_BosonMatched_JetMass";
   else
-    return "jetAnalyzerCA8FatJets_"+grooming+"Subjets/h2_JetPt_SubJetMin"+algo+"_BosonMatched_JetMass"; 
+    return "jetAnalyzerCA"+size+"FatJets_"+grooming+"Subjets" + (postfix != "" ? "_" + postfix : "") + "/h2_JetPt_SubJetMin"+algo+"_BosonMatched_JetMass"; 
 }
 
 void plotEfficiencyCurves(std::map< std::string,TGraph* > &graphs, const std::vector< std::string> &ordering, const string& fTitle, const string& fXAxisTitle, const string& fYAxisTitle,
@@ -156,14 +201,14 @@ void makePlots()
   // BTV-13-001 setup
   //==========================================
   
-  graphsPt300To500["Fat Jet CSV (BTV-13-001)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false),300,500);
-  graphsPt300To500["Subjet CSV (BTV-13-001)"]  = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",true),300,500);
+  graphsPt300To500["Fat Jet CSV (BTV-13-001)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false,"","8"),300,500);
+  graphsPt300To500["Subjet CSV (BTV-13-001)"]  = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",true,"","8"),300,500);
   
   orderingPt300To500.push_back("Fat Jet CSV (BTV-13-001)");
   orderingPt300To500.push_back("Subjet CSV (BTV-13-001)");
   //------------------------------------------
-  graphsPt700ToInf["Fat Jet CSV (BTV-13-001)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false),700,1100);
-  graphsPt700ToInf["Subjet CSV (BTV-13-001)"]  = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",true),700,1100);
+  graphsPt700ToInf["Fat Jet CSV (BTV-13-001)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false,"","8"),700,1100);
+  graphsPt700ToInf["Subjet CSV (BTV-13-001)"]  = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",true,"","8"),700,1100);
   
   orderingPt700ToInf.push_back("Fat Jet CSV (BTV-13-001)");
   orderingPt700ToInf.push_back("Subjet CSV (BTV-13-001)");
@@ -182,7 +227,7 @@ void makePlots()
   //==========================================
   // Fat jets
   //------------------------------------------
-  graphsPt300To500["Fat Jet CSV (BTV-13-001)"]      = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false),300,500);
+  graphsPt300To500["Fat Jet CSV (BTV-13-001)"]      = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false,"","8"),300,500);
   graphsPt300To500["Fat Jet CSV"]                   = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","CSV",false),300,500);
   graphsPt300To500["Fat Jet IVFCSV"]                = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",false),300,500);
   graphsPt300To500["Fat Jet JP"]                    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","JP",false),300,500);
@@ -202,7 +247,7 @@ void makePlots()
   orderingPt300To500.push_back("Fat Jet JBP");
   //orderingPt300To500.push_back("Fat Jet JBP (Explicit JTA)");
   //------------------------------------------
-  graphsPt700ToInf["Fat Jet CSV (BTV-13-001)"]      = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false),700,1100);
+  graphsPt700ToInf["Fat Jet CSV (BTV-13-001)"]      = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false,"","8"),700,1100);
   graphsPt700ToInf["Fat Jet CSV"]                   = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","CSV",false),700,1100);
   graphsPt700ToInf["Fat Jet IVFCSV"]                = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",false),700,1100);
   graphsPt700ToInf["Fat Jet JP"]                    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","JP",false),700,1100);
@@ -468,9 +513,9 @@ void makePlots()
   //------------------------------------------
   graphsPt300To500["Subjet IVFCSV (Pruned)"]                                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
   graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA)"]                             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]              = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Ext. PF CHS)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_ExtPFchs.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]              = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Ext. PF CHS)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_ExtPFchs.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
   graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, SV momentum)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_SVMomentum_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_SVMomentum_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
 
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned)");
@@ -482,9 +527,9 @@ void makePlots()
   //------------------------------------------
   graphsPt700ToInf["Subjet IVFCSV (Pruned)"]                                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
   graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA)"]                             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]              = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Ext. PF CHS)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_ExtPFchs.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]              = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Ext. PF CHS)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_ExtPFchs.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
   graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, SV momentum)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_SVMomentum_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_SVMomentum_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
 
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned)");
@@ -504,22 +549,96 @@ void makePlots()
   orderingPt700ToInf.clear();
 
   //------------------------------------------
+  // Subjets: Kt IVFCSV comparison
+  //------------------------------------------
+  graphsPt300To500["Subjet IVFCSV (k_{T})"]                                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (k_{T}, Explicit JTA)"]                             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (k_{T}, SV Clustering)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Kt","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)"]              = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Kt","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, Ext. PF CHS)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_ExtPFchs.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Kt","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, SV momentum)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_SVMomentum_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_SVMomentum_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),300,500);
+
+  orderingPt300To500.push_back("Subjet IVFCSV (k_{T})");
+  orderingPt300To500.push_back("Subjet IVFCSV (k_{T}, Explicit JTA)");
+  orderingPt300To500.push_back("Subjet IVFCSV (k_{T}, SV Clustering)");
+  orderingPt300To500.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
+  orderingPt300To500.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, SV momentum)");
+  orderingPt300To500.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, Ext. PF CHS)");
+  //------------------------------------------
+  graphsPt700ToInf["Subjet IVFCSV (k_{T})"]                                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (k_{T}, Explicit JTA)"]                             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (k_{T}, SV Clustering)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Kt","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)"]              = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Kt","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, Ext. PF CHS)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_ExtPFchs.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Kt","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, SV momentum)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_SVMomentum_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_SVMomentum_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),700,1100);
+
+  orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T})");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, SV Clustering)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, SV momentum)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, Ext. PF CHS)");
+  //------------------------------------------
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500,"#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","Extended PF CHS only for signal","btagperfcomp_Pt300to500_Subjets_Kt_IVFCSV_comparison.eps",0, 1, 1E-3, 1,1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf,"#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","Extended PF CHS only for signal","btagperfcomp_Pt700toInf_Subjets_Kt_IVFCSV_comparison.eps",0, 1, 1E-3, 1,1);
+
+  graphsPt300To500.clear();
+  graphsPt700ToInf.clear();
+
+  orderingPt300To500.clear();
+  orderingPt700ToInf.clear();
+
+  //------------------------------------------
+  // Subjets: Pruned and Kt IVFCSV comparison
+  //------------------------------------------
+  graphsPt300To500["Subjet IVFCSV (Pruned)"]               = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (k_{T})"]                = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (k_{T}, Explicit JTA)"]  = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),300,500);
+
+  orderingPt300To500.push_back("Subjet IVFCSV (Pruned)");
+  orderingPt300To500.push_back("Subjet IVFCSV (Pruned, Explicit JTA)");
+  orderingPt300To500.push_back("Subjet IVFCSV (k_{T})");
+  orderingPt300To500.push_back("Subjet IVFCSV (k_{T}, Explicit JTA)");
+
+  //------------------------------------------
+  graphsPt700ToInf["Subjet IVFCSV (Pruned)"]               = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (k_{T})"]                = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (k_{T}, Explicit JTA)"]  = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Kt","IVFCSV",true),700,1100);
+
+  orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T})");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA)");
+
+  //------------------------------------------
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500,"#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","","btagperfcomp_Pt300to500_Subjets_Pruned_Kt_IVFCSV_comparison.eps",0, 1, 1E-3, 1,1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf,"#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","","btagperfcomp_Pt700toInf_Subjets_Pruned_Kt_IVFCSV_comparison.eps",0, 1, 1E-3, 1,1);
+
+  graphsPt300To500.clear();
+  graphsPt700ToInf.clear();
+
+  orderingPt300To500.clear();
+  orderingPt700ToInf.clear();
+  
+  //------------------------------------------
   // Subjets: Pruned IVFCSV Explicit JTA comparison
   //------------------------------------------
-  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering)"]                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering)"]                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
 
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, SV Clustering)");
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA)");
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA signal only)");
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA bkg only)");
   //------------------------------------------
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering)"]                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering)"]                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
 
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA)");
@@ -539,9 +658,9 @@ void makePlots()
   // Subjets: Pruned IVFCSV SV comparison
   //------------------------------------------
   graphsPt300To500["Subjet IVFCSV (Pruned)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
 
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned)");
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, SV Clustering)");
@@ -549,9 +668,9 @@ void makePlots()
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, SV Clustering bkg only)");
   //------------------------------------------
   graphsPt700ToInf["Subjet IVFCSV (Pruned)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
 
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering)");
@@ -571,9 +690,9 @@ void makePlots()
   // Subjets: Pruned IVFCSV, Explicit JTA, SV comparison
   //------------------------------------------
   graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
 
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, Explicit JTA)");
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
@@ -581,9 +700,9 @@ void makePlots()
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering bkg only)");
   //------------------------------------------
   graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering signal only)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering bkg only)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
 
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
@@ -602,29 +721,33 @@ void makePlots()
   //------------------------------------------
   // Fat jets and subjets
   //------------------------------------------
-  graphsPt300To500["Fat Jet CSV (BTV-13-001)"]                                    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false),300,500);
+  graphsPt300To500["Fat Jet CSV (BTV-13-001)"]                                    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false,"","8"),300,500);
   graphsPt300To500["Fat Jet IVFCSV (Explicit JTA)"]                               = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",false),300,500);
   graphsPt300To500["Subjet CSV (Pruned, BTV-13-001)"]                             = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","CSV",true),300,500);
-  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]         = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),300,500);
-  graphsPt300To500["Hybrid IVFCSV (Pruned subjets, Explicit JTA, SV Clustering)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","HybridIVFCSV",false),300,500);
-  
+  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]         = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),300,500);
+  graphsPt300To500["Hybrid CSV (Pruned subjets, Explicit JTA, SV Clustering)"]    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","HybridCSV",false),300,500);
+  graphsPt300To500["Hybrid IVFCSV (Pruned subjets, Explicit JTA, SV Clustering)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","HybridIVFCSV",false),300,500);
+
   orderingPt300To500.push_back("Fat Jet CSV (BTV-13-001)");
   orderingPt300To500.push_back("Fat Jet IVFCSV (Explicit JTA)");
   orderingPt300To500.push_back("Subjet CSV (Pruned, BTV-13-001)");
   orderingPt300To500.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
-  orderingPt300To500.push_back("Hybrid IVFCSV (Pruned subjets, Explicit JTA, SV Clustering)");
+  //orderingPt300To500.push_back("Hybrid CSV (Pruned subjets, Explicit JTA, SV Clustering)");
+  //orderingPt300To500.push_back("Hybrid IVFCSV (Pruned subjets, Explicit JTA, SV Clustering)");
   //------------------------------------------
-  graphsPt700ToInf["Fat Jet CSV (BTV-13-001)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false),700,1100);
+  graphsPt700ToInf["Fat Jet CSV (BTV-13-001)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root","ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",getHistName("Pruned","CSVL",false,"","8"),700,1100);
   graphsPt700ToInf["Fat Jet IVFCSV (Explicit JTA)"]                       = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_PATTuple_v3.root",getHistName("Pruned","IVFCSV",false),700,1100);
   graphsPt700ToInf["Subjet CSV (Pruned, BTV-13-001)"]                     = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_PATTuple_v3.root",getHistName("Pruned","CSV",true),700,1100);
-  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","IVFCSV",true),700,1100);
-  graphsPt700ToInf["Hybrid IVFCSV (Pruned subjets, Explicit JTA, SV Clustering)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",getHistName("Pruned","HybridIVFCSV",false),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true),700,1100);
+  graphsPt700ToInf["Hybrid CSV (Pruned subjets, Explicit JTA, SV Clustering)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","HybridCSV",false),700,1100);
+  graphsPt700ToInf["Hybrid IVFCSV (Pruned subjets, Explicit JTA, SV Clustering)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","HybridIVFCSV",false),700,1100);
 
   orderingPt700ToInf.push_back("Fat Jet CSV (BTV-13-001)");
   orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA)");
   orderingPt700ToInf.push_back("Subjet CSV (Pruned, BTV-13-001)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
-  orderingPt700ToInf.push_back("Hybrid IVFCSV (Pruned subjets, Explicit JTA, SV Clustering)");
+  //orderingPt700ToInf.push_back("Hybrid CSV (Pruned subjets, Explicit JTA, SV Clustering)");
+  //orderingPt700ToInf.push_back("Hybrid IVFCSV (Pruned subjets, Explicit JTA, SV Clustering)");
   //------------------------------------------
   plotEfficiencyCurves(graphsPt300To500,orderingPt300To500,"#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","","btagperfcomp_Pt300to500_FatJets_Subjets.eps",0, 1, 1E-3, 1,1);
   plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf,"#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","","btagperfcomp_Pt700toInf_FatJets_Subjets.eps",0, 1, 1E-3, 1,1);
@@ -634,6 +757,86 @@ void makePlots()
 
   orderingPt300To500.clear();
   orderingPt700ToInf.clear();
-  
+
+  //------------------------------------------
+  // Fat jets and subjets: NoVertex type
+  //------------------------------------------
+  graphsPt300To500["Fat Jet IVFCSV"]                                      = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",false,"NoVtx"),300,500);
+  graphsPt300To500["Fat Jet IVFCSV (Explicit JTA)"]                       = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",false,"NoVtx"),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering)"]               = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true,"NoVtx"),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true,"NoVtx"),300,500);
+
+  orderingPt300To500.push_back("Fat Jet IVFCSV");
+  orderingPt300To500.push_back("Fat Jet IVFCSV (Explicit JTA)");
+  orderingPt300To500.push_back("Subjet IVFCSV (Pruned, SV Clustering)");
+  orderingPt300To500.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
+  //------------------------------------------
+  graphsPt700ToInf["Fat Jet IVFCSV"]                                      = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",false,"NoVtx"),700,1100);
+  graphsPt700ToInf["Fat Jet IVFCSV (Explicit JTA)"]                       = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",false,"NoVtx"),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering)"]               = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true,"NoVtx"),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true,"NoVtx"),700,1100);
+
+  orderingPt700ToInf.push_back("Fat Jet IVFCSV");
+  orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
+  //------------------------------------------
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500,"#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","NoVertex","btagperfcomp_Pt300to500_FatJets_Subjets_NoVtx.eps",0, 1, 1E-3, 1,1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf,"#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","NoVertex","btagperfcomp_Pt700toInf_FatJets_Subjets_NoVtx.eps",0, 1, 1E-3, 1,1);
+
+  graphsPt300To500.clear();
+  graphsPt700ToInf.clear();
+
+  orderingPt300To500.clear();
+  orderingPt700ToInf.clear();
+
+  //------------------------------------------
+  // Fat jets and subjets: RecoVertex type
+  //------------------------------------------
+  graphsPt300To500["Fat Jet IVFCSV"]                                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",false,"RecoVtx"),300,500);
+  //graphsPt300To500["Fat Jet IVFCSV (Fix)"]                                     = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root",getHistName("Pruned","IVFCSV",false,"RecoVtx"),300,500);
+  graphsPt300To500["Fat Jet IVFCSV (Explicit JTA)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",false,"RecoVtx"),300,500);
+  //graphsPt300To500["Fat Jet IVFCSV (Explicit JTA, Fix)"]                       = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root",getHistName("Pruned","IVFCSV",false,"RecoVtx"),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering)"]                    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true,"RecoVtx"),300,500);
+  //graphsPt300To500["Subjet IVFCSV (Pruned, SV Clustering, Fix)"]               = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root",getHistName("Pruned","IVFCSV",true,"RecoVtx"),300,500);
+  graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]      = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true,"RecoVtx"),300,500);
+  //graphsPt300To500["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Fix)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root",getHistName("Pruned","IVFCSV",true,"RecoVtx"),300,500);
+
+  orderingPt300To500.push_back("Fat Jet IVFCSV");
+  //orderingPt300To500.push_back("Fat Jet IVFCSV (Fix)");
+  orderingPt300To500.push_back("Fat Jet IVFCSV (Explicit JTA)");
+  //orderingPt300To500.push_back("Fat Jet IVFCSV (Explicit JTA, Fix)");
+  orderingPt300To500.push_back("Subjet IVFCSV (Pruned, SV Clustering)");
+  //orderingPt300To500.push_back("Subjet IVFCSV (Pruned, SV Clustering, Fix)");
+  orderingPt300To500.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
+  //orderingPt300To500.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Fix)");
+  //------------------------------------------
+  graphsPt700ToInf["Fat Jet IVFCSV"]                                           = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",false,"RecoVtx"),700,1100);
+  //graphsPt700ToInf["Fat Jet IVFCSV (Fix)"]                                     = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root",getHistName("Pruned","IVFCSV",false,"RecoVtx"),700,1100);
+  graphsPt700ToInf["Fat Jet IVFCSV (Explicit JTA)"]                            = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",false,"RecoVtx"),700,1100);
+  //graphsPt700ToInf["Fat Jet IVFCSV (Explicit JTA, Fix)"]                       = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root",getHistName("Pruned","IVFCSV",false,"RecoVtx"),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering)"]                    = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true,"RecoVtx"),700,1100);
+  //graphsPt700ToInf["Subjet IVFCSV (Pruned, SV Clustering, Fix)"]               = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root","ROOT_files/QCDPythia6_HiggsTagging_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root",getHistName("Pruned","IVFCSV",true,"RecoVtx"),700,1100);
+  graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)"]      = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType.root",getHistName("Pruned","IVFCSV",true,"RecoVtx"),700,1100);
+  //graphsPt700ToInf["Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Fix)"] = getEfficiencyCurve("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root","ROOT_files/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_VtxType_trackEtaRelFix.root",getHistName("Pruned","IVFCSV",true,"RecoVtx"),700,1100);
+
+  orderingPt700ToInf.push_back("Fat Jet IVFCSV");
+  //orderingPt700ToInf.push_back("Fat Jet IVFCSV (Fix)");
+  orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA)");
+  //orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA, Fix)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering)");
+  //orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering, Fix)");
+  orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
+  //orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Fix)");
+  //------------------------------------------
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500,"#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","RecoVertex","btagperfcomp_Pt300to500_FatJets_Subjets_RecoVtx.eps",0, 1, 1E-3, 1,1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf,"#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","RecoVertex","btagperfcomp_Pt700toInf_FatJets_Subjets_RecoVtx.eps",0, 1, 1E-3, 1,1);
+
+  graphsPt300To500.clear();
+  graphsPt700ToInf.clear();
+
+  orderingPt300To500.clear();
+  orderingPt700ToInf.clear();
+
   //------------------------------------------
 }
