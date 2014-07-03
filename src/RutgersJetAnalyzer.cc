@@ -1148,7 +1148,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h1_JetEta->Fill(it->eta(), eventWeight);
 
       // get groomed jet mass
-      double jetMass = it->userFloat("caPFJetsCHSPrunedMass");
+      double jetMass = it->userFloat("PFJetsCHSPrunedMass");
 
       h2_JetPt_JetPtOverGenJetPt->Fill(jetPt, (it->genJet()!=0 ? jetPt/(it->genJet()->pt()) : -10.), eventWeight);
       h2_JetPt_JetMass->Fill(jetPt, jetMass, eventWeight);
@@ -1653,8 +1653,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       }
 
 
-      double tau1 = it->userFloat("NjettinessCA:tau1");
-      double tau2 = it->userFloat("NjettinessCA:tau2");
+      double tau1 = it->userFloat("Njettiness:tau1");
+      double tau2 = it->userFloat("Njettiness:tau2");
       double tau2overtau1 = (tau1>0 ? tau2/tau1 : -10.);
 
       int nTracks = it->associatedTracks().size();
