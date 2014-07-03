@@ -181,6 +181,12 @@ private:
     TH1F *h1_JetEta_BosonMatched;
     TH1F *h1_JetEta_BosonMatched_JetMass;
 
+    TH1F *h1_nPV_BosonMatched_JetMass;
+    TH1F *h1_nPV_BosonMatched_JetMass_IVFCSVL;
+    TH1F *h1_nPV_BosonMatched_JetMass_IVFCSVM;
+    TH1F *h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVL;
+    TH1F *h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVM;
+
     TH1F *h1_SubJetPt_BosonMatched_JetMass;
     TProfile *p1_SubJetPt_TotalTracks_BosonMatched_JetMass;
     TProfile *p1_SubJetPt_SharedTracks_BosonMatched_JetMass;
@@ -427,6 +433,12 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h1_JetEta = fs->make<TH1F>("h1_JetEta",";#eta;",etaBins,etaMin,etaMax);
     h1_JetEta_BosonMatched = fs->make<TH1F>("h1_JetEta_BosonMatched",";#eta;",etaBins,etaMin,etaMax);
     h1_JetEta_BosonMatched_JetMass = fs->make<TH1F>("h1_JetEta_BosonMatched_JetMass",";#eta;",etaBins,etaMin,etaMax);
+
+    h1_nPV_BosonMatched_JetMass = fs->make<TH1F>("h1_nPV_BosonMatched_JetMass",";nPV;",pvBins,pvMin,pvMax);
+    h1_nPV_BosonMatched_JetMass_IVFCSVL = fs->make<TH1F>("h1_nPV_BosonMatched_JetMass_IVFCSVL",";nPV;",pvBins,pvMin,pvMax);
+    h1_nPV_BosonMatched_JetMass_IVFCSVM = fs->make<TH1F>("h1_nPV_BosonMatched_JetMass_IVFCSVM",";nPV;",pvBins,pvMin,pvMax);
+    h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVL = fs->make<TH1F>("h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVL",";nPV;",pvBins,pvMin,pvMax);
+    h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVM = fs->make<TH1F>("h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVM",";nPV;",pvBins,pvMin,pvMax);
 
     h1_SubJetPt_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetPt_BosonMatched_JetMass",";p_{T} [GeV];",ptBins,ptMin,ptMax);
     p1_SubJetPt_TotalTracks_BosonMatched_JetMass = fs->make<TProfile>("p1_SubJetPt_TotalTracks_BosonMatched_JetMass",";p_{T} [GeV];",20,ptMin,ptMax);
@@ -1359,6 +1371,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
       h1_JetPt_BosonMatched_JetMass->Fill(jetPt, eventWeight);
       h1_JetEta_BosonMatched_JetMass->Fill(it->eta(), eventWeight);
+      h1_nPV_BosonMatched_JetMass->Fill(nPV, eventWeight);
 
       h2_JetPt_mindRjetBhadron_BosonMatched_JetMass->    Fill(jetPt, (mindRfatjet<999.  ? mindRfatjet  : -99.), eventWeight);
       h2_JetPt_mindRSubjet1Bhadron_BosonMatched_JetMass->Fill(jetPt, (mindRsubjet1<999. ? mindRsubjet1 : -99.), eventWeight);
@@ -1564,8 +1577,16 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
       if( jet_CSV_discr>0.244 )    h1_JetPt_BosonMatched_JetMass_CSVL->Fill(jetPt, eventWeight);
       if( jet_CSV_discr>0.679 )    h1_JetPt_BosonMatched_JetMass_CSVM->Fill(jetPt, eventWeight);
-      if( jet_IVFCSV_discr>0.244 ) h1_JetPt_BosonMatched_JetMass_IVFCSVL->Fill(jetPt, eventWeight);
-      if( jet_IVFCSV_discr>0.679 ) h1_JetPt_BosonMatched_JetMass_IVFCSVM->Fill(jetPt, eventWeight);
+      if( jet_IVFCSV_discr>0.423 )
+      {
+        h1_JetPt_BosonMatched_JetMass_IVFCSVL->Fill(jetPt, eventWeight);
+        h1_nPV_BosonMatched_JetMass_IVFCSVL->Fill(nPV, eventWeight);
+      }
+      if( jet_IVFCSV_discr>0.814 )
+      {
+        h1_JetPt_BosonMatched_JetMass_IVFCSVM->Fill(jetPt, eventWeight);
+        h1_nPV_BosonMatched_JetMass_IVFCSVM->Fill(nPV, eventWeight);
+      }
       if( jet_JP_discr>0.275 )     h1_JetPt_BosonMatched_JetMass_JPL->Fill(jetPt, eventWeight);
       if( jet_JP_discr>0.545 )     h1_JetPt_BosonMatched_JetMass_JPM->Fill(jetPt, eventWeight);
       if( jet_JBP_discr>1.33 )     h1_JetPt_BosonMatched_JetMass_JBPL->Fill(jetPt, eventWeight);
@@ -1580,10 +1601,18 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       if( subJet_maxCSV_discr>0.244 )    h1_JetPt_BosonMatched_JetMass_SubJetMaxCSVL->Fill(jetPt, eventWeight);
       if( subJet_minCSV_discr>0.679 )    h1_JetPt_BosonMatched_JetMass_SubJetMinCSVM->Fill(jetPt, eventWeight);
       if( subJet_maxCSV_discr>0.679 )    h1_JetPt_BosonMatched_JetMass_SubJetMaxCSVM->Fill(jetPt, eventWeight);
-      if( subJet_minIVFCSV_discr>0.244 ) h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVL->Fill(jetPt, eventWeight);
-      if( subJet_maxIVFCSV_discr>0.244 ) h1_JetPt_BosonMatched_JetMass_SubJetMaxIVFCSVL->Fill(jetPt, eventWeight);
-      if( subJet_minIVFCSV_discr>0.679 ) h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVM->Fill(jetPt, eventWeight);
-      if( subJet_maxIVFCSV_discr>0.679 ) h1_JetPt_BosonMatched_JetMass_SubJetMaxIVFCSVM->Fill(jetPt, eventWeight);
+      if( subJet_minIVFCSV_discr>0.423 )
+      {
+        h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVL->Fill(jetPt, eventWeight);
+        h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVL->Fill(nPV, eventWeight);
+      }
+      if( subJet_maxIVFCSV_discr>0.423 ) h1_JetPt_BosonMatched_JetMass_SubJetMaxIVFCSVL->Fill(jetPt, eventWeight);
+      if( subJet_minIVFCSV_discr>0.814 )
+      {
+        h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVM->Fill(jetPt, eventWeight);
+        h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVM->Fill(nPV, eventWeight);
+      }
+      if( subJet_maxIVFCSV_discr>0.814 ) h1_JetPt_BosonMatched_JetMass_SubJetMaxIVFCSVM->Fill(jetPt, eventWeight);
       if( subJet_minJP_discr>0.275 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJPL->Fill(jetPt, eventWeight);
       if( subJet_maxJP_discr>0.275 )     h1_JetPt_BosonMatched_JetMass_SubJetMaxJPL->Fill(jetPt, eventWeight);
       if( subJet_minJP_discr>0.545 )     h1_JetPt_BosonMatched_JetMass_SubJetMinJPM->Fill(jetPt, eventWeight);
