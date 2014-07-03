@@ -493,42 +493,42 @@ addJetCollection(
     genJetCollection=cms.InputTag('genJetsNoNuFiltered','SubJets')
 )
 ## MassDrop-BDRS filtered fat jets
-addJetCollection(
-    process,
-    jetCollection=cms.InputTag('PFJetsCHSMDBDRSFiltered'),
-    algoLabel=algoLabel,
-    typeLabel='MDBDRSFilteredPFCHS',
-    getJetMCFlavour=False,
-    doJTA=False,
-    doBTagging=False,
-    btagInfo=bTagInfos,
-    btagdiscriminators=bTagDiscriminators,
-    jetCorrLabel=inputJetCorrLabelAK7,
-    doType1MET=False,
-    doL1Cleaning=False,
-    doL1Counters=False,
-    doJetID=False,
-    genJetCollection=cms.InputTag("genJetsNoNu")
-)
+#addJetCollection(
+    #process,
+    #jetCollection=cms.InputTag('PFJetsCHSMDBDRSFiltered'),
+    #algoLabel=algoLabel,
+    #typeLabel='MDBDRSFilteredPFCHS',
+    #getJetMCFlavour=False,
+    #doJTA=False,
+    #doBTagging=False,
+    #btagInfo=bTagInfos,
+    #btagdiscriminators=bTagDiscriminators,
+    #jetCorrLabel=inputJetCorrLabelAK7,
+    #doType1MET=False,
+    #doL1Cleaning=False,
+    #doL1Counters=False,
+    #doJetID=False,
+    #genJetCollection=cms.InputTag("genJetsNoNu")
+#)
 ## MassDrop-BDRS filtered subjets of fat jets
-addJetCollection(
-    process,
-    jetCollection=cms.InputTag('PFJetsCHSMDBDRSFiltered','SubJets'),
-    algoLabel=algoLabel,
-    typeLabel='MDBDRSFilteredSubjetsPFCHS',
-    rParam = options.jetRadius,
-    useLegacyFlavour=False,
-    doJTA=options.doJTA,
-    doBTagging=options.doBTagging,
-    btagInfo=bTagInfos,
-    btagdiscriminators=bTagDiscriminators,
-    jetCorrLabel=inputJetCorrLabelAK5,
-    doType1MET=False,
-    doL1Cleaning=False,
-    doL1Counters=False,
-    doJetID=False,
-    genJetCollection=cms.InputTag('genJetsNoNuMDBDRSFiltered','SubJets')
-)
+#addJetCollection(
+    #process,
+    #jetCollection=cms.InputTag('PFJetsCHSMDBDRSFiltered','SubJets'),
+    #algoLabel=algoLabel,
+    #typeLabel='MDBDRSFilteredSubjetsPFCHS',
+    #rParam = options.jetRadius,
+    #useLegacyFlavour=False,
+    #doJTA=options.doJTA,
+    #doBTagging=options.doBTagging,
+    #btagInfo=bTagInfos,
+    #btagdiscriminators=bTagDiscriminators,
+    #jetCorrLabel=inputJetCorrLabelAK5,
+    #doType1MET=False,
+    #doL1Cleaning=False,
+    #doL1Counters=False,
+    #doJetID=False,
+    #genJetCollection=cms.InputTag('genJetsNoNuMDBDRSFiltered','SubJets')
+#)
 ## Kt-BDRS filtered fat jets
 addJetCollection(
     process,
@@ -699,15 +699,15 @@ if options.useSVClustering:
         fatJets         = cms.InputTag("PFJetsCHS"),
         groomedFatJets  = cms.InputTag("PFJetsCHSFiltered")
     ))
-    setattr(process,'inclusiveSecondaryVertexFinderTagInfos'+algoLabel+'MDBDRSFilteredSubjetsPFCHS', getattr(process,'inclusiveSecondaryVertexFinderTagInfos'+algoLabel+'MDBDRSFilteredSubjetsPFCHS').clone(
-        useSVClustering = cms.bool(True),
-        useSVMomentum   = cms.bool(options.useSVMomentum), # otherwise using SV flight direction
-        jetAlgorithm    = cms.string(options.jetAlgo),
-        rParam          = cms.double(options.jetRadius),
-        ghostRescaling  = cms.double(1e-18),
-        fatJets         = cms.InputTag("PFJetsCHS"),
-        groomedFatJets  = cms.InputTag("PFJetsCHSMDBDRSFiltered")
-    ))
+    #setattr(process,'inclusiveSecondaryVertexFinderTagInfos'+algoLabel+'MDBDRSFilteredSubjetsPFCHS', getattr(process,'inclusiveSecondaryVertexFinderTagInfos'+algoLabel+'MDBDRSFilteredSubjetsPFCHS').clone(
+        #useSVClustering = cms.bool(True),
+        #useSVMomentum   = cms.bool(options.useSVMomentum), # otherwise using SV flight direction
+        #jetAlgorithm    = cms.string(options.jetAlgo),
+        #rParam          = cms.double(options.jetRadius),
+        #ghostRescaling  = cms.double(1e-18),
+        #fatJets         = cms.InputTag("PFJetsCHS"),
+        #groomedFatJets  = cms.InputTag("PFJetsCHSMDBDRSFiltered")
+    #))
     setattr(process,'inclusiveSecondaryVertexFinderTagInfos'+algoLabel+'KtBDRSFilteredSubjetsPFCHS', getattr(process,'inclusiveSecondaryVertexFinderTagInfos'+algoLabel+'KtBDRSFilteredSubjetsPFCHS').clone(
         useSVClustering = cms.bool(True),
         useSVMomentum   = cms.bool(options.useSVMomentum), # otherwise using SV flight direction
@@ -745,11 +745,11 @@ setattr(process,'patJetFlavourAssociation'+algoLabel+'FilteredSubjetsPFCHS', pro
 ))
 getattr(process,'patJets'+algoLabel+'FilteredSubjetsPFCHS').JetFlavourInfoSource = cms.InputTag("patJetFlavourAssociation"+algoLabel+"FilteredSubjetsPFCHS","SubJets")
 ## Adjust the jet flavor for MassDrop-BDRS filtered subjets
-setattr(process,'patJetFlavourAssociation'+algoLabel+'MDBDRSFilteredSubjetsPFCHS', process.patJetFlavourAssociation.clone(
-    groomedJets = cms.InputTag("PFJetsCHSMDBDRSFiltered"),
-    subjets = cms.InputTag("PFJetsCHSMDBDRSFiltered", "SubJets")
-))
-getattr(process,'patJets'+algoLabel+'MDBDRSFilteredSubjetsPFCHS').JetFlavourInfoSource = cms.InputTag("patJetFlavourAssociation"+algoLabel+"MDBDRSFilteredSubjetsPFCHS","SubJets")
+#setattr(process,'patJetFlavourAssociation'+algoLabel+'MDBDRSFilteredSubjetsPFCHS', process.patJetFlavourAssociation.clone(
+    #groomedJets = cms.InputTag("PFJetsCHSMDBDRSFiltered"),
+    #subjets = cms.InputTag("PFJetsCHSMDBDRSFiltered", "SubJets")
+#))
+#getattr(process,'patJets'+algoLabel+'MDBDRSFilteredSubjetsPFCHS').JetFlavourInfoSource = cms.InputTag("patJetFlavourAssociation"+algoLabel+"MDBDRSFilteredSubjetsPFCHS","SubJets")
 ## Adjust the jet flavor for Kt-BDRS filtered subjets
 setattr(process,'patJetFlavourAssociation'+algoLabel+'KtBDRSFilteredSubjetsPFCHS', process.patJetFlavourAssociation.clone(
     groomedJets = cms.InputTag("PFJetsCHSKtBDRSFiltered"),
@@ -776,10 +776,10 @@ process.selectedPatJetsFilteredPFCHSPacked = cms.EDProducer("BoostedJetMerger",
     subjetSrc=cms.InputTag("selectedPatJets"+algoLabel+"FilteredSubjetsPFCHS")
 )
 
-process.selectedPatJetsMDBDRSFilteredPFCHSPacked = cms.EDProducer("BoostedJetMerger",
-    jetSrc=cms.InputTag("selectedPatJets"+algoLabel+"MDBDRSFilteredPFCHS"),
-    subjetSrc=cms.InputTag("selectedPatJets"+algoLabel+"MDBDRSFilteredSubjetsPFCHS")
-)
+#process.selectedPatJetsMDBDRSFilteredPFCHSPacked = cms.EDProducer("BoostedJetMerger",
+    #jetSrc=cms.InputTag("selectedPatJets"+algoLabel+"MDBDRSFilteredPFCHS"),
+    #subjetSrc=cms.InputTag("selectedPatJets"+algoLabel+"MDBDRSFilteredSubjetsPFCHS")
+#)
 
 process.selectedPatJetsKtBDRSFilteredPFCHSPacked = cms.EDProducer("BoostedJetMerger",
     jetSrc=cms.InputTag("selectedPatJets"+algoLabel+"KtBDRSFilteredPFCHS"),
@@ -799,7 +799,7 @@ process.selectedPatJetsKtPrunedPFCHSPacked = cms.EDProducer("BoostedJetMerger",
 ## Define BoostedJetMerger sequence
 process.jetMergerSeq = cms.Sequence(
     process.selectedPatJetsFilteredPFCHSPacked
-    + process.selectedPatJetsMDBDRSFilteredPFCHSPacked
+    #+ process.selectedPatJetsMDBDRSFilteredPFCHSPacked
     + process.selectedPatJetsKtBDRSFilteredPFCHSPacked
     + process.selectedPatJetsPrunedPFCHSPacked
     + process.selectedPatJetsKtPrunedPFCHSPacked
@@ -850,10 +850,10 @@ process.jetAnalyzerFatJets_FilteredSubjets = process.jetAnalyzerFatJets_PrunedSu
     GroomedBasicJetsTag       = cms.InputTag('selectedPatJetsFilteredPFCHSPacked'),
     SubJetMode                = cms.string('Filtered')
 )
-process.jetAnalyzerFatJets_MDBDRSFilteredSubjets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
-    GroomedBasicJetsTag       = cms.InputTag('selectedPatJetsMDBDRSFilteredPFCHSPacked'),
-    SubJetMode                = cms.string('Filtered')
-)
+#process.jetAnalyzerFatJets_MDBDRSFilteredSubjets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
+    #GroomedBasicJetsTag       = cms.InputTag('selectedPatJetsMDBDRSFilteredPFCHSPacked'),
+    #SubJetMode                = cms.string('Filtered')
+#)
 process.jetAnalyzerFatJets_KtBDRSFilteredSubjets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
     GroomedBasicJetsTag       = cms.InputTag('selectedPatJetsKtBDRSFilteredPFCHSPacked'),
     SubJetMode                = cms.string('Filtered')
@@ -867,7 +867,7 @@ process.jetAnalyzerFatJets_KtSubjets = process.jetAnalyzerFatJets_PrunedSubjets.
 process.jetAnalyzerSequence = cms.Sequence(
     process.jetAnalyzerFatJets_PrunedSubjets
     + process.jetAnalyzerFatJets_FilteredSubjets
-    + process.jetAnalyzerFatJets_MDBDRSFilteredSubjets
+    #+ process.jetAnalyzerFatJets_MDBDRSFilteredSubjets
     + process.jetAnalyzerFatJets_KtBDRSFilteredSubjets
     + process.jetAnalyzerFatJets_KtSubjets
 )
@@ -883,10 +883,10 @@ if options.useVtxTypes:
         UseVtxType = cms.bool(True),
         VtxType    = cms.string('RecoVertex')
     )
-    process.jetAnalyzerFatJets_MDBDRSFilteredSubjets_RecoVtx = process.jetAnalyzerFatJets_MDBDRSFilteredSubjets.clone(
-        UseVtxType = cms.bool(True),
-        VtxType    = cms.string('RecoVertex')
-    )
+    #process.jetAnalyzerFatJets_MDBDRSFilteredSubjets_RecoVtx = process.jetAnalyzerFatJets_MDBDRSFilteredSubjets.clone(
+        #UseVtxType = cms.bool(True),
+        #VtxType    = cms.string('RecoVertex')
+    #)
     process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_RecoVtx = process.jetAnalyzerFatJets_KtBDRSFilteredSubjets.clone(
         UseVtxType = cms.bool(True),
         VtxType    = cms.string('RecoVertex')
@@ -904,10 +904,10 @@ if options.useVtxTypes:
         UseVtxType = cms.bool(True),
         VtxType    = cms.string('NoVertex')
     )
-    process.jetAnalyzerFatJets_MDBDRSFilteredSubjets_NoVtx = process.jetAnalyzerFatJets_MDBDRSFilteredSubjets.clone(
-        UseVtxType = cms.bool(True),
-        VtxType    = cms.string('NoVertex')
-    )
+    #process.jetAnalyzerFatJets_MDBDRSFilteredSubjets_NoVtx = process.jetAnalyzerFatJets_MDBDRSFilteredSubjets.clone(
+        #UseVtxType = cms.bool(True),
+        #VtxType    = cms.string('NoVertex')
+    #)
     process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_NoVtx = process.jetAnalyzerFatJets_KtBDRSFilteredSubjets.clone(
         UseVtxType = cms.bool(True),
         VtxType    = cms.string('NoVertex')
@@ -920,12 +920,12 @@ if options.useVtxTypes:
     process.jetAnalyzerSequence_VtxType = cms.Sequence(
         process.jetAnalyzerFatJets_PrunedSubjets_RecoVtx
         + process.jetAnalyzerFatJets_FilteredSubjets_RecoVtx
-        + process.jetAnalyzerFatJets_MDBDRSFilteredSubjets_RecoVtx
+        #+ process.jetAnalyzerFatJets_MDBDRSFilteredSubjets_RecoVtx
         + process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_RecoVtx
         + process.jetAnalyzerFatJets_KtSubjets_RecoVtx
         + process.jetAnalyzerFatJets_PrunedSubjets_NoVtx
         + process.jetAnalyzerFatJets_FilteredSubjets_NoVtx
-        + process.jetAnalyzerFatJets_MDBDRSFilteredSubjets_NoVtx
+        #+ process.jetAnalyzerFatJets_MDBDRSFilteredSubjets_NoVtx
         + process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_NoVtx
         + process.jetAnalyzerFatJets_KtSubjets_NoVtx
     )
@@ -953,7 +953,7 @@ for m in getattr(process,"patDefaultSequence").moduleNames():
 process.genJetSeq = cms.Sequence(
     process.genJetsNoNu
     + process.genJetsNoNuFiltered
-    + process.genJetsNoNuMDBDRSFiltered
+    #+ process.genJetsNoNuMDBDRSFiltered
     + process.genJetsNoNuKtBDRSFiltered
     + process.genJetsNoNuPruned
     + process.genJetsNoNuKtPruned
@@ -962,7 +962,7 @@ process.jetSeq = cms.Sequence(
     (
     process.PFJetsCHS
     + process.PFJetsCHSFiltered
-    + process.PFJetsCHSMDBDRSFiltered
+    #+ process.PFJetsCHSMDBDRSFiltered
     + process.PFJetsCHSKtBDRSFiltered
     + process.PFJetsCHSPruned
     + process.PFJetsCHSKtPruned
