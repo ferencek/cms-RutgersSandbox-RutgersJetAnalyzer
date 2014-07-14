@@ -102,26 +102,6 @@ options.register('useAK5Jets', True,
     VarParsing.varType.bool,
     "Use AK5 jets"
 )
-options.register('runQCDFlavorExtra', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Run QCD flavor extra"
-)
-options.register('runOnWBkg', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Run on W background"
-)
-options.register('runOnZBkg', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Run on Z background"
-)
-options.register('runOnTopBkg', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Run on top background"
-)
 options.register('useSVClustering', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -141,6 +121,26 @@ options.register('useVtxTypes', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Use vertex types to select jets"
+)
+options.register('runQCDFlavorExtra', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run QCD flavor extra"
+)
+options.register('runOnWBkg', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run on W background"
+)
+options.register('runOnZBkg', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run on Z background"
+)
+options.register('runOnTopBkg', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run on top background"
 )
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
@@ -1193,6 +1193,15 @@ for m in getattr(process,'jetAnalyzerSequence').moduleNames():
         setattr( getattr(process,m), 'JetPtMin',   cms.double(200.) )
         setattr( getattr(process,m), 'JetMassMin', cms.double(90.) )
         setattr( getattr(process,m), 'JetMassMax', cms.double(150.) )
+    if options.runOnWBkg:
+        setattr( getattr(process,m), 'BosonPdgId', cms.int32(24) )
+        setattr( getattr(process,m), 'BosonDecayProdPdgIds', cms.vint32(1,2,3,4) )
+    if options.runOnZBkg:
+        setattr( getattr(process,m), 'BosonPdgId', cms.int32(23) )
+        setattr( getattr(process,m), 'BosonDecayProdPdgIds', cms.vint32(1,2,3,4,5) )
+    if options.runOnTopBkg:
+        setattr( getattr(process,m), 'BosonPdgId', cms.int32(6) ) # top quark is not a boson but keeping the boson label for backward compatibility
+        setattr( getattr(process,m), 'BosonDecayProdPdgIds', cms.vint32(1,2,3,4) ) # applied to the W decay products
 
 #-------------------------------------
 ## Path definition
