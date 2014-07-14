@@ -292,6 +292,9 @@ private:
     TH2F *h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_dRsubjets0p4to0p6;
     TH2F *h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_dRsubjets0p6to0p8;
 
+    // subjet flavor
+    TH2F *h2_SubJet1Flavor_SubJet2Flavor_BosonMatched_JetMass_2bHadrons;
+
     std::map<std::string, TH2F*> h2_nPV_JetMass_Pt;
     std::map<std::string, TH2F*> h2_nPV_tau1_Pt;
     std::map<std::string, TH2F*> h2_nPV_tau2_Pt;
@@ -544,6 +547,8 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_dRsubjets0p2to0p4 = fs->make<TH2F>("h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_dRsubjets0p2to0p4",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,10.,100,0.,10.);
     h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_dRsubjets0p4to0p6 = fs->make<TH2F>("h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_dRsubjets0p4to0p6",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,10.,100,0.,10.);
     h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_dRsubjets0p6to0p8 = fs->make<TH2F>("h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_dRsubjets0p6to0p8",";Subjet_{1} Discr;Subjet_{2} Discr",100,0.,10.,100,0.,10.);
+
+    h2_SubJet1Flavor_SubJet2Flavor_BosonMatched_JetMass_2bHadrons = fs->make<TH2F>("h2_SubJet1Flavor_SubJet2Flavor_BosonMatched_JetMass_2bHadrons",";Subjet_{1} is b;Subjet_{2} is b",2,-0.5,1.5,2,-0.5,1.5);
 
     for(unsigned i=0; i<=(jetPtBins+1); ++i)
     {
@@ -940,12 +945,12 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       // skip the jet if it does not pass pT and eta cuts
       if( !(jetPt > jetPtMin && fabs(it->eta()) < jetAbsEtaMax) ) continue;
 
-
+      int jetFlavor = 0;
       bool isRightFlavor = false;
       // check jet flavor
       if( doJetFlavor )
       {
-        int jetFlavor = it->partonFlavour();
+        jetFlavor = it->partonFlavour();
 
         if( useGSPFlavor ) // use gluon splitting b-jet flavor based on the number of b hadrons inside the jet cone
         {
@@ -1402,6 +1407,9 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         h2_JetPt_dRsubjets_BosonMatched_JetMass->Fill(jetPt, dRsubjets, eventWeight);
         if( bHadronMatchSubjet1 != genParticles->end() && bHadronMatchSubjet2 != genParticles->end() )
           h2_JetPt_SameMatchedBhadron_BosonMatched_JetMass->Fill(jetPt, ( bHadronMatchSubjet1 == bHadronMatchSubjet2 ? 1. : 0. ), eventWeight);
+
+        if( jetFlavor==85 )
+          h2_SubJet1Flavor_SubJet2Flavor_BosonMatched_JetMass_2bHadrons->Fill( (abs(subjets.at(0)->partonFlavour())==5 ? 1. : 0.), (abs(subjets.at(1)->partonFlavour())==5 ? 1. : 0.), eventWeight);
 
         int nTotalFat = 0, nSharedFat = 0, nVertexTotalFat = 0, nVertexSharedFat = 0;
         GlobalPoint vertexPosition(PVs->front().x(),PVs->front().y(),PVs->front().z()); // PV position
