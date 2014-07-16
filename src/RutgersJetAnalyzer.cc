@@ -945,24 +945,22 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       // skip the jet if it does not pass pT and eta cuts
       if( !(jetPt > jetPtMin && fabs(it->eta()) < jetAbsEtaMax) ) continue;
 
-      int jetFlavor = 0;
+      int jetFlavor = it->partonFlavour();
+      if( useGSPFlavor ) // use gluon splitting b-jet flavor based on the number of b hadrons inside the jet cone
+      {
+        const reco::GenParticleRefVector & bHadrons = it->jetFlavourInfo().getbHadrons();
+
+        if( bHadrons.size()>=2 )
+        {
+          jetFlavor = 85; // custom jet flavor code for gluon splitting b jets
+          h2_JetPt_dRmatchedBhadrons_GSPbJets->Fill( jetPt, reco::deltaR( bHadrons.at(0)->p4(), bHadrons.at(1)->p4() ), eventWeight );
+        }
+      }
+
       bool isRightFlavor = false;
       // check jet flavor
       if( doJetFlavor )
       {
-        jetFlavor = it->partonFlavour();
-
-        if( useGSPFlavor ) // use gluon splitting b-jet flavor based on the number of b hadrons inside the jet cone
-        {
-          const reco::GenParticleRefVector & bHadrons = it->jetFlavourInfo().getbHadrons();
-
-          if( bHadrons.size()>=2 )
-          {
-            jetFlavor = 85; // custom jet flavor code for gluon splitting b jets
-            h2_JetPt_dRmatchedBhadrons_GSPbJets->Fill( jetPt, reco::deltaR( bHadrons.at(0)->p4(), bHadrons.at(1)->p4() ), eventWeight );
-          }
-        }
-
         for(std::vector<int>::const_iterator pdgIdIt = jetFlavorPdgIds.begin(); pdgIdIt != jetFlavorPdgIds.end(); ++pdgIdIt)
         {
           if( abs(jetFlavor) == abs(*pdgIdIt))
