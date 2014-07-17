@@ -1080,11 +1080,11 @@ void efficiency1D_overlayMulti_3(const string& fInputFile1, const string& fInput
 }
 
 
-void efficiency1D_overlayMulti_5(const string& fInputFile1, const string& fInputFile2, const string& fInputFile3, const string& fInputFile4, const string& fInputFile5,
-                               const string& fPlotPass, const string& fPlotTotal, const string& fTitle, const string& fXAxisTitle, const string& fYAxisTitle,
-                               const Int_t fRebinX, const Double_t fXmin, const Double_t fXmax, const Double_t fYmin, const Double_t fYmax,
-                               const string& fOutputFile, const Int_t fLogy=0, const Double_t fTitleOffsetX=1.0, const Double_t fTitleOffsetY=1.0,
-                               const Double_t fLeftMargin=0.12, const Double_t fTopMargin=0.07, const Double_t fPlotWidth=0.8)
+void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInputFile2, const string& fInputFile3, const string& fInputFile4, const string& fInputFile5,
+				 const string& fDir, const string& fPlotPass, const string& fPlotTotal, const string& fTitle, const string& fXAxisTitle, const string& fYAxisTitle,
+				 const Int_t fRebinX, const Double_t fXmin, const Double_t fXmax, const Double_t fYmin, const Double_t fYmax,
+				 const string& fOutputFile, const Int_t fLogy=0, const Double_t fTitleOffsetX=1.0, const Double_t fTitleOffsetY=1.0,
+				 const Double_t fLeftMargin=0.12, const Double_t fTopMargin=0.07, const Double_t fPlotWidth=0.8)
 {
   gROOT->SetBatch(kTRUE);
   setEXOStyle();
@@ -1104,29 +1104,33 @@ void efficiency1D_overlayMulti_5(const string& fInputFile1, const string& fInput
   TFile *file5  = new TFile(fInputFile5.c_str());
 
   // histograms
-  TH1D *h1_Pass1 = (TH1D*)file1->Get(fPlotPass.c_str());
-  TH1D *h1_Pass2 = (TH1D*)file2->Get(fPlotPass.c_str());
-  TH1D *h1_Pass3 = (TH1D*)file3->Get(fPlotPass.c_str());
-  TH1D *h1_Pass4 = (TH1D*)file4->Get(fPlotPass.c_str());
-  TH1D *h1_Pass5 = (TH1D*)file5->Get(fPlotPass.c_str());
+  TH1D *h1_Pass1 = (TH1D*)file1->Get((fDir + "/" + fPlotPass).c_str());
+  TH1D *h1_Pass2 = (TH1D*)file2->Get((fDir + "/" + fPlotPass).c_str());
+  TH1D *h1_Pass3 = (TH1D*)file3->Get((fDir + "/" + fPlotPass).c_str());
+  TH1D *h1_Pass4 = (TH1D*)file4->Get((fDir + "/" + fPlotPass).c_str());
+  TH1D *h1_Pass5 = (TH1D*)file5->Get((fDir + "_bJetsGSP/" + fPlotPass).c_str());
+  TH1D *h1_Pass6 = (TH1D*)file5->Get((fDir + "_udsJets/" + fPlotPass).c_str());
 
-  TH1D *h1_Total1 = (TH1D*)file1->Get(fPlotTotal.c_str());
-  TH1D *h1_Total2 = (TH1D*)file2->Get(fPlotTotal.c_str());
-  TH1D *h1_Total3 = (TH1D*)file3->Get(fPlotTotal.c_str());
-  TH1D *h1_Total4 = (TH1D*)file4->Get(fPlotTotal.c_str());
-  TH1D *h1_Total5 = (TH1D*)file5->Get(fPlotTotal.c_str());
+  TH1D *h1_Total1 = (TH1D*)file1->Get((fDir + "/" + fPlotTotal).c_str());
+  TH1D *h1_Total2 = (TH1D*)file2->Get((fDir + "/" + fPlotTotal).c_str());
+  TH1D *h1_Total3 = (TH1D*)file3->Get((fDir + "/" + fPlotTotal).c_str());
+  TH1D *h1_Total4 = (TH1D*)file4->Get((fDir + "/" + fPlotTotal).c_str());
+  TH1D *h1_Total5 = (TH1D*)file5->Get((fDir + "_bJetsGSP/" + fPlotTotal).c_str());
+  TH1D *h1_Total6 = (TH1D*)file5->Get((fDir + "_udsJets/" + fPlotTotal).c_str());
 
   h1_Pass1->Rebin(fRebinX);
   h1_Pass2->Rebin(fRebinX);
   h1_Pass3->Rebin(fRebinX);
   h1_Pass4->Rebin(fRebinX);
   h1_Pass5->Rebin(fRebinX);
+  h1_Pass6->Rebin(fRebinX);
 
   h1_Total1->Rebin(fRebinX);
   h1_Total2->Rebin(fRebinX);
   h1_Total3->Rebin(fRebinX);
   h1_Total4->Rebin(fRebinX);
   h1_Total5->Rebin(fRebinX);
+  h1_Total6->Rebin(fRebinX);
 
   TCanvas *c = new TCanvas("c", "",1000,800);
   c->cd();
@@ -1151,52 +1155,62 @@ void efficiency1D_overlayMulti_5(const string& fInputFile1, const string& fInput
   TGraphAsymmErrors *g_efficiency2 = new TGraphAsymmErrors(h1_Pass2, h1_Total2,"cp");
   g_efficiency2->SetLineWidth(2);
   g_efficiency2->SetLineStyle(2);
-  g_efficiency2->SetLineColor(kRed);
+  g_efficiency2->SetLineColor(kBlue+2);
   g_efficiency2->SetMarkerSize(1.);
-  g_efficiency2->SetMarkerStyle(26);
-  g_efficiency2->SetMarkerColor(kRed);
+  g_efficiency2->SetMarkerStyle(20);
+  g_efficiency2->SetMarkerColor(kBlue+2);
 
   TGraphAsymmErrors *g_efficiency3 = new TGraphAsymmErrors(h1_Pass3, h1_Total3,"cp");
   g_efficiency3->SetLineWidth(2);
   g_efficiency3->SetLineStyle(3);
-  g_efficiency3->SetLineColor(kBlue+2);
+  g_efficiency3->SetLineColor(kOrange+1);
   g_efficiency3->SetMarkerSize(1.);
-  g_efficiency3->SetMarkerStyle(20);
-  g_efficiency3->SetMarkerColor(kBlue+2);
+  g_efficiency3->SetMarkerStyle(22);
+  g_efficiency3->SetMarkerColor(kOrange+1);
 
   TGraphAsymmErrors *g_efficiency4 = new TGraphAsymmErrors(h1_Pass4, h1_Total4,"cp");
   g_efficiency4->SetLineWidth(2);
   g_efficiency4->SetLineStyle(4);
-  g_efficiency4->SetLineColor(kOrange+1);
+  g_efficiency4->SetLineColor(kMagenta+2);
   g_efficiency4->SetMarkerSize(1.);
-  g_efficiency4->SetMarkerStyle(22);
-  g_efficiency4->SetMarkerColor(kOrange+1);
+  g_efficiency4->SetMarkerStyle(23);
+  g_efficiency4->SetMarkerColor(kMagenta+2);
 
   TGraphAsymmErrors *g_efficiency5 = new TGraphAsymmErrors(h1_Pass5, h1_Total5,"cp");
   g_efficiency5->SetLineWidth(2);
   g_efficiency5->SetLineStyle(5);
-  g_efficiency5->SetLineColor(kMagenta+2);
+  g_efficiency5->SetLineColor(kRed);
   g_efficiency5->SetMarkerSize(1.);
-  g_efficiency5->SetMarkerStyle(23);
-  g_efficiency5->SetMarkerColor(kMagenta+2);
+  g_efficiency5->SetMarkerStyle(26);
+  g_efficiency5->SetMarkerColor(kRed);
+
+  TGraphAsymmErrors *g_efficiency6 = new TGraphAsymmErrors(h1_Pass6, h1_Total6,"cp");
+  g_efficiency6->SetLineWidth(2);
+  g_efficiency6->SetLineStyle(6);
+  g_efficiency6->SetLineColor(kRed+3);
+  g_efficiency6->SetMarkerSize(1.);
+  g_efficiency6->SetMarkerStyle(27);
+  g_efficiency6->SetMarkerColor(kRed+3);
 
   g_efficiency1->Draw("LP");
   g_efficiency2->Draw("LPsame");
   g_efficiency3->Draw("LPsame");
   g_efficiency4->Draw("LPsame");
   g_efficiency5->Draw("LPsame");
+  g_efficiency6->Draw("LPsame");
 
-  TLegend *legend = new TLegend(.15+(fLeftMargin-0.12),.55,.35+(fLeftMargin-0.12),.80);
+  TLegend *legend = new TLegend(.15+(fLeftMargin-0.12),.50,.35+(fLeftMargin-0.12),.85);
   legend->SetBorderSize(0);
   legend->SetFillColor(0);
   legend->SetFillStyle(0);
   legend->SetTextFont(42);
   legend->SetTextSize(0.05);
   legend->AddEntry(g_efficiency1, "H(120)#rightarrowb#bar{b}","lp");
-  legend->AddEntry(g_efficiency4, "Z","lp");
-  legend->AddEntry(g_efficiency5, "top","lp");
-  legend->AddEntry(g_efficiency3, "W","lp");
-  legend->AddEntry(g_efficiency2, "QCD","lp");
+  legend->AddEntry(g_efficiency5, "QCD (b from GSP)","lp");
+  legend->AddEntry(g_efficiency3, "Z","lp");
+  legend->AddEntry(g_efficiency4, "top","lp");
+  legend->AddEntry(g_efficiency2, "W","lp");
+  legend->AddEntry(g_efficiency6, "QCD (uds)","lp");
   legend->Draw();
 
   TLatex l1;
@@ -1231,60 +1245,6 @@ void efficiency1D_overlayMulti_5(const string& fInputFile1, const string& fInput
 
 void makePlots()
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  //================
-  // W tagging
-  //================
-//   efficiency_curves_grooming("output_files_v2/WW500_WTagging.root", "output_files_v2/QCDPythia6_WTagging.root",
-//                             "Pt500toInf", 0, 52, "WW vs QCD, AK R=0.6, p_{T}>500 GeV", "Trimmed jet mass", "Filtered jet mass",
-//                             "Pruned jet mass", "Default jet mass", 0, 0.3, "W_tag_eff_grooming_Pt500toInf_WW500.eps");
-//
-//   efficiency_curves_comp("output_files_v2/WW500_WTagging.root", "output_files_v2/QCDPythia6_WTagging.root",
-//                          "jetAnalyzerTrimmedJetMass", "jetAnalyzerTrimmedJets", "jetAnalyzerTrimmedJetMass", "jetAnalyzerTrimmedJets",
-//                          "Pt500toInf", 0, 52, "WW vs QCD, AK R=0.6, p_{T}>500 GeV", "Default N-subjettiness", "Trimmed N-subjettiness",
-//                          0, 0.3, "W_tag_eff_nsjgroomed_Pt500toInf_TrimmedJetMass_WW500.eps");
-//
-//   efficiency_curves_comp("output_files_v2/WW500_WTagging_JetSubstructure.root", "output_files_v2/QCDPythia6_WTagging_JetSubstructure.root",
-//                          "jetAnalyzerPrunedJetMass", "jetAnalyzerPrunedJets", "jetAnalyzerPrunedJetMass", "jetAnalyzerPrunedJets",
-//                          "Pt500toInf", 0, 52, "WW vs QCD, AK R=0.8, p_{T}>500 GeV, 55<m<95 GeV", "Default N-subjettiness", "Pruned N-subjettiness",
-//                          0, 0.3, "W_tag_eff_nsjgroomed_AK_Pt500toInf_PrunedJetMass_WW500.eps");
-//
-//   efficiency_curves_comp("output_files_v2/WW500_WTagging_JetSubstructure.root", "output_files_v2/QCDPythia6_WTagging_JetSubstructure.root",
-//                          "jetAnalyzerCAPrunedJetMass", "jetAnalyzerCAPrunedJets", "jetAnalyzerCAPrunedJetMass", "jetAnalyzerCAPrunedJets",
-//                          "Pt500toInf", 0, 52, "WW vs QCD, CA R=0.8, p_{T}>500 GeV, 55<m<95 GeV", "Default N-subjettiness", "Pruned N-subjettiness",
-//                          0, 0.3, "W_tag_eff_nsjgroomed_CA_Pt500toInf_PrunedJetMass_WW500.eps");
-//
-//   efficiency_curves_comp("output_files_v2/WW500_WTagging_JetSubstructure.root", "output_files_v2/QCDPythia6_WTagging_JetSubstructure.root",
-//                          "jetAnalyzerPrunedJetMass", "jetAnalyzerCAPrunedJetMass", "jetAnalyzerPrunedJetMass", "jetAnalyzerCAPrunedJetMass",
-//                          "Pt500toInf", 0, 52, "WW vs QCD, R=0.8, p_{T}>500 GeV, 55<m<95 GeV", "N-subjettiness (AK)", "N-subjettiness (CA)",
-//                          0, 0.3, "W_tag_eff_AK_vs_CA_Pt500toInf_PrunedJetMass_WW500.eps");
-//
-//   efficiency_curves_comp("output_files_v2/WW500_WTagging_JetSubstructure.root", "output_files_v2/QCDPythia6_WTagging_JetSubstructure.root",
-//                          "jetAnalyzerPrunedJetMass", "jetAnalyzerPrunedJetMassKtAxes", "jetAnalyzerPrunedJetMass", "jetAnalyzerPrunedJetMassKtAxes",
-//                          "Pt500toInf", 0, 52, "WW vs QCD, AK R=0.8, p_{T}>500 GeV, 55<m<95 GeV", "N-subj. (Onepass k_{T} axes)", "N-subj. (k_{T} axes)",
-//                          0, 0.3, "W_tag_eff_AK_onepassktaxes_vs_ktaxes_Pt500toInf_PrunedJetMass_WW500.eps");
-//
-//   efficiency_curves_nsj_massdrop("output_files_v2/WW500_WTagging.root", "output_files_v2/QCDPythia6_WTagging.root",
-//                                  "jetAnalyzerTrimmedJetMass", "jetAnalyzerCAPrunedJets",
-//                                  "Pt500toInf", 0, 52, "WW vs QCD, R=0.6, p_{T}>500 GeV", "N-subj. (trimmed AK)", "Mass drop (pruned CA)",
-//                                  0, 0.3, "W_tag_eff_nsj_massdrop_Pt500toInf_WW500.eps");
-//
-//   efficiency_curves_nsj_massdrop("output_files_v2/WW500_WTagging.root", "output_files_v2/QCDPythia6_WTagging.root",
-//                                  "jetAnalyzerPrunedJetMass", "jetAnalyzerCAPrunedJets",
-//                                  "Pt500toInf", 0, 52, "WW vs QCD, R=0.6, p_{T}>500 GeV", "N-subj. (pruned AK)", "Mass drop (pruned CA)",
-//                                  0, 0.3, "W_tag_eff_nsj_massdrop_pruned_Pt500toInf_WW500.eps");
-//
-//   efficiency_vs_cut("output_files_v2/WW500_WTagging.root", "jetAnalyzerCAPrunedJets",
-//                     "MassDrop", "Pt500toInf", 0, 52, "WW, CA R=0.6 pruned, p_{T}>500 GeV, 60<m<90 GeV",
-//                     "#mu=m_{subjet1}/m_{jet}<", "Tagging efficiency", 0, 1., 0, 0.9,
-//                     "W_tag_eff_vs_massdrop_cut_Pt500toInf_CAPrunedJets_WW500.eps", 0.9, 1.05);
-//
-//   efficiency_vs_cut("output_files_v2/WW500_WTagging.root", "jetAnalyzerTrimmedJetMass",
-//                     "tau2tau1", "Pt500toInf", 0, 52, "WW, AK R=0.6, p_{T}>500 GeV, 65<m<95 GeV (trimmed)",
-//                     "#tau_{2}/#tau_{1}<", "Tagging efficiency", 0, 1., 0, 0.9,
-//                     "W_tag_eff_vs_nsj_cut_Pt500toInf_TrimmedJetMass_WW500.eps", 0.9, 1.05);
-
-  //--------------------------------------------------------------------------------------------------------------------
   //================
   // Higgs tagging
   //================
@@ -1538,16 +1498,49 @@ void makePlots()
   //                          "b-tag_eff_SubjetCSVL_CAPrunedJetMass_JetMassCutComparison.eps", 0, 1., 1.);
 
   // overlay multiple backgrounds
-//   efficiency1D_overlayMulti_5("output_files_v2/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_dRsubjetBhadron_CA8only.root",
-//                             "output_files_v2/QCDPythia6_HiggsTagging_dRsubjetBhadron_jetFlavor_CA8only.root",
-//                             "output_files_v2/BprimeBprimeToTWTWinc_M-1300_HiggsTagging_WBkg_dRsubjetBhadron_CA8only.root",
-//                             "output_files_v2/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ZBkg_dRsubjetBhadron_CA8only.root",
-//                             "output_files_v2/TprimeToTHinc_M-1700_HiggsTagging_TopBkg_dRsubjetBhadron_CA8only.root",
-//                             "jetAnalyzerCAPrunedJetMass/h1_JetPt_BosonMatched_JetMass_SubJetMinCSVL", "jetAnalyzerCAPrunedJetMass/h1_JetPt_BosonMatched_JetMass",
-//                             "#splitline{CA R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
-//                             "Fat jet p_{T} [GeV/c]", "Double-b-tagging efficiency", 10, 0, 1000, 0.001, 1,
-//                             "b-tag_eff_SubjetCSVL_CAPrunedJetMass.eps", 1, 1., 1.);
+  // Subjet IVFCSVL
+  efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/BprimeBprimeToTWTWinc_M-1300_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVL", "h1_JetPt_BosonMatched_JetMass",
+			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVL}",
+			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 10, 0, 1000, 0.001, 1,
+			      "b-tag_eff_vs_FatJetPt_SubjetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
 
+  // Subjet IVFCSVM
+  efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/BprimeBprimeToTWTWinc_M-1300_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVM", "h1_JetPt_BosonMatched_JetMass",
+			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVM}",
+			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 10, 0, 1000, 0.0001, 1,
+			      "b-tag_eff_vs_FatJetPt_SubjetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
+  // Fat jet IVFCSVL
+  efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/BprimeBprimeToTWTWinc_M-1300_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_IVFCSVL", "h1_JetPt_BosonMatched_JetMass",
+			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVL}",
+			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 10, 0, 1000, 0.1, 1,
+			      "b-tag_eff_vs_FatJetPt_FatJetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
+
+  // Fat jet IVFCSVM
+  efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/BprimeBprimeToTWTWinc_M-1300_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
+			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_IVFCSVM", "h1_JetPt_BosonMatched_JetMass",
+			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVM}",
+			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 10, 0, 1000, 0.01, 1,
+			      "b-tag_eff_vs_FatJetPt_FatJetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
+  
   //--------------------------------------------------------------------------------------------------------------------
 
 //   // b-tagging mistag rate
@@ -1992,19 +1985,19 @@ void makePlots()
   //--------------------------------------------------------------------------------------------------------------------
 
   // b-tagging efficiency vs mistag rate (CA8 pruned jets with enlarged JTA cone)
-  efficiency_curves_comp_xrange("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root", "ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root",
-                         "ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root", "ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",
-                         "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_JetCSVL_BosonMatched_JetMass", "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_SubJetMinCSVL_BosonMatched_JetMass",
-                         "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_JetCSVL_BosonMatched_JetMass", "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_SubJetMinCSVL_BosonMatched_JetMass",
-                         300, 500, "#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","Fat jet CSV (JTA #DeltaR<0.8)", "Subjet CSV",
-                         0, 1, 1E-3, 1, "b-tag_eff_vs_mistag_CA8_JTA_QCDBkg_Pt300to500_JetMass.eps", 1);
-
-  efficiency_curves_comp_xrange("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root", "ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root",
-                         "ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root", "ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",
-                         "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_JetCSVL_BosonMatched_JetMass", "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_SubJetMinCSVL_BosonMatched_JetMass",
-                         "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_JetCSVL_BosonMatched_JetMass", "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_SubJetMinCSVL_BosonMatched_JetMass",
-                         700, 1100, "#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","Fat jet CSV (JTA #DeltaR<0.8)", "Subjet CSV",
-                         0, 1, 1E-3, 1, "b-tag_eff_vs_mistag_CA8_JTA_QCDBkg_Pt700toInf_JetMass.eps", 1);
+//   efficiency_curves_comp_xrange("ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root", "ROOT_files/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001.root",
+//                          "ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root", "ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",
+//                          "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_JetCSVL_BosonMatched_JetMass", "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_SubJetMinCSVL_BosonMatched_JetMass",
+//                          "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_JetCSVL_BosonMatched_JetMass", "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_SubJetMinCSVL_BosonMatched_JetMass",
+//                          300, 500, "#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","Fat jet CSV (JTA #DeltaR<0.8)", "Subjet CSV",
+//                          0, 1, 1E-3, 1, "b-tag_eff_vs_mistag_CA8_JTA_QCDBkg_Pt300to500_JetMass.eps", 1);
+// 
+//   efficiency_curves_comp_xrange("ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root", "ROOT_files/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001.root",
+//                          "ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root", "ROOT_files/QCDPythia6_HiggsTagging_BTV-13-001.root",
+//                          "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_JetCSVL_BosonMatched_JetMass", "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_SubJetMinCSVL_BosonMatched_JetMass",
+//                          "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_JetCSVL_BosonMatched_JetMass", "jetAnalyzerCA8FatJets_PrunedSubjets/h2_JetPt_SubJetMinCSVL_BosonMatched_JetMass",
+//                          700, 1100, "#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misidentification probability (QCD)","Fat jet CSV (JTA #DeltaR<0.8)", "Subjet CSV",
+//                          0, 1, 1E-3, 1, "b-tag_eff_vs_mistag_CA8_JTA_QCDBkg_Pt700toInf_JetMass.eps", 1);
 
 //   // b-tagging efficiency vs mistag rate (CA8 pruned jets, PF JTA for fat jets)
 //   efficiency_curves_comp_xrange("output_files_v2/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_dRsubjetBhadron.root", "output_files_v2/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_PFJTA.root",
