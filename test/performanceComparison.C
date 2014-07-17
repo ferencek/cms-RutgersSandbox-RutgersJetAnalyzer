@@ -1058,8 +1058,8 @@ void makePlots()
   orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{AK R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", "btagperfcomp_Pt300to500_FatJets_Subjets_AK_Hadronic_Z.eps", 0, 1, 1E-2, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{AK R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", "btagperfcomp_Pt700toInf_FatJets_Subjets_AK_Hadronic_Z.eps", 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{AK R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", "btagperfcomp_Pt300to500_FatJets_Subjets_AK_Hadronic_Z.eps", 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{AK R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", "btagperfcomp_Pt700toInf_FatJets_Subjets_AK_Hadronic_Z.eps", 0, 1, 1E-2, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1082,8 +1082,8 @@ void makePlots()
   orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{AK R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", "btagperfcomp_Pt300to500_FatJets_Subjets_AK_Hadronic_top.eps", 0, 1, 1E-2, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{AK R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", "btagperfcomp_Pt700toInf_FatJets_Subjets_AK_Hadronic_top.eps", 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{AK R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", "btagperfcomp_Pt300to500_FatJets_Subjets_AK_Hadronic_top.eps", 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{AK R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", "btagperfcomp_Pt700toInf_FatJets_Subjets_AK_Hadronic_top.eps", 0, 1, 1E-2, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
