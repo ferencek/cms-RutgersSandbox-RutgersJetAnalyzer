@@ -147,6 +147,11 @@ options.register('runOnTopBkg', False,
     VarParsing.varType.bool,
     "Run on top background"
 )
+options.register('useBTV13001Setup', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use BTV-13-001 fat jet b-tagging setup"
+)
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
 
@@ -184,8 +189,10 @@ bTagDiscriminators = ['jetProbabilityBJetTags','jetBProbabilityBJetTags','combin
 
 ## Clustering algorithm label
 algoLabel = 'CA'
-if options.jetAlgo == 'AntiKt':
+if options.jetAlgo == 'AntiKt' and not options.useBTV13001Setup:
     algoLabel = 'AK'
+if options.useBTV13001Setup:
+    options.setDefault('jetAlgo', 'CambridgeAachen')
 
 
 import FWCore.ParameterSet.Config as cms
@@ -1199,26 +1206,27 @@ if options.doBTagging:
     # Set the cone size for the jet-track association to the jet radius
     process.jetTracksAssociatorAtVertex.coneSize = cms.double(options.jetRadius) # default is 0.5
     process.secondaryVertexTagInfosAOD.trackSelection.jetDeltaRMax = cms.double(options.jetRadius)   # default is 0.3
-    process.secondaryVertexTagInfosAOD.vertexCuts.maxDeltaRToJetAxis = cms.double(options.jetRadius) # default is 0.5
-    # Set the jet-SV dR to the jet radius
-    process.inclusiveSecondaryVertexFinderTagInfosAOD.vertexCuts.maxDeltaRToJetAxis = cms.double(options.jetRadius) # default is 0.5
-    process.inclusiveSecondaryVertexFinderTagInfosAOD.extSVDeltaRToJet = cms.double(options.jetRadius) # default is 0.3
-    # Set the JP track dR cut to the jet radius
-    process.jetProbabilityFat = process.jetProbability.clone( deltaR = cms.double(options.jetRadius) ) # default is 0.3
-    process.jetProbabilityBJetTagsAOD.jetTagComputer = cms.string('jetProbabilityFat')
-    # Set the JBP track dR cut to the jet radius
-    process.jetBProbabilityFat = process.jetBProbability.clone( deltaR = cms.double(options.jetRadius) ) # default is 0.5
-    process.jetBProbabilityBJetTagsAOD.jetTagComputer = cms.string('jetBProbabilityFat')
-    # Set the CSV track dR cut to the jet radius
-    process.combinedSecondaryVertexFat = process.combinedSecondaryVertex.clone()
-    process.combinedSecondaryVertexFat.trackSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
-    process.combinedSecondaryVertexFat.trackPseudoSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
-    process.combinedSecondaryVertexBJetTagsAOD.jetTagComputer = cms.string('combinedSecondaryVertexFat')
-    # Set the CSVV2 track dR cut to the jet radius
-    process.combinedSecondaryVertexV2Fat = process.combinedSecondaryVertexV2.clone()
-    process.combinedSecondaryVertexV2Fat.trackSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
-    process.combinedSecondaryVertexV2Fat.trackPseudoSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
-    process.combinedSecondaryVertexV2BJetTagsAOD.jetTagComputer = cms.string('combinedSecondaryVertexV2Fat')
+    if not options.useBTV13001Setup:
+	process.secondaryVertexTagInfosAOD.vertexCuts.maxDeltaRToJetAxis = cms.double(options.jetRadius) # default is 0.5
+	# Set the jet-SV dR to the jet radius
+	process.inclusiveSecondaryVertexFinderTagInfosAOD.vertexCuts.maxDeltaRToJetAxis = cms.double(options.jetRadius) # default is 0.5
+	process.inclusiveSecondaryVertexFinderTagInfosAOD.extSVDeltaRToJet = cms.double(options.jetRadius) # default is 0.3
+	# Set the JP track dR cut to the jet radius
+	process.jetProbabilityFat = process.jetProbability.clone( deltaR = cms.double(options.jetRadius) ) # default is 0.3
+	process.jetProbabilityBJetTagsAOD.jetTagComputer = cms.string('jetProbabilityFat')
+	# Set the JBP track dR cut to the jet radius
+	process.jetBProbabilityFat = process.jetBProbability.clone( deltaR = cms.double(options.jetRadius) ) # default is 0.5
+	process.jetBProbabilityBJetTagsAOD.jetTagComputer = cms.string('jetBProbabilityFat')
+	# Set the CSV track dR cut to the jet radius
+	process.combinedSecondaryVertexFat = process.combinedSecondaryVertex.clone()
+	process.combinedSecondaryVertexFat.trackSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
+	process.combinedSecondaryVertexFat.trackPseudoSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
+	process.combinedSecondaryVertexBJetTagsAOD.jetTagComputer = cms.string('combinedSecondaryVertexFat')
+	# Set the CSVV2 track dR cut to the jet radius
+	process.combinedSecondaryVertexV2Fat = process.combinedSecondaryVertexV2.clone()
+	process.combinedSecondaryVertexV2Fat.trackSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
+	process.combinedSecondaryVertexV2Fat.trackPseudoSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
+	process.combinedSecondaryVertexV2BJetTagsAOD.jetTagComputer = cms.string('combinedSecondaryVertexV2Fat')
 
 #-------------------------------------
 ## Various additional options
