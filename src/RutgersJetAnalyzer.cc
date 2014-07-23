@@ -102,9 +102,10 @@ private:
     const edm::InputTag    jetsTag;
     const bool             useSubJets;
     const edm::InputTag    groomedBasicJetsTag;
-    const bool             useAK5Jets;
-    const edm::InputTag    ak5JetsTag;
     const std::string      subJetMode;
+    const bool             useStdJets;
+    const edm::InputTag    stdJetsTag;
+    const double           stdJetMatchingRadius;
     const edm::InputTag    pvTag;
     const double           jetRadius;          // radius for jet clustering
     const bool             doBosonMatching;    // parameter for deciding if matching is on or off
@@ -211,28 +212,28 @@ private:
     TH2F *h2_JetPt_JetMass_BosonMatched;
     TH2F *h2_JetPt_dRsubjets_BosonMatched;
     TH2F *h2_JetPt_dRsubjets_BosonMatched_JetMass;
-    TH2F *h2_JetPt_dRak5jets_BosonMatched;
-    TH2F *h2_JetPt_dRak5jets_BosonMatched_JetMass;
+    TH2F *h2_JetPt_dRstdjets_BosonMatched;
+    TH2F *h2_JetPt_dRstdjets_BosonMatched_JetMass;
 
     TH2F *h2_JetPt_mindRjetBhadron_BosonMatched;
     TH2F *h2_JetPt_mindRSubjet1Bhadron_BosonMatched;
     TH2F *h2_JetPt_mindRSubjet2Bhadron_BosonMatched;
-    TH2F *h2_JetPt_mindRak5jetBhadron_BosonMatched;
-    TH2F *h2_JetPt_mindRak5jet1Bhadron_BosonMatched;
-    TH2F *h2_JetPt_mindRak5jet2Bhadron_BosonMatched;
+    TH2F *h2_JetPt_mindRstdjetBhadron_BosonMatched;
+    TH2F *h2_JetPt_mindRstdjet1Bhadron_BosonMatched;
+    TH2F *h2_JetPt_mindRstdjet2Bhadron_BosonMatched;
     TH2F *h2_JetPt_mindRjetBhadron_BosonMatched_JetMass;
     TH2F *h2_JetPt_mindRSubjet1Bhadron_BosonMatched_JetMass;
     TH2F *h2_JetPt_mindRSubjet2Bhadron_BosonMatched_JetMass;
-    TH2F *h2_JetPt_mindRak5jetBhadron_BosonMatched_JetMass;
-    TH2F *h2_JetPt_mindRak5jet1Bhadron_BosonMatched_JetMass;
-    TH2F *h2_JetPt_mindRak5jet2Bhadron_BosonMatched_JetMass;
+    TH2F *h2_JetPt_mindRstdjetBhadron_BosonMatched_JetMass;
+    TH2F *h2_JetPt_mindRstdjet1Bhadron_BosonMatched_JetMass;
+    TH2F *h2_JetPt_mindRstdjet2Bhadron_BosonMatched_JetMass;
 
     TH2F *h2_JetPt_SameMatchedBhadron_BosonMatched;
     TH2F *h2_JetPt_SameMatchedBhadron_BosonMatched_SubJetMinCSVL;
     TH2F *h2_JetPt_SameMatchedBhadron_BosonMatched_JetMass;
     TH2F *h2_JetPt_SameMatchedBhadron_BosonMatched_JetMass_SubJetMinCSVL;
-    TH2F *h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched;
-    TH2F *h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched_JetMass;
+    TH2F *h2_JetPt_SameMatchedBhadronStdJets_BosonMatched;
+    TH2F *h2_JetPt_SameMatchedBhadronStdJets_BosonMatched_JetMass;
 
     TH1F *h1_JetCSVDiscr_BosonMatched_JetMass;
     TH1F *h1_JetIVFCSVDiscr_BosonMatched_JetMass;
@@ -269,8 +270,8 @@ private:
     TH2F *h2_JetPt_SubJetMinJBP_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMaxJBP_BosonMatched_JetMass;
 
-    TH2F *h2_JetPt_AK5JetCSV_BosonMatched_JetMass;
-    TH2F *h2_JetPt_AK5JetMinCSV_BosonMatched_JetMass;
+    TH2F *h2_JetPt_StdJetIVFCSV_BosonMatched_JetMass;
+    TH2F *h2_JetPt_StdJetMinIVFCSV_BosonMatched_JetMass;
 
     TH2F *h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0to0p2;
     TH2F *h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p2to0p4;
@@ -343,9 +344,10 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
   jetsTag(iConfig.getParameter<edm::InputTag>("JetsTag")),
   useSubJets(iConfig.getParameter<bool>("UseSubJets")),
   groomedBasicJetsTag(iConfig.getParameter<edm::InputTag>("GroomedBasicJetsTag")),
-  useAK5Jets( iConfig.exists("UseAK5Jets") ? iConfig.getParameter<bool>("UseAK5Jets") : false ),
-  ak5JetsTag( iConfig.exists("AK5JetsTag") ? iConfig.getParameter<edm::InputTag>("AK5JetsTag") : edm::InputTag("selectedPatJetsAK5PF") ),
   subJetMode(iConfig.getParameter<std::string>("SubJetMode")),
+  useStdJets( iConfig.exists("UseStdJets") ? iConfig.getParameter<bool>("UseStdJets") : false ),
+  stdJetsTag( iConfig.exists("StdJetsTag") ? iConfig.getParameter<edm::InputTag>("StdJetsTag") : edm::InputTag("selectedPatJetsAKPFCHS") ),
+  stdJetMatchingRadius( iConfig.exists("StdJetMatchingRadius") ? iConfig.getParameter<double>("StdJetMatchingRadius") : -1. ),
   pvTag(iConfig.getParameter<edm::InputTag>("PvTag")),
   jetRadius(iConfig.getParameter<double>("JetRadius")),
   doBosonMatching(iConfig.getParameter<bool>("DoBosonMatching")),
@@ -468,28 +470,28 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h2_JetPt_JetMass_BosonMatched = fs->make<TH2F>("h2_JetPt_JetMass_BosonMatched",";p_{T} [GeV];m_{jet} [GeV]",ptBins,ptMin,ptMax,massBins,massMin,massMax);
     h2_JetPt_dRsubjets_BosonMatched = fs->make<TH2F>("h2_JetPt_dRsubjets_BosonMatched",";p_{T} [GeV];#DeltaR(subjet_{1},subjet_{2})",ptBins,ptMin,ptMax,dRBins,dRMin,dRMax);
     h2_JetPt_dRsubjets_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_dRsubjets_BosonMatched_JetMass",";p_{T} [GeV];#DeltaR(subjet_{1},subjet_{2})",ptBins,ptMin,ptMax,dRBins,dRMin,dRMax);
-    h2_JetPt_dRak5jets_BosonMatched = fs->make<TH2F>("h2_JetPt_dRak5jets_BosonMatched",";p_{T} [GeV];#DeltaR(AK5 jet_{1},AK5 jet_{2})",ptBins,ptMin,ptMax,dRBins,dRMin,dRMax);
-    h2_JetPt_dRak5jets_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_dRak5jets_BosonMatched_JetMass",";p_{T} [GeV];#DeltaR(AK5 jet_{1},AK5 jet_{2})",ptBins,ptMin,ptMax,dRBins,dRMin,dRMax);
+    h2_JetPt_dRstdjets_BosonMatched = fs->make<TH2F>("h2_JetPt_dRstdjets_BosonMatched",";p_{T} [GeV];#DeltaR(Std jet_{1},Std jet_{2})",ptBins,ptMin,ptMax,dRBins,dRMin,dRMax);
+    h2_JetPt_dRstdjets_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_dRstdjets_BosonMatched_JetMass",";p_{T} [GeV];#DeltaR(Std jet_{1},Std jet_{2})",ptBins,ptMin,ptMax,dRBins,dRMin,dRMax);
 
     h2_JetPt_mindRjetBhadron_BosonMatched     = fs->make<TH2F>("h2_JetPt_mindRjetBhadron_BosonMatched",    ";p_{T} [GeV];min #DeltaR(fat jet,b hadron)",    ptBins,ptMin,ptMax,dRBins,0.,2.);
     h2_JetPt_mindRSubjet1Bhadron_BosonMatched = fs->make<TH2F>("h2_JetPt_mindRSubjet1Bhadron_BosonMatched",";p_{T} [GeV];min #DeltaR(subjet_{1},b hadron)", ptBins,ptMin,ptMax,dRBins,0.,2.);
     h2_JetPt_mindRSubjet2Bhadron_BosonMatched = fs->make<TH2F>("h2_JetPt_mindRSubjet2Bhadron_BosonMatched",";p_{T} [GeV];min #DeltaR(subjet_{2},b hadron)", ptBins,ptMin,ptMax,dRBins,0.,2.);
-    h2_JetPt_mindRak5jetBhadron_BosonMatched  = fs->make<TH2F>("h2_JetPt_mindRak5jetBhadron_BosonMatched", ";p_{T} [GeV];min #DeltaR(AK5 jet,b hadron)",    ptBins,ptMin,ptMax,dRBins,0.,2.);
-    h2_JetPt_mindRak5jet1Bhadron_BosonMatched = fs->make<TH2F>("h2_JetPt_mindRak5jet1Bhadron_BosonMatched",";p_{T} [GeV];min #DeltaR(AK5 jet_{1},b hadron)",ptBins,ptMin,ptMax,dRBins,0.,2.);
-    h2_JetPt_mindRak5jet2Bhadron_BosonMatched = fs->make<TH2F>("h2_JetPt_mindRak5jet2Bhadron_BosonMatched",";p_{T} [GeV];min #DeltaR(AK5 jet_{2},b hadron)",ptBins,ptMin,ptMax,dRBins,0.,2.);
+    h2_JetPt_mindRstdjetBhadron_BosonMatched  = fs->make<TH2F>("h2_JetPt_mindRstdjetBhadron_BosonMatched", ";p_{T} [GeV];min #DeltaR(Std jet,b hadron)",    ptBins,ptMin,ptMax,dRBins,0.,2.);
+    h2_JetPt_mindRstdjet1Bhadron_BosonMatched = fs->make<TH2F>("h2_JetPt_mindRstdjet1Bhadron_BosonMatched",";p_{T} [GeV];min #DeltaR(Std jet_{1},b hadron)",ptBins,ptMin,ptMax,dRBins,0.,2.);
+    h2_JetPt_mindRstdjet2Bhadron_BosonMatched = fs->make<TH2F>("h2_JetPt_mindRstdjet2Bhadron_BosonMatched",";p_{T} [GeV];min #DeltaR(Std jet_{2},b hadron)",ptBins,ptMin,ptMax,dRBins,0.,2.);
     h2_JetPt_mindRjetBhadron_BosonMatched_JetMass     = fs->make<TH2F>("h2_JetPt_mindRjetBhadron_BosonMatched_JetMass",    ";p_{T} [GeV];min #DeltaR(fat jet,b hadron)",    ptBins,ptMin,ptMax,dRBins,0.,2.);
     h2_JetPt_mindRSubjet1Bhadron_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_mindRSubjet1Bhadron_BosonMatched_JetMass",";p_{T} [GeV];min #DeltaR(subjet_{1},b hadron)", ptBins,ptMin,ptMax,dRBins,0.,2.);
     h2_JetPt_mindRSubjet2Bhadron_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_mindRSubjet2Bhadron_BosonMatched_JetMass",";p_{T} [GeV];min #DeltaR(subjet_{2},b hadron)", ptBins,ptMin,ptMax,dRBins,0.,2.);
-    h2_JetPt_mindRak5jetBhadron_BosonMatched_JetMass  = fs->make<TH2F>("h2_JetPt_mindRak5jetBhadron_BosonMatched_JetMass", ";p_{T} [GeV];min #DeltaR(AK5 jet,b hadron)",    ptBins,ptMin,ptMax,dRBins,0.,2.);
-    h2_JetPt_mindRak5jet1Bhadron_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_mindRak5jet1Bhadron_BosonMatched_JetMass",";p_{T} [GeV];min #DeltaR(AK5 jet_{1},b hadron)",ptBins,ptMin,ptMax,dRBins,0.,2.);
-    h2_JetPt_mindRak5jet2Bhadron_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_mindRak5jet2Bhadron_BosonMatched_JetMass",";p_{T} [GeV];min #DeltaR(AK5 jet_{2},b hadron)",ptBins,ptMin,ptMax,dRBins,0.,2.);
+    h2_JetPt_mindRstdjetBhadron_BosonMatched_JetMass  = fs->make<TH2F>("h2_JetPt_mindRstdjetBhadron_BosonMatched_JetMass", ";p_{T} [GeV];min #DeltaR(Std jet,b hadron)",    ptBins,ptMin,ptMax,dRBins,0.,2.);
+    h2_JetPt_mindRstdjet1Bhadron_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_mindRstdjet1Bhadron_BosonMatched_JetMass",";p_{T} [GeV];min #DeltaR(Std jet_{1},b hadron)",ptBins,ptMin,ptMax,dRBins,0.,2.);
+    h2_JetPt_mindRstdjet2Bhadron_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_mindRstdjet2Bhadron_BosonMatched_JetMass",";p_{T} [GeV];min #DeltaR(Std jet_{2},b hadron)",ptBins,ptMin,ptMax,dRBins,0.,2.);
 
     h2_JetPt_SameMatchedBhadron_BosonMatched = fs->make<TH2F>("h2_JetPt_SameMatchedBhadron_BosonMatched",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
     h2_JetPt_SameMatchedBhadron_BosonMatched_SubJetMinCSVL = fs->make<TH2F>("h2_JetPt_SameMatchedBhadron_BosonMatched_SubJetMinCSVL",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
     h2_JetPt_SameMatchedBhadron_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SameMatchedBhadron_BosonMatched_JetMass",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
     h2_JetPt_SameMatchedBhadron_BosonMatched_JetMass_SubJetMinCSVL = fs->make<TH2F>("h2_JetPt_SameMatchedBhadron_BosonMatched_JetMass_SubJetMinCSVL",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
-    h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched = fs->make<TH2F>("h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
-    h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched_JetMass",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
+    h2_JetPt_SameMatchedBhadronStdJets_BosonMatched = fs->make<TH2F>("h2_JetPt_SameMatchedBhadronStdJets_BosonMatched",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
+    h2_JetPt_SameMatchedBhadronStdJets_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SameMatchedBhadronStdJets_BosonMatched_JetMass",";p_{T} [GeV];Same matched b hadron",ptBins,ptMin,ptMax,2,-0.5,1.5);
 
     h1_JetCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetCSVDiscr_BosonMatched_JetMass",";Jet CSV Discr;",404,0.,1.01);
     h1_JetIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetIVFCSVDiscr_BosonMatched_JetMass",";Jet IVFCSV Discr;",404,0.,1.01);
@@ -525,8 +527,8 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h2_JetPt_SubJetMinJBP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinJBP_BosonMatched_JetMass",";p_{T} [GeV];Subjet min JBP Discr",ptBins,ptMin,ptMax,100,0.,10.);
     h2_JetPt_SubJetMaxJBP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxJBP_BosonMatched_JetMass",";p_{T} [GeV];Subjet max JBP Discr",ptBins,ptMin,ptMax,100,0.,10.);
 
-    h2_JetPt_AK5JetCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_AK5JetCSV_BosonMatched_JetMass",";p_{T} [GeV];AK5 Jet CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
-    h2_JetPt_AK5JetMinCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_AK5JetMinCSV_BosonMatched_JetMass",";p_{T} [GeV];AK5 Jets min CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
+    h2_JetPt_StdJetIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_StdJetIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Std Jet CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
+    h2_JetPt_StdJetMinIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_StdJetMinIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Std Jet min CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
 
     h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0to0p2   = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0to0p2",  ";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
     h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p2to0p4 = fs->make<TH2F>("h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p2to0p4",";Subjet_{1} Discr;Subjet_{2} Discr",101,0.,1.01,101,0.,1.01);
@@ -686,8 +688,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     edm::Handle<PatJetCollection> groomedBasicJets;
     if( useSubJets ) iEvent.getByLabel(groomedBasicJetsTag,groomedBasicJets);
 
-    edm::Handle<PatJetCollection> ak5Jets;
-    if( useAK5Jets ) iEvent.getByLabel(ak5JetsTag,ak5Jets);
+    edm::Handle<PatJetCollection> stdJets;
+    if( useStdJets ) iEvent.getByLabel(stdJetsTag,stdJets);
 
     edm::Handle<reco::VertexCollection> PVs;
     iEvent.getByLabel(pvTag,PVs);
@@ -1041,29 +1043,29 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         }
       }
 
-      // vector of pointers to matching AK5 jets (matching radius is 0.6)
-      std::vector<const pat::Jet*> matchedAK5Jets;
-      if( useAK5Jets )
+      // vector of pointers to matching Std jets (matching radius is 0.6)
+      std::vector<const pat::Jet*> matchedStdJets;
+      if( useStdJets )
       {
-        for(PatJetCollection::const_iterator jIt = ak5Jets->begin(); jIt != ak5Jets->end(); ++jIt)
+        for(PatJetCollection::const_iterator jIt = stdJets->begin(); jIt != stdJets->end(); ++jIt)
         {
           double dR_temp = reco::deltaR( it->p4(), jIt->p4() );
-          if( dR_temp < 0.6 ) matchedAK5Jets.push_back(&(*jIt));
+          if( dR_temp < stdJetMatchingRadius ) matchedStdJets.push_back(&(*jIt));
         }
       }
-      // sort matched AK5 jets by increasing b-tag discriminator
-      std::vector<unsigned> sortedMatchedAK5JetsIdx;
-      if( matchedAK5Jets.size()>1 )
+      // sort matched Std jets by increasing b-tag discriminator
+      std::vector<unsigned> sortedMatchedStdJetsIdx;
+      if( matchedStdJets.size()>1 )
       {
-        std::multimap<double, unsigned> sortedMatchedAK5Jets;
-        for(unsigned i = 0; i<matchedAK5Jets.size(); ++i)
-          sortedMatchedAK5Jets.insert(std::make_pair(matchedAK5Jets.at(i)->bDiscriminator("combinedSecondaryVertexBJetTags"), i));
+        std::multimap<double, unsigned> sortedMatchedStdJets;
+        for(unsigned i = 0; i<matchedStdJets.size(); ++i)
+          sortedMatchedStdJets.insert(std::make_pair(matchedStdJets.at(i)->bDiscriminator("combinedSecondaryVertexV2BJetTags"), i));
 
-        for(std::multimap<double, unsigned>::const_iterator it = sortedMatchedAK5Jets.begin(); it != sortedMatchedAK5Jets.end(); ++it)
-          sortedMatchedAK5JetsIdx.push_back(it->second);
+        for(std::multimap<double, unsigned>::const_iterator it = sortedMatchedStdJets.begin(); it != sortedMatchedStdJets.end(); ++it)
+          sortedMatchedStdJetsIdx.push_back(it->second);
       }
-      else if (matchedAK5Jets.size()==1 )
-        sortedMatchedAK5JetsIdx.push_back(0);
+      else if (matchedStdJets.size()==1 )
+        sortedMatchedStdJetsIdx.push_back(0);
 
       // Determine CSV vertex types for the jet and its subjets
       // Vertex types defined in DataFormats/BTauReco/interface/VertexTypes.h)
@@ -1227,10 +1229,10 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         h2_nPV_JetMass_Pt[suffix]->Fill(nPV, jetMass, eventWeight);
       }
 
-      // find the closest b hadron to the fat jet, the two subjets, and the matched AK5 jets
-      double mindRfatjet = 999., mindRsubjet1 = 999., mindRsubjet2 = 999., mindRak5jet = 999., mindRak5jet1 = 999., mindRak5jet2 = 999.;
+      // find the closest b hadron to the fat jet, the two subjets, and the matched Std jets
+      double mindRfatjet = 999., mindRsubjet1 = 999., mindRsubjet2 = 999., mindRstdjet = 999., mindRstdjet1 = 999., mindRstdjet2 = 999.;
       reco::GenParticleCollection::const_iterator bHadronMatchSubjet1 = genParticles->end(), bHadronMatchSubjet2 = genParticles->end(),
-                                                  bHadronMatchAK5jet1 = genParticles->end(), bHadronMatchAK5jet2 = genParticles->end();
+                                                  bHadronMatchStdjet1 = genParticles->end(), bHadronMatchStdjet2 = genParticles->end();
 
       for(reco::GenParticleCollection::const_iterator gpIt = genParticles->begin(); gpIt != genParticles->end(); ++gpIt)
       {
@@ -1258,26 +1260,26 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
           }
         }
 
-        if( matchedAK5Jets.size()>0 )
+        if( matchedStdJets.size()>0 )
         {
-          double dRak5jet = reco::deltaR( matchedAK5Jets.at(sortedMatchedAK5JetsIdx.back())->p4(), gpIt->p4() );
-          if( dRak5jet < mindRak5jet )
-            mindRak5jet = dRak5jet;
+          double dRstdjet = reco::deltaR( matchedStdJets.at(sortedMatchedStdJetsIdx.back())->p4(), gpIt->p4() );
+          if( dRstdjet < mindRstdjet )
+            mindRstdjet = dRstdjet;
         }
 
-        if( matchedAK5Jets.size()>1 )
+        if( matchedStdJets.size()>1 )
         {
-          double dRak5jet1 = reco::deltaR( matchedAK5Jets.at(sortedMatchedAK5JetsIdx.back())->p4(), gpIt->p4() );
-          double dRak5jet2 = reco::deltaR( matchedAK5Jets.at(sortedMatchedAK5JetsIdx.at(matchedAK5Jets.size()-2))->p4(), gpIt->p4() );
-          if( dRak5jet1 < mindRak5jet1 )
+          double dRstdjet1 = reco::deltaR( matchedStdJets.at(sortedMatchedStdJetsIdx.back())->p4(), gpIt->p4() );
+          double dRstdjet2 = reco::deltaR( matchedStdJets.at(sortedMatchedStdJetsIdx.at(matchedStdJets.size()-2))->p4(), gpIt->p4() );
+          if( dRstdjet1 < mindRstdjet1 )
           {
-            mindRak5jet1 = dRak5jet1;
-            bHadronMatchAK5jet1 = gpIt;
+            mindRstdjet1 = dRstdjet1;
+            bHadronMatchStdjet1 = gpIt;
           }
-          if( dRak5jet2 < mindRak5jet2 )
+          if( dRstdjet2 < mindRstdjet2 )
           {
-            mindRak5jet2 = dRak5jet2;
-            bHadronMatchAK5jet2 = gpIt;
+            mindRstdjet2 = dRstdjet2;
+            bHadronMatchStdjet2 = gpIt;
           }
         }
       }
@@ -1285,11 +1287,11 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h2_JetPt_mindRjetBhadron_BosonMatched->    Fill(jetPt, (mindRfatjet<999.  ? mindRfatjet  : -99.), eventWeight);
       h2_JetPt_mindRSubjet1Bhadron_BosonMatched->Fill(jetPt, (mindRsubjet1<999. ? mindRsubjet1 : -99.), eventWeight);
       h2_JetPt_mindRSubjet2Bhadron_BosonMatched->Fill(jetPt, (mindRsubjet2<999. ? mindRsubjet2 : -99.), eventWeight);
-      if( useAK5Jets )
+      if( useStdJets )
       {
-        h2_JetPt_mindRak5jetBhadron_BosonMatched-> Fill(jetPt, (mindRak5jet<999.  ? mindRak5jet  : -99.), eventWeight);
-        h2_JetPt_mindRak5jet1Bhadron_BosonMatched->Fill(jetPt, (mindRak5jet1<999. ? mindRak5jet1 : -99.), eventWeight);
-        h2_JetPt_mindRak5jet2Bhadron_BosonMatched->Fill(jetPt, (mindRak5jet2<999. ? mindRak5jet2 : -99.), eventWeight);
+        h2_JetPt_mindRstdjetBhadron_BosonMatched-> Fill(jetPt, (mindRstdjet<999.  ? mindRstdjet  : -99.), eventWeight);
+        h2_JetPt_mindRstdjet1Bhadron_BosonMatched->Fill(jetPt, (mindRstdjet1<999. ? mindRstdjet1 : -99.), eventWeight);
+        h2_JetPt_mindRstdjet2Bhadron_BosonMatched->Fill(jetPt, (mindRstdjet2<999. ? mindRstdjet2 : -99.), eventWeight);
       }
 
       double dRsubjets = -999.;
@@ -1302,11 +1304,11 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
           h2_JetPt_SameMatchedBhadron_BosonMatched->Fill(jetPt, ( bHadronMatchSubjet1 == bHadronMatchSubjet2 ? 1. : 0. ), eventWeight);
       }
 
-      if( matchedAK5Jets.size()>1 )
+      if( matchedStdJets.size()>1 )
       {
-        h2_JetPt_dRak5jets_BosonMatched->Fill(jetPt, reco::deltaR( matchedAK5Jets.at(sortedMatchedAK5JetsIdx.back())->p4(), matchedAK5Jets.at(sortedMatchedAK5JetsIdx.at(matchedAK5Jets.size()-2))->p4() ), eventWeight);
-        if( bHadronMatchAK5jet1 != genParticles->end() && bHadronMatchAK5jet2 != genParticles->end() )
-          h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched->Fill(jetPt, ( bHadronMatchAK5jet1 == bHadronMatchAK5jet2 ? 1. : 0. ), eventWeight);
+        h2_JetPt_dRstdjets_BosonMatched->Fill(jetPt, reco::deltaR( matchedStdJets.at(sortedMatchedStdJetsIdx.back())->p4(), matchedStdJets.at(sortedMatchedStdJetsIdx.at(matchedStdJets.size()-2))->p4() ), eventWeight);
+        if( bHadronMatchStdjet1 != genParticles->end() && bHadronMatchStdjet2 != genParticles->end() )
+          h2_JetPt_SameMatchedBhadronStdJets_BosonMatched->Fill(jetPt, ( bHadronMatchStdjet1 == bHadronMatchStdjet2 ? 1. : 0. ), eventWeight);
       }
 
       // get b-tag discriminators
@@ -1318,7 +1320,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       double subJet1_IVFCSV_discr = -999., subJet2_IVFCSV_discr = -999.;
       double subJet1_JP_discr = -999., subJet2_JP_discr = -999.;
       double subJet1_JBP_discr = -999., subJet2_JBP_discr = -999.;
-      double ak5Jet_CSV_discr = -999., ak5Jet1_CSV_discr = -999., ak5Jet2_CSV_discr = -999.;
+      double stdJet_IVFCSV_discr = -999., stdJet1_IVFCSV_discr = -999., stdJet2_IVFCSV_discr = -999.;
       if( subjets.size()>1 )
       {
         subJet1_CSV_discr = subjets.at(0)->bDiscriminator("combinedSecondaryVertexBJetTags");
@@ -1333,12 +1335,12 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         subJet1_JBP_discr = subjets.at(0)->bDiscriminator("jetBProbabilityBJetTags");
         subJet2_JBP_discr = subjets.at(1)->bDiscriminator("jetBProbabilityBJetTags");
       }
-      if( matchedAK5Jets.size()>0 )
-        ak5Jet_CSV_discr = matchedAK5Jets.at(sortedMatchedAK5JetsIdx.back())->bDiscriminator("combinedSecondaryVertexBJetTags");
-      if( matchedAK5Jets.size()>1 )
+      if( matchedStdJets.size()>0 )
+        stdJet_IVFCSV_discr = matchedStdJets.at(sortedMatchedStdJetsIdx.back())->bDiscriminator("combinedSecondaryVertexV2BJetTags");
+      if( matchedStdJets.size()>1 )
       {
-        ak5Jet1_CSV_discr = matchedAK5Jets.at(sortedMatchedAK5JetsIdx.back())->bDiscriminator("combinedSecondaryVertexBJetTags");
-        ak5Jet2_CSV_discr = matchedAK5Jets.at(sortedMatchedAK5JetsIdx.at(matchedAK5Jets.size()-2))->bDiscriminator("combinedSecondaryVertexBJetTags");
+        stdJet1_IVFCSV_discr = matchedStdJets.at(sortedMatchedStdJetsIdx.back())->bDiscriminator("combinedSecondaryVertexV2BJetTags");
+        stdJet2_IVFCSV_discr = matchedStdJets.at(sortedMatchedStdJetsIdx.at(matchedStdJets.size()-2))->bDiscriminator("combinedSecondaryVertexV2BJetTags");
       }
       double subJet_minCSV_discr = std::min(subJet1_CSV_discr, subJet2_CSV_discr);
       double subJet_maxCSV_discr = std::max(subJet1_CSV_discr, subJet2_CSV_discr);
@@ -1348,7 +1350,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       double subJet_maxJP_discr = std::max(subJet1_JP_discr, subJet2_JP_discr);
       double subJet_minJBP_discr = std::min(subJet1_JBP_discr, subJet2_JBP_discr);
       double subJet_maxJBP_discr = std::max(subJet1_JBP_discr, subJet2_JBP_discr);
-      double minAK5Jets_CSV_discr = std::min(ak5Jet1_CSV_discr, ak5Jet2_CSV_discr);
+      double minStdJets_IVFCSV_discr = std::min(stdJet1_IVFCSV_discr, stdJet2_IVFCSV_discr);
       double jet_DoubleB_discr = it->bDiscriminator("doubleSecondaryVertexHighEffBJetTags");
       // Define hybrid CSV discriminator
       double jet_HybridCSV_discr = subJet_minCSV_discr;
@@ -1379,11 +1381,11 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h2_JetPt_mindRjetBhadron_BosonMatched_JetMass->    Fill(jetPt, (mindRfatjet<999.  ? mindRfatjet  : -99.), eventWeight);
       h2_JetPt_mindRSubjet1Bhadron_BosonMatched_JetMass->Fill(jetPt, (mindRsubjet1<999. ? mindRsubjet1 : -99.), eventWeight);
       h2_JetPt_mindRSubjet2Bhadron_BosonMatched_JetMass->Fill(jetPt, (mindRsubjet2<999. ? mindRsubjet2 : -99.), eventWeight);
-      if( useAK5Jets )
+      if( useStdJets )
       {
-        h2_JetPt_mindRak5jetBhadron_BosonMatched_JetMass-> Fill(jetPt, (mindRak5jet<999.  ? mindRak5jet  : -99.), eventWeight);
-        h2_JetPt_mindRak5jet1Bhadron_BosonMatched_JetMass->Fill(jetPt, (mindRak5jet1<999. ? mindRak5jet1 : -99.), eventWeight);
-        h2_JetPt_mindRak5jet2Bhadron_BosonMatched_JetMass->Fill(jetPt, (mindRak5jet2<999. ? mindRak5jet2 : -99.), eventWeight);
+        h2_JetPt_mindRstdjetBhadron_BosonMatched_JetMass-> Fill(jetPt, (mindRstdjet<999.  ? mindRstdjet  : -99.), eventWeight);
+        h2_JetPt_mindRstdjet1Bhadron_BosonMatched_JetMass->Fill(jetPt, (mindRstdjet1<999. ? mindRstdjet1 : -99.), eventWeight);
+        h2_JetPt_mindRstdjet2Bhadron_BosonMatched_JetMass->Fill(jetPt, (mindRstdjet2<999. ? mindRstdjet2 : -99.), eventWeight);
       }
 
 //       reco::TaggingVariableList tvlIP = it->tagInfoTrackIP("impactParameter")->taggingVariables();
@@ -1537,11 +1539,11 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         }
       }
 
-      if( matchedAK5Jets.size()>1 )
+      if( matchedStdJets.size()>1 )
       {
-        h2_JetPt_dRak5jets_BosonMatched_JetMass->Fill(jetPt, reco::deltaR( matchedAK5Jets.at(sortedMatchedAK5JetsIdx.back())->p4(), matchedAK5Jets.at(sortedMatchedAK5JetsIdx.at(matchedAK5Jets.size()-2))->p4() ), eventWeight);
-        if( bHadronMatchAK5jet1 != genParticles->end() && bHadronMatchAK5jet2 != genParticles->end() )
-          h2_JetPt_SameMatchedBhadronAK5Jets_BosonMatched_JetMass->Fill(jetPt, ( bHadronMatchAK5jet1 == bHadronMatchAK5jet2 ? 1. : 0. ), eventWeight);
+        h2_JetPt_dRstdjets_BosonMatched_JetMass->Fill(jetPt, reco::deltaR( matchedStdJets.at(sortedMatchedStdJetsIdx.back())->p4(), matchedStdJets.at(sortedMatchedStdJetsIdx.at(matchedStdJets.size()-2))->p4() ), eventWeight);
+        if( bHadronMatchStdjet1 != genParticles->end() && bHadronMatchStdjet2 != genParticles->end() )
+          h2_JetPt_SameMatchedBhadronStdJets_BosonMatched_JetMass->Fill(jetPt, ( bHadronMatchStdjet1 == bHadronMatchStdjet2 ? 1. : 0. ), eventWeight);
       }
 
       h1_JetCSVDiscr_BosonMatched_JetMass->Fill( jet_CSV_discr, eventWeight);
@@ -1578,8 +1580,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h2_JetPt_SubJetMinJBP_BosonMatched_JetMass->Fill(jetPt, subJet_minJBP_discr, eventWeight);
       h2_JetPt_SubJetMaxJBP_BosonMatched_JetMass->Fill(jetPt, subJet_maxJBP_discr, eventWeight);
 
-      h2_JetPt_AK5JetCSV_BosonMatched_JetMass->Fill(jetPt, ak5Jet_CSV_discr, eventWeight);
-      h2_JetPt_AK5JetMinCSV_BosonMatched_JetMass->Fill(jetPt, minAK5Jets_CSV_discr, eventWeight);
+      h2_JetPt_StdJetIVFCSV_BosonMatched_JetMass->Fill(jetPt, stdJet_IVFCSV_discr, eventWeight);
+      h2_JetPt_StdJetMinIVFCSV_BosonMatched_JetMass->Fill(jetPt, minStdJets_IVFCSV_discr, eventWeight);
 
       if( jet_CSV_discr>0.244 )    h1_JetPt_BosonMatched_JetMass_CSVL->Fill(jetPt, eventWeight);
       if( jet_CSV_discr>0.679 )    h1_JetPt_BosonMatched_JetMass_CSVM->Fill(jetPt, eventWeight);

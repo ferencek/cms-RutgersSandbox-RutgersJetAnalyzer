@@ -97,10 +97,15 @@ options.register('useEventWeight', False,
     VarParsing.varType.bool,
     "Use event weight"
 )
-options.register('useAK5Jets', True,
+options.register('useStdJets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    "Use AK5 jets"
+    "Use standard jets"
+)
+options.register('stdRadius', 0.4,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Distance parameter R for standard jets (default is 0.4)"
 )
 options.register('useSVClustering', False,
     VarParsing.multiplicity.singleton,
@@ -181,6 +186,7 @@ bTagDiscriminators = ['jetProbabilityBJetTags','jetBProbabilityBJetTags','combin
 algoLabel = 'CA'
 if options.jetAlgo == 'AntiKt':
     algoLabel = 'AK'
+
 
 import FWCore.ParameterSet.Config as cms
 
@@ -268,7 +274,20 @@ process.out = cms.OutputModule("PoolOutputModule",
 )
 
 #-------------------------------------
-## fat jets (Gen and Reco)
+## Standard jets (Gen and Reco)
+from RecoJets.JetProducers.ak5GenJets_cfi import ak5GenJets
+process.stdGenJetsNoNu = ak5GenJets.clone(
+    rParam = cms.double(options.stdRadius),
+    src = cms.InputTag("genParticlesForJetsNoNu")
+)
+from RecoJets.JetProducers.ak5PFJets_cfi import ak5PFJets
+process.stdPFJetsCHS = ak5PFJets.clone(
+    rParam = cms.double(options.stdRadius),
+    src = cms.InputTag("pfNoElectronPFlow"),
+    srcPVs = cms.InputTag("goodOfflinePrimaryVertices"),
+    doAreaFastjet = cms.bool(True)
+)
+## Fat jets (Gen and Reco)
 from RecoJets.JetProducers.ca4GenJets_cfi import ca4GenJets
 process.genJetsNoNu = ca4GenJets.clone(
     jetAlgorithm = cms.string(options.jetAlgo),
@@ -444,7 +463,7 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJetCollection(process,
     jetCollection=cms.InputTag('PFJetsCHS'),
     jetIdLabel=algoLabel,
-    rParam = options.jetRadius,
+    rParam=options.jetRadius,
     useLegacyFlavour=False,
     doJTA=options.doJTA,
     doBTagging=options.doBTagging,
@@ -456,8 +475,7 @@ switchJetCollection(process,
     doJetID      = False,
 )
 ## Filtered fat jets
-addJetCollection(
-    process,
+addJetCollection(process,
     jetCollection=cms.InputTag('PFJetsCHSFiltered'),
     algoLabel=algoLabel,
     typeLabel='FilteredPFCHS',
@@ -474,12 +492,11 @@ addJetCollection(
     genJetCollection=cms.InputTag("genJetsNoNu")
 )
 ## Filtered subjets of fat jets
-addJetCollection(
-    process,
+addJetCollection(process,
     jetCollection=cms.InputTag('PFJetsCHSFiltered','SubJets'),
     algoLabel=algoLabel,
     typeLabel='FilteredSubjetsPFCHS',
-    rParam = options.jetRadius,
+    rParam=options.jetRadius,
     useLegacyFlavour=False,
     doJTA=options.doJTA,
     doBTagging=options.doBTagging,
@@ -493,8 +510,7 @@ addJetCollection(
     genJetCollection=cms.InputTag('genJetsNoNuFiltered','SubJets')
 )
 ## MassDrop-BDRS filtered fat jets
-#addJetCollection(
-    #process,
+#addJetCollection(process,
     #jetCollection=cms.InputTag('PFJetsCHSMDBDRSFiltered'),
     #algoLabel=algoLabel,
     #typeLabel='MDBDRSFilteredPFCHS',
@@ -511,12 +527,11 @@ addJetCollection(
     #genJetCollection=cms.InputTag("genJetsNoNu")
 #)
 ## MassDrop-BDRS filtered subjets of fat jets
-#addJetCollection(
-    #process,
+#addJetCollection(process,
     #jetCollection=cms.InputTag('PFJetsCHSMDBDRSFiltered','SubJets'),
     #algoLabel=algoLabel,
     #typeLabel='MDBDRSFilteredSubjetsPFCHS',
-    #rParam = options.jetRadius,
+    #rParam=options.jetRadius,
     #useLegacyFlavour=False,
     #doJTA=options.doJTA,
     #doBTagging=options.doBTagging,
@@ -530,8 +545,7 @@ addJetCollection(
     #genJetCollection=cms.InputTag('genJetsNoNuMDBDRSFiltered','SubJets')
 #)
 ## Kt-BDRS filtered fat jets
-addJetCollection(
-    process,
+addJetCollection(process,
     jetCollection=cms.InputTag('PFJetsCHSKtBDRSFiltered'),
     algoLabel=algoLabel,
     typeLabel='KtBDRSFilteredPFCHS',
@@ -548,12 +562,11 @@ addJetCollection(
     genJetCollection=cms.InputTag("genJetsNoNu")
 )
 ## Kt-BDRS filtered subjets of fat jets
-addJetCollection(
-    process,
+addJetCollection(process,
     jetCollection=cms.InputTag('PFJetsCHSKtBDRSFiltered','SubJets'),
     algoLabel=algoLabel,
     typeLabel='KtBDRSFilteredSubjetsPFCHS',
-    rParam = options.jetRadius,
+    rParam=options.jetRadius,
     useLegacyFlavour=False,
     doJTA=options.doJTA,
     doBTagging=options.doBTagging,
@@ -567,8 +580,7 @@ addJetCollection(
     genJetCollection=cms.InputTag('genJetsNoNuKtBDRSFiltered','SubJets')
 )
 ## Pruned fat jets
-addJetCollection(
-    process,
+addJetCollection(process,
     jetCollection=cms.InputTag('PFJetsCHSPruned'),
     algoLabel=algoLabel,
     typeLabel='PrunedPFCHS',
@@ -585,12 +597,11 @@ addJetCollection(
     genJetCollection=cms.InputTag("genJetsNoNu")
 )
 ## Pruned subjets of fat jets
-addJetCollection(
-    process,
+addJetCollection(process,
     jetCollection=cms.InputTag('PFJetsCHSPruned','SubJets'),
     algoLabel=algoLabel,
     typeLabel='PrunedSubjetsPFCHS',
-    rParam = options.jetRadius,
+    rParam=options.jetRadius,
     useLegacyFlavour=False,
     doJTA=options.doJTA,
     doBTagging=options.doBTagging,
@@ -604,8 +615,7 @@ addJetCollection(
     genJetCollection=cms.InputTag('genJetsNoNuPruned','SubJets')
 )
 ## Kt pruned fat jets
-addJetCollection(
-    process,
+addJetCollection(process,
     jetCollection=cms.InputTag('PFJetsCHSKtPruned'),
     algoLabel=algoLabel,
     typeLabel='KtPrunedPFCHS',
@@ -622,12 +632,11 @@ addJetCollection(
     genJetCollection=cms.InputTag("genJetsNoNu")
 )
 ## Kt subjets of fat jets
-addJetCollection(
-    process,
+addJetCollection(process,
     jetCollection=cms.InputTag('PFJetsCHSKtPruned','SubJets'),
     algoLabel=algoLabel,
     typeLabel='KtSubjetsPFCHS',
-    rParam = options.jetRadius,
+    rParam=options.jetRadius,
     useLegacyFlavour=False,
     doJTA=options.doJTA,
     doBTagging=options.doBTagging,
@@ -640,6 +649,25 @@ addJetCollection(
     doJetID=False,
     genJetCollection=cms.InputTag('genJetsNoNuKtPruned','SubJets')
 )
+if options.useStdJets:
+    addJetCollection(process,
+        jetCollection=cms.InputTag('stdPFJetsCHS'),
+        algoLabel='AK',
+        typeLabel='PFCHS',
+        rParam=options.stdRadius,
+        useLegacyFlavour=False,
+        doJTA=options.doJTA,
+        doBTagging=options.doBTagging,
+        btagInfo=bTagInfos,
+        btagdiscriminators=bTagDiscriminators,
+        jetCorrLabel=inputJetCorrLabelAK5,
+        doType1MET=False,
+        doL1Cleaning=False,
+        doL1Counters=False,
+        doJetID=False,
+        genJetCollection=cms.InputTag("stdGenJetsNoNu")
+    )
+    getattr(process,'jetTracksAssociatorAtVertexAKPFCHS').coneSize = options.stdRadius
 
 #-------------------------------------
 ## N-subjettiness
@@ -828,6 +856,9 @@ process.jetAnalyzerFatJets_PrunedSubjets = cms.EDAnalyzer('RutgersJetAnalyzer',
     UseSubJets                = cms.bool(True),
     GroomedBasicJetsTag       = cms.InputTag('selectedPatJetsPrunedPFCHSPacked'),
     SubJetMode                = cms.string('Pruned'),
+    UseStdJets                = cms.bool(options.useStdJets),
+    StdJetMatchingRadius      = cms.double(options.jetRadius-options.stdRadius+0.1),
+    StdJetsTag                = cms.InputTag('selectedPatJetsAKPFCHS'),
     PvTag                     = cms.InputTag('goodOfflinePrimaryVertices'),
     JetRadius                 = cms.double(options.jetRadius),
     DoBosonMatching           = cms.bool(True),
@@ -844,6 +875,7 @@ process.jetAnalyzerFatJets_PrunedSubjets = cms.EDAnalyzer('RutgersJetAnalyzer',
     JetMassMin                = cms.double(75.),
     JetMassMax                = cms.double(135.),
     DoJetFlavor               = cms.bool(False),
+    UseGSPFlavor              = cms.bool(True),
     JetFlavorPdgIds           = cms.vint32(5)
 )
 process.jetAnalyzerFatJets_FilteredSubjets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
@@ -878,148 +910,124 @@ if options.runQCDFlavorExtra:
     ## b jets
     process.jetAnalyzerFatJets_PrunedSubjets_bJets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(5)
     )
     ## b jets from gluon splitting
     process.jetAnalyzerFatJets_PrunedSubjets_bJetsGSP = process.jetAnalyzerFatJets_PrunedSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(85)
     )
     ## c jets
     process.jetAnalyzerFatJets_PrunedSubjets_cJets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(4)
     )
     ## uds jets
     process.jetAnalyzerFatJets_PrunedSubjets_udsJets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(1,2,3)
     )
     ## gluon jets
     process.jetAnalyzerFatJets_PrunedSubjets_gluonJets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(21)
     )
     ## udsg jets
     process.jetAnalyzerFatJets_PrunedSubjets_udsgJets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(1,2,3,21)
     )
     ## Filtered subjets
     ## b jets
     process.jetAnalyzerFatJets_FilteredSubjets_bJets = process.jetAnalyzerFatJets_FilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(5)
     )
     ## b jets from gluon splitting
     process.jetAnalyzerFatJets_FilteredSubjets_bJetsGSP = process.jetAnalyzerFatJets_FilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(85)
     )
     ## c jets
     process.jetAnalyzerFatJets_FilteredSubjets_cJets = process.jetAnalyzerFatJets_FilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(4)
     )
     ## uds jets
     process.jetAnalyzerFatJets_FilteredSubjets_udsJets = process.jetAnalyzerFatJets_FilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(1,2,3)
     )
     ## gluon jets
     process.jetAnalyzerFatJets_FilteredSubjets_gluonJets = process.jetAnalyzerFatJets_FilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(21)
     )
     ## udsg jets
     process.jetAnalyzerFatJets_FilteredSubjets_udsgJets = process.jetAnalyzerFatJets_FilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(1,2,3,21)
     )
     ## Kt-BDRS filtered subjets
     ## b jets
     process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_bJets = process.jetAnalyzerFatJets_KtBDRSFilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(5)
     )
     ## b jets from gluon splitting
     process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_bJetsGSP = process.jetAnalyzerFatJets_KtBDRSFilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(85)
     )
     ## c jets
     process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_cJets = process.jetAnalyzerFatJets_KtBDRSFilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(4)
     )
     ## uds jets
     process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_udsJets = process.jetAnalyzerFatJets_KtBDRSFilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(1,2,3)
     )
     ## gluon jets
     process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_gluonJets = process.jetAnalyzerFatJets_KtBDRSFilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(21)
     )
     ## udsg jets
     process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_udsgJets = process.jetAnalyzerFatJets_KtBDRSFilteredSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(1,2,3,21)
     )
     ## Kt subjets
     ## b jets
     process.jetAnalyzerFatJets_KtSubjets_bJets = process.jetAnalyzerFatJets_KtSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(5)
     )
     ## b jets from gluon splitting
     process.jetAnalyzerFatJets_KtSubjets_bJetsGSP = process.jetAnalyzerFatJets_KtSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(85)
     )
     ## c jets
     process.jetAnalyzerFatJets_KtSubjets_cJets = process.jetAnalyzerFatJets_KtSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(4)
     )
     ## uds jets
     process.jetAnalyzerFatJets_KtSubjets_udsJets = process.jetAnalyzerFatJets_KtSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(1,2,3)
     )
     ## gluon jets
     process.jetAnalyzerFatJets_KtSubjets_gluonJets = process.jetAnalyzerFatJets_KtSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(21)
     )
     ## udsg jets
     process.jetAnalyzerFatJets_KtSubjets_udsgJets = process.jetAnalyzerFatJets_KtSubjets.clone(
         DoJetFlavor = cms.bool(True),
-        UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(1,2,3,21)
     )
 
@@ -1156,6 +1164,10 @@ process.jetSeq = cms.Sequence(
     + process.PFJetsCHSTrimmedMass
     )
 )
+
+if options.useStdJets:
+    process.genJetSeq = cms.Sequence( process.genJetSeq + process.stdGenJetsNoNu )
+    process.jetSeq = cms.Sequence( process.jetSeq + process.stdPFJetsCHS )
 
 if not options.runOnData:
     process.jetSeq = cms.Sequence( process.genParticlesForJetsNoNu * process.genJetSeq + process.jetSeq )
