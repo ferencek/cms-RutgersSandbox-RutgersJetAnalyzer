@@ -905,6 +905,12 @@ if options.runQCDFlavorExtra:
         UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(21)
     )
+    ## udsg jets
+    process.jetAnalyzerFatJets_PrunedSubjets_udsgJets = process.jetAnalyzerFatJets_PrunedSubjets.clone(
+        DoJetFlavor = cms.bool(True),
+        UseGSPFlavor = cms.bool(True),
+        JetFlavorPdgIds = cms.vint32(1,2,3,21)
+    )
     ## Filtered subjets
     ## b jets
     process.jetAnalyzerFatJets_FilteredSubjets_bJets = process.jetAnalyzerFatJets_FilteredSubjets.clone(
@@ -935,6 +941,12 @@ if options.runQCDFlavorExtra:
         DoJetFlavor = cms.bool(True),
         UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(21)
+    )
+    ## udsg jets
+    process.jetAnalyzerFatJets_FilteredSubjets_udsgJets = process.jetAnalyzerFatJets_FilteredSubjets.clone(
+        DoJetFlavor = cms.bool(True),
+        UseGSPFlavor = cms.bool(True),
+        JetFlavorPdgIds = cms.vint32(1,2,3,21)
     )
     ## Kt-BDRS filtered subjets
     ## b jets
@@ -967,6 +979,12 @@ if options.runQCDFlavorExtra:
         UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(21)
     )
+    ## udsg jets
+    process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_udsgJets = process.jetAnalyzerFatJets_KtBDRSFilteredSubjets.clone(
+        DoJetFlavor = cms.bool(True),
+        UseGSPFlavor = cms.bool(True),
+        JetFlavorPdgIds = cms.vint32(1,2,3,21)
+    )
     ## Kt subjets
     ## b jets
     process.jetAnalyzerFatJets_KtSubjets_bJets = process.jetAnalyzerFatJets_KtSubjets.clone(
@@ -998,6 +1016,12 @@ if options.runQCDFlavorExtra:
         UseGSPFlavor = cms.bool(True),
         JetFlavorPdgIds = cms.vint32(21)
     )
+    ## udsg jets
+    process.jetAnalyzerFatJets_KtSubjets_udsgJets = process.jetAnalyzerFatJets_KtSubjets.clone(
+        DoJetFlavor = cms.bool(True),
+        UseGSPFlavor = cms.bool(True),
+        JetFlavorPdgIds = cms.vint32(1,2,3,21)
+    )
 
     ## QCD flavor extra jet analyzer sequence
     process.jetAnalyzerSequence_QCDFlavorExtra = cms.Sequence(
@@ -1006,21 +1030,25 @@ if options.runQCDFlavorExtra:
         + process.jetAnalyzerFatJets_PrunedSubjets_cJets
         + process.jetAnalyzerFatJets_PrunedSubjets_udsJets
         + process.jetAnalyzerFatJets_PrunedSubjets_gluonJets
+        + process.jetAnalyzerFatJets_PrunedSubjets_udsgJets
         + process.jetAnalyzerFatJets_FilteredSubjets_bJets
         + process.jetAnalyzerFatJets_FilteredSubjets_bJetsGSP
         + process.jetAnalyzerFatJets_FilteredSubjets_cJets
         + process.jetAnalyzerFatJets_FilteredSubjets_udsJets
         + process.jetAnalyzerFatJets_FilteredSubjets_gluonJets
+        + process.jetAnalyzerFatJets_FilteredSubjets_udsgJets
         + process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_bJets
         + process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_bJetsGSP
         + process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_cJets
         + process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_udsJets
         + process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_gluonJets
+        + process.jetAnalyzerFatJets_KtBDRSFilteredSubjets_udsgJets
         + process.jetAnalyzerFatJets_KtSubjets_bJets
         + process.jetAnalyzerFatJets_KtSubjets_bJetsGSP
         + process.jetAnalyzerFatJets_KtSubjets_cJets
         + process.jetAnalyzerFatJets_KtSubjets_udsJets
         + process.jetAnalyzerFatJets_KtSubjets_gluonJets
+        + process.jetAnalyzerFatJets_KtSubjets_udsgJets
     )
     ## Combined jet analyzer sequence
     process.jetAnalyzerSequence = cms.Sequence( process.jetAnalyzerSequence + process.jetAnalyzerSequence_QCDFlavorExtra )
