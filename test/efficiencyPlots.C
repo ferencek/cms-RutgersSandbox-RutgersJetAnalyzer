@@ -1506,7 +1506,7 @@ void makePlots()
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVL", "h1_JetPt_BosonMatched_JetMass",
 			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVL}",
-			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 10, 0, 1000, 0.001, 1,
+			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 25, 0, 1000, 0.001, 1,
 			      "b-tag_eff_vs_FatJetPt_SubjetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
 
   // Subjet IVFCSVM
@@ -1517,7 +1517,7 @@ void makePlots()
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVM", "h1_JetPt_BosonMatched_JetMass",
 			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVM}",
-			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 10, 0, 1000, 0.0001, 1,
+			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 25, 0, 1000, 0.0001, 1,
 			      "b-tag_eff_vs_FatJetPt_SubjetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
   // Fat jet IVFCSVL
   efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
@@ -1527,7 +1527,7 @@ void makePlots()
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_IVFCSVL", "h1_JetPt_BosonMatched_JetMass",
 			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVL}",
-			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 10, 0, 1000, 0.1, 1,
+			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 25, 0, 1000, 0.1, 1,
 			      "b-tag_eff_vs_FatJetPt_FatJetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
 
   // Fat jet IVFCSVM
@@ -1538,7 +1538,7 @@ void makePlots()
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_IVFCSVM", "h1_JetPt_BosonMatched_JetMass",
 			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVM}",
-			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 10, 0, 1000, 0.01, 1,
+			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 25, 0, 1000, 0.01, 1,
 			      "b-tag_eff_vs_FatJetPt_FatJetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
   
   //--------------------------------------------------------------------------------------------------------------------
