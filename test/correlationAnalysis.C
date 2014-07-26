@@ -310,25 +310,25 @@ void plot_eff_NoErrors(const string& fInputFile, const string& fPlot, const doub
 
 void makePlots()
 {
-//   // Subjet CSV discriminators
-//   plot2D("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets/h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p4to0p6",
-//          "#splitline{H(120)#rightarrowb#bar{b}, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
-//          "Subjet_{1} CSV discr.", "Subjet_{2} CSV discr.", 1, 0, 1, 1, 0, 1, "CSV_dicsr_subjet1_vs_subjet2_HiggsToBBbar_BprimeBprimeToBHBHinc_M-1500.eps", 0.95, 1.1, 0.16, 0.07, 0.8);
-// 
-//   // Subjet IVFCSV discriminators
-//   plot2D("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets/h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p4to0p6",
-//          "#splitline{H(120)#rightarrowb#bar{b}, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
-//          "Subjet_{1} CSV discr.", "Subjet_{2} CSV discr.", 1, 0, 1, 1, 0, 1, "IVFCSV_dicsr_subjet1_vs_subjet2_HiggsToBBbar_BprimeBprimeToBHBHinc_M-1500.eps", 0.95, 1.1, 0.16, 0.07, 0.8);
+  // Subjet CSV discriminators
+  plot2D("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets/h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p4to0p6",
+         "#splitline{H(120)#rightarrowb#bar{b}, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
+         "Subjet_{1} CSV discr.", "Subjet_{2} CSV discr.", 1, 0, 1, 1, 0, 1, "CSV_discr_subjet1_vs_subjet2_HiggsToBBbar_BprimeBprimeToBHBHinc_M-1500.eps", 0.95, 1.1, 0.16, 0.07, 0.8);
+
+  // Subjet IVFCSV discriminators
+  plot2D("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets/h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p4to0p6",
+         "#splitline{H(120)#rightarrowb#bar{b}, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
+         "Subjet_{1} CSV discr.", "Subjet_{2} CSV discr.", 1, 0, 1, 1, 0, 1, "IVFCSV_discr_subjet1_vs_subjet2_HiggsToBBbar_BprimeBprimeToBHBHinc_M-1500.eps", 0.95, 1.1, 0.16, 0.07, 0.8);
 
   // CSVL
   // BprimeBprimeToBHBHinc
   plot_eff("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets/h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets",
            0.244, "#splitline{H(120)#rightarrowb#bar{b}, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
            "#DeltaR(subjets)", "Tagging efficiency","Subjet_tag_correlation_SubjetCSVL_PrunedJetMass_HiggsToBBbar_BprimeBprimeToBHBHinc_M-1500.eps");
-  // QCD, uds jets
+  // QCD, udsg jets
   plot_eff("ROOT_files_AK8/QCDPythia6_HiggsTagging_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets_udsJets/h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets",
-           0.244, "#splitline{QCD uds, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
-           "#DeltaR(subjets)", "Tagging efficiency","Subjet_tag_correlation_SubjetCSVL_PrunedJetMass_QCD_udsJets.eps", 0., 0.15);
+           0.244, "#splitline{QCD udsg, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
+           "#DeltaR(subjets)", "Tagging efficiency","Subjet_tag_correlation_SubjetCSVL_PrunedJetMass_QCD_udsgJets.eps", 0., 0.15);
 //   // QCD, b jets
 //   plot_eff("ROOT_files_AK8/QCDPythia6_HiggsTagging_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets_bJets/h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets",
 //            0.244, "#splitline{QCD b, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
@@ -342,11 +342,11 @@ void makePlots()
   // BprimeBprimeToBHBHinc
   plot_eff("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets/h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets",
            0.423, "#splitline{H(120)#rightarrowb#bar{b}, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVL}",
-           "#DeltaR(subjets)", "Tagging efficiency","Subjet_tag_correlation_SubjetIVFCSVL_CAPrunedJetMass_HiggsToBBbar_BprimeBprimeToBHBHinc_M-1500.eps");
-  // QCD, uds jets
+           "#DeltaR(subjets)", "Tagging efficiency","Subjet_tag_correlation_SubjetIVFCSVL_PrunedJetMass_HiggsToBBbar_BprimeBprimeToBHBHinc_M-1500.eps");
+  // QCD, udsg jets
   plot_eff("ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets_udsJets/h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets",
-           0.423, "#splitline{QCD uds, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVL}",
-           "#DeltaR(subjets)", "Tagging efficiency","Subjet_tag_correlation_SubjetIVFCSVL_PrunedJetMass_QCD_udsJets.eps", 0., 0.3);
+           0.423, "#splitline{QCD udsg, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVL}",
+           "#DeltaR(subjets)", "Tagging efficiency","Subjet_tag_correlation_SubjetIVFCSVL_PrunedJetMass_QCD_udsgJets.eps", 0., 0.3);
 //   // QCD, b jets
 //   plot_eff("ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets_bJets/h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_dRsubjets",
 //            0.423, "#splitline{QCD b, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVL}",
