@@ -318,7 +318,7 @@ void makePlots()
   // Subjet IVFCSV discriminators
   plot2D("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets/h2_SubJet1CSV_SubJet2CSV_BosonMatched_JetMass_dRsubjets0p4to0p6",
          "#splitline{H(120)#rightarrowb#bar{b}, AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet CSVL}",
-         "Subjet_{1} CSV discr.", "Subjet_{2} CSV discr.", 1, 0, 1, 1, 0, 1, "IVFCSV_discr_subjet1_vs_subjet2_HiggsToBBbar_BprimeBprimeToBHBHinc_M-1500.eps", 0.95, 1.1, 0.16, 0.07, 0.8);
+         "Subjet_{1} IVFCSV discr.", "Subjet_{2} IVFCSV discr.", 1, 0, 1, 1, 0, 1, "IVFCSV_discr_subjet1_vs_subjet2_HiggsToBBbar_BprimeBprimeToBHBHinc_M-1500.eps", 0.95, 1.1, 0.16, 0.07, 0.8);
 
   // CSVL
   // BprimeBprimeToBHBHinc
