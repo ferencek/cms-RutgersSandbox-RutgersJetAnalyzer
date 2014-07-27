@@ -1398,7 +1398,7 @@ void makePlots()
 
   // udsg jets
   makePlotsQCDFatvsSub("ROOT_files", "AK", 1e-4, 1, "udsgJets", 1, 1);  // AK8
-  //makePlotsQCDAKvsCA("ROOT_files", 1e-4, 1, "udsgJets");  // AK8 vs CA8
+  makePlotsQCDAKvsCA("ROOT_files", 1e-4, 1, "udsgJets");  // AK8 vs CA8
   makePlotsQCDStdJets("ROOT_files", "AK", 1e-4, 1, "udsgJets");   // AK8
 
   // other backgrounds
