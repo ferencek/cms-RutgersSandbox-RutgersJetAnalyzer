@@ -12,6 +12,7 @@
 #include "TLegend.h"
 #include "TGraphAsymmErrors.h"
 #include "exoStyle.C"
+#include "CMS_lumi.C"
 
 
 using namespace std;
@@ -1088,6 +1089,7 @@ void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInput
 {
   gROOT->SetBatch(kTRUE);
   setEXOStyle();
+
   gStyle->SetGridColor(kGray);
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPadTopMargin(fTopMargin);
@@ -1192,6 +1194,14 @@ void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInput
   g_efficiency6->SetMarkerStyle(27);
   g_efficiency6->SetMarkerColor(kRed+3);
 
+  // remove last point
+  g_efficiency1->RemovePoint(g_efficiency1->GetN()-1);
+  g_efficiency2->RemovePoint(g_efficiency2->GetN()-1);
+  g_efficiency3->RemovePoint(g_efficiency3->GetN()-1);
+  g_efficiency4->RemovePoint(g_efficiency4->GetN()-1);
+  g_efficiency5->RemovePoint(g_efficiency5->GetN()-1);
+  g_efficiency6->RemovePoint(g_efficiency6->GetN()-1);
+
   g_efficiency1->Draw("LP");
   g_efficiency2->Draw("LPsame");
   g_efficiency3->Draw("LPsame");
@@ -1199,18 +1209,18 @@ void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInput
   g_efficiency5->Draw("LPsame");
   g_efficiency6->Draw("LPsame");
 
-  TLegend *legend = new TLegend(.15+(fLeftMargin-0.12),.50,.35+(fLeftMargin-0.12),.85);
+  TLegend *legend = new TLegend(.15+(fLeftMargin-0.12),.55,.35+(fLeftMargin-0.12),.85);
   legend->SetBorderSize(0);
   legend->SetFillColor(0);
   legend->SetFillStyle(0);
   legend->SetTextFont(42);
-  legend->SetTextSize(0.05);
+  legend->SetTextSize(0.04);
   legend->AddEntry(g_efficiency1, "H(120)#rightarrowb#bar{b}","lp");
-  legend->AddEntry(g_efficiency5, "QCD (b from GSP)","lp");
+  legend->AddEntry(g_efficiency5, "QCD (GSP b jets)","lp");
   legend->AddEntry(g_efficiency3, "Z","lp");
   legend->AddEntry(g_efficiency4, "top","lp");
   legend->AddEntry(g_efficiency2, "W","lp");
-  legend->AddEntry(g_efficiency6, "QCD (udsg)","lp");
+  legend->AddEntry(g_efficiency6, "QCD (udsg jets)","lp");
   legend->Draw();
 
   TLatex l1;
@@ -1220,17 +1230,32 @@ void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInput
   l1.SetNDC();
   l1.DrawLatex(fLeftMargin+0.03,0.26, fTitle.c_str());
 
-  l1.SetTextAlign(12);
-  l1.SetTextSize(0.05);
-  l1.SetTextFont(62);
-  l1.DrawLatex(fLeftMargin,0.97, "CMS Simulation Preliminary, #sqrt{s} = 8 TeV");
+  //l1.SetTextAlign(12);
+  //l1.SetTextSize(0.05);
+  //l1.SetTextFont(62);
+  //l1.DrawLatex(fLeftMargin,0.97, "CMS Simulation Preliminary, #sqrt{s} = 8 TeV");
   //l1.DrawLatex(fLeftMargin,0.97, "CMS Simulation");
   //l1.SetTextFont(42);
   //l1.DrawLatex(fLeftMargin+0.35,0.97, "#sqrt{s} = 8 TeV");
+  
+  int iPeriod = 2;    // 1=7TeV, 2=8TeV, 3=7+8TeV, 7=7+8+13TeV 
+
+  // second parameter is iPos, which drives the position of the CMS logo in the plot
+  // iPos=11 : top-left, left-aligned
+  // iPos=33 : top-right, right-aligned
+  // iPos=22 : center, centered
+  // more generally : 
+  // iPos = 10*(alignment 1/2/3) + position (1/2/3 = left/center/right)
+
+  int iPos = 0; // out of frame (in exceptional cases)
+
+  // New Pub Comm recommendation
+  CMS_lumi( c, iPeriod, iPos );
 
   //c->RedrawAxis();
   c->SetLogz();
   if(fLogy) c->SetLogy();
+
   c->SaveAs(fOutputFile.c_str());
 
   delete legend;
@@ -1245,6 +1270,11 @@ void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInput
 
 void makePlots()
 {
+  writeExtraText = true;       // if extra text
+  extraText  = "Simulation Preliminary";  // default extra text is "Preliminary"
+  relPosX    = 0.12;
+  lumi_8TeV  = ""; // default is "19.7 fb^{-1}"
+
   //--------------------------------------------------------------------------------------------------------------------
   // overlay multiple backgrounds
   // Subjet IVFCSVL
@@ -1265,7 +1295,7 @@ void makePlots()
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVL", "h1_nPV_BosonMatched_JetMass",
 			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVL}",
-			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 49.5, 0.001, 1,
+			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 39.5, 0.001, 1,
 			      "b-tag_eff_vs_nPV_SubjetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
 
   // Subjet IVFCSVM
@@ -1286,7 +1316,7 @@ void makePlots()
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVM", "h1_nPV_BosonMatched_JetMass",
 			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVM}",
-			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 49.5, 0.0001, 1,
+			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 39.5, 0.0001, 1,
 			      "b-tag_eff_vs_nPV_SubjetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
 
   // Fat jet IVFCSVL
@@ -1307,7 +1337,7 @@ void makePlots()
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_nPV_BosonMatched_JetMass_IVFCSVL", "h1_nPV_BosonMatched_JetMass",
 			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVL}",
-			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 49.5, 0.1, 1,
+			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 39.5, 0.1, 1,
 			      "b-tag_eff_vs_nPV_FatJetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
 
   // Fat jet IVFCSVM
@@ -1328,7 +1358,7 @@ void makePlots()
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_nPV_BosonMatched_JetMass_IVFCSVM", "h1_nPV_BosonMatched_JetMass",
 			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVM}",
-			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 49.5, 0.01, 1,
+			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 39.5, 0.01, 1,
 			      "b-tag_eff_vs_nPV_FatJetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
 
   //--------------------------------------------------------------------------------------------------------------------

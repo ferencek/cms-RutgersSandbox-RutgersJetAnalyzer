@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TFile.h"
@@ -11,9 +12,10 @@
 #include "TLatex.h"
 #include "TLegend.h"
 #include "TGraphAsymmErrors.h"
-#include "exoStyle.C"
-#include <map>
 #include "Rtypes.h"
+#include "exoStyle.C"
+#include "CMS_lumi.C"
+
 
 using namespace std;
 
@@ -213,9 +215,9 @@ std::string getHistName2D(const std::string & grooming, const std::string & algo
 void plotEfficiencyCurves(std::map< std::string,TGraph* > &graphs, const std::vector< std::string> &ordering, const string& fTitle, const string& fXAxisTitle, const string& fYAxisTitle,
                           const string& fExtraInfo, const string& fOutputFile, const double fXmin, const double fXmax, const double fYmin, const double fYmax,const Int_t fLogy=0)
 {
-
   gROOT->SetBatch(kTRUE);
   setEXOStyle();
+
   gStyle->SetGridColor(kGray);
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPadTopMargin(0.07);
@@ -226,20 +228,21 @@ void plotEfficiencyCurves(std::map< std::string,TGraph* > &graphs, const std::ve
 
   TCanvas *c = new TCanvas("c", "",800,800);
   c->cd();
+  c->SetGridx();
+  c->SetGridy();
+
   TH2D *bkg = new TH2D("bkg","",100,fXmin,fXmax,100,fYmin,fYmax);
   bkg->GetXaxis()->SetTitle(fXAxisTitle.c_str());
   bkg->GetYaxis()->SetTitle(fYAxisTitle.c_str());
   bkg->SetTitleOffset(1.1,"Y");
   bkg->Draw();
-  c->SetGridx();
-  c->SetGridy();
 
-  TLegend *legend = new TLegend(.16,.64,.36,.77);
+  TLegend *legend = new TLegend(.16,.77-float(graphs.size())*(0.04),.36,.77);
   legend->SetBorderSize(0);
   legend->SetFillColor(0);
   legend->SetFillStyle(0);
   legend->SetTextFont(42);
-  legend->SetTextSize(0.021);
+  legend->SetTextSize(0.03);
 
   int graphCounter = 0;
   for (std::vector<std::string>::const_iterator it = ordering.begin(); it != ordering.end(); ++it)
@@ -252,7 +255,6 @@ void plotEfficiencyCurves(std::map< std::string,TGraph* > &graphs, const std::ve
     graphCounter++;
   }
 
-  if (fLogy) c->SetLogy();
   legend->Draw();
   TLatex l1;
   l1.SetTextAlign(13);
@@ -261,16 +263,35 @@ void plotEfficiencyCurves(std::map< std::string,TGraph* > &graphs, const std::ve
   l1.SetTextSize(0.04);
   l1.DrawLatex(0.14+0.03,0.90, fTitle.c_str());
 
-  l1.SetTextAlign(12);
-  l1.SetTextSize(0.045);
-  l1.SetTextFont(62);
-  l1.DrawLatex(0.14,0.96, "CMS Simulation Preliminary, #sqrt{s} = 8 TeV");
+  //l1.SetTextAlign(12);
+  //l1.SetTextSize(0.045);
+  //l1.SetTextFont(62);
+  //l1.DrawLatex(0.14,0.96, "CMS Simulation Preliminary, #sqrt{s} = 8 TeV");
+
+  int iPeriod = 2;    // 1=7TeV, 2=8TeV, 3=7+8TeV, 7=7+8+13TeV 
+
+  // second parameter is iPos, which drives the position of the CMS logo in the plot
+  // iPos=11 : top-left, left-aligned
+  // iPos=33 : top-right, right-aligned
+  // iPos=22 : center, centered
+  // more generally : 
+  // iPos = 10*(alignment 1/2/3) + position (1/2/3 = left/center/right)
+
+  int iPos = 0; // out of frame (in exceptional cases)
+
+  // New Pub Comm recommendation
+  CMS_lumi( c, iPeriod, iPos );
 
   l1.SetTextFont(42);
   l1.SetTextSize(0.04);
   l1.DrawLatex(0.48,0.18, fExtraInfo.c_str());
+
+  if (fLogy) c->SetLogy();
+
   c->SaveAs(fOutputFile.c_str());
+
   graphs.clear();
+
   delete c;
   delete legend;
   delete bkg;
@@ -287,7 +308,21 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   // maps to hold legend entries and TGraph*s
   std::map< std::string,TGraph* > graphsPt300To500;
   std::map< std::string,TGraph* > graphsPt700ToInf;
-  
+
+  std::string flv = "";
+  if( flavor=="bJets" )
+    flv = "b jets";
+  else if( flavor=="bJetGSP" )
+    flv = "GSP b jets";
+  else if( flavor=="cJets" )
+    flv = "c jets";
+  else if( flavor=="udsJets" )
+    flv = "uds jets";
+  else if( flavor=="gluonJets" )
+    flv = "g jets";
+  else if( flavor=="udsgJets" )
+    flv = "udsg jets";
+
   //==========================================
   // Post-BTV-13-001 setup
   //==========================================
@@ -313,8 +348,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Fat Jet JP");
   orderingPt700ToInf.push_back("Fat Jet JBP");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -337,8 +372,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Fat Jet IVFCSV");
   orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA)");
   //------------------------------------------------- 
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_IVFCSV_Cone_vs_ExplJTA_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_IVFCSV_Cone_vs_ExplJTA_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_IVFCSV_Cone_vs_ExplJTA_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_IVFCSV_Cone_vs_ExplJTA_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -369,8 +404,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA signal only)");
   orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA bkg only)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -401,8 +436,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet CSV (k_{T})");
   orderingPt700ToInf.push_back("Subjet CSV (k_{T}+Filtered)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_CSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_CSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_CSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_CSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -433,8 +468,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T})");
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}+Filtered)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -465,8 +500,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}+Filtered, Explicit JTA, SV Clustering)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_ExplJTA_SV_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_ExplJTA_SV_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_ExplJTA_SV_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_ExplJTA_SV_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -497,8 +532,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet JP (k_{T})");
   orderingPt700ToInf.push_back("Subjet JP (k_{T}+Filtered)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_JP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_JP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_JP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_JP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -529,8 +564,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet JBP (k_{T})");
   orderingPt700ToInf.push_back("Subjet JBP (k_{T}+Filtered)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_JBP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_JBP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_JBP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_JBP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -561,8 +596,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet JP (Pruned)");
   orderingPt700ToInf.push_back("Subjet JBP (Pruned)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(),"",("btagperfcomp_Pt300to500_Subjets_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(),"",("btagperfcomp_Pt700toInf_Subjets_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(),"",("btagperfcomp_Pt300to500_Subjets_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(),"",("btagperfcomp_Pt700toInf_Subjets_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -593,8 +628,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet JP (Pruned, Explicit JTA, SV Clustering)");
   orderingPt700ToInf.push_back("Subjet JBP (Pruned, Explicit JTA, SV Clustering)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(),"",("btagperfcomp_Pt300to500_Subjets_ExplJTA_SV_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(),"",("btagperfcomp_Pt700toInf_Subjets_ExplJTA_SV_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(),"",("btagperfcomp_Pt300to500_Subjets_ExplJTA_SV_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(),"",("btagperfcomp_Pt700toInf_Subjets_ExplJTA_SV_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -629,8 +664,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, SV momentum)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -665,8 +700,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, SV momentum)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -699,8 +734,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA)");
 
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -731,8 +766,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA signal only)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA bkg only)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -763,8 +798,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering signal only)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering bkg only)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -795,8 +830,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering signal only)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering bkg only)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_ExplJTA_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_ExplJTA_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_ExplJTA_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_ExplJTA_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -818,6 +853,20 @@ void makePlotsQCDFatvsSub(const string & dir = "ROOT_files", const string & algo
   // maps to hold legend entries and TGraph*s
   std::map< std::string,TGraph* > graphsPt300To500;
   std::map< std::string,TGraph* > graphsPt700ToInf;
+  
+  std::string flv = "";
+  if( flavor=="bJets" )
+    flv = "b jets";
+  else if( flavor=="bJetGSP" )
+    flv = "GSP b jets";
+  else if( flavor=="cJets" )
+    flv = "c jets";
+  else if( flavor=="udsJets" )
+    flv = "uds jets";
+  else if( flavor=="gluonJets" )
+    flv = "g jets";
+  else if( flavor=="udsgJets" )
+    flv = "udsg jets";
   
   //==========================================
   // Post-BTV-13-001 setup
@@ -852,8 +901,8 @@ void makePlotsQCDFatvsSub(const string & dir = "ROOT_files", const string & algo
   if(overlayKtSubjets) orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
   //orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Optimal 2D)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1009,6 +1058,20 @@ void makePlotsQCDAKvsCA(const string & dir = "ROOT_files", const double Ymin = 1
   std::map< std::string,TGraph* > graphsPt300To500;
   std::map< std::string,TGraph* > graphsPt700ToInf;
   
+  std::string flv = "";
+  if( flavor=="bJets" )
+    flv = "b jets";
+  else if( flavor=="bJetGSP" )
+    flv = "GSP b jets";
+  else if( flavor=="cJets" )
+    flv = "c jets";
+  else if( flavor=="udsJets" )
+    flv = "uds jets";
+  else if( flavor=="gluonJets" )
+    flv = "g jets";
+  else if( flavor=="udsgJets" )
+    flv = "udsg jets";
+  
   //==========================================
   // Post-BTV-13-001 setup
   //==========================================
@@ -1034,8 +1097,8 @@ void makePlotsQCDAKvsCA(const string & dir = "ROOT_files", const double Ymin = 1
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - AK");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - CA");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA" + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA" + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA" + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA" + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1169,6 +1232,20 @@ void makePlotsQCDStdJets(const string & dir = "ROOT_files", const string & algo 
   std::map< std::string,TGraph* > graphsPt300To500;
   std::map< std::string,TGraph* > graphsPt700ToInf;
   
+  std::string flv = "";
+  if( flavor=="bJets" )
+    flv = "b jets";
+  else if( flavor=="bJetGSP" )
+    flv = "GSP b jets";
+  else if( flavor=="cJets" )
+    flv = "c jets";
+  else if( flavor=="udsJets" )
+    flv = "uds jets";
+  else if( flavor=="gluonJets" )
+    flv = "g jets";
+  else if( flavor=="udsgJets" )
+    flv = "udsg jets";
+  
   //==========================================
   // Post-BTV-13-001 setup
   //==========================================
@@ -1194,8 +1271,8 @@ void makePlotsQCDStdJets(const string & dir = "ROOT_files", const string & algo 
   orderingPt700ToInf.push_back("1 matched AK4 jet IVFCSV");
   orderingPt700ToInf.push_back("2 matched AK4 jets IVFCSV");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flavor != "" ? ", " + flavor : "")  + ")").c_str(), "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1320,6 +1397,11 @@ void makePlotsOtherStdJets(const string & dir = "ROOT_files", const string & alg
 
 void makePlots()
 {
+  writeExtraText = true;       // if extra text
+  extraText  = "Simulation Preliminary";  // default extra text is "Preliminary"
+  relPosX    = 0.15;
+  lumi_8TeV  = ""; // default is "19.7 fb^{-1}"
+
   // for multiple plots on the same canvas
 
   // vectors storing the order of legend entries
