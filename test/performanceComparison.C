@@ -284,7 +284,7 @@ void plotEfficiencyCurves(std::map< std::string,TGraph* > &graphs, const std::ve
 
   l1.SetTextFont(42);
   l1.SetTextSize(0.04);
-  l1.DrawLatex(0.48,0.18, fExtraInfo.c_str());
+  l1.DrawLatex(0.48,0.20, fExtraInfo.c_str());
 
   if (fLogy) c->SetLogy();
 
@@ -312,16 +312,18 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   std::string flv = "";
   if( flavor=="bJets" )
     flv = "b jets";
-  else if( flavor=="bJetGSP" )
-    flv = "GSP b jets";
+  else if( flavor=="bJetsGSP" )
+    flv = "g#rightarrowb#bar{b} splitting";
   else if( flavor=="cJets" )
     flv = "c jets";
   else if( flavor=="udsJets" )
     flv = "uds jets";
   else if( flavor=="gluonJets" )
-    flv = "g jets";
+    flv = "gluon jets";
   else if( flavor=="udsgJets" )
     flv = "udsg jets";
+  else
+    flv = "Inclusive QCD";
 
   //==========================================
   // Post-BTV-13-001 setup
@@ -348,8 +350,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Fat Jet JP");
   orderingPt700ToInf.push_back("Fat Jet JBP");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -372,8 +374,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Fat Jet IVFCSV");
   orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA)");
   //------------------------------------------------- 
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_IVFCSV_Cone_vs_ExplJTA_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_IVFCSV_Cone_vs_ExplJTA_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_IVFCSV_Cone_vs_ExplJTA_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_IVFCSV_Cone_vs_ExplJTA_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -404,8 +406,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA signal only)");
   orderingPt700ToInf.push_back("Fat Jet IVFCSV (Explicit JTA bkg only)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -436,8 +438,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet CSV (k_{T})");
   orderingPt700ToInf.push_back("Subjet CSV (k_{T}+Filtered)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_CSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_CSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_CSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_CSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -468,8 +470,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T})");
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}+Filtered)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -500,8 +502,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}+Filtered, Explicit JTA, SV Clustering)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_ExplJTA_SV_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_ExplJTA_SV_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_ExplJTA_SV_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_ExplJTA_SV_IVFCSV_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -532,8 +534,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet JP (k_{T})");
   orderingPt700ToInf.push_back("Subjet JP (k_{T}+Filtered)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_JP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_JP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_JP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_JP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -564,8 +566,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet JBP (k_{T})");
   orderingPt700ToInf.push_back("Subjet JBP (k_{T}+Filtered)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_JBP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_JBP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_JBP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_JBP_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -596,8 +598,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet JP (Pruned)");
   orderingPt700ToInf.push_back("Subjet JBP (Pruned)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(),"",("btagperfcomp_Pt300to500_Subjets_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(),"",("btagperfcomp_Pt700toInf_Subjets_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(),"",("btagperfcomp_Pt300to500_Subjets_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(),"",("btagperfcomp_Pt700toInf_Subjets_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -628,8 +630,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet JP (Pruned, Explicit JTA, SV Clustering)");
   orderingPt700ToInf.push_back("Subjet JBP (Pruned, Explicit JTA, SV Clustering)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(),"",("btagperfcomp_Pt300to500_Subjets_ExplJTA_SV_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(),"",("btagperfcomp_Pt700toInf_Subjets_ExplJTA_SV_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(),"",("btagperfcomp_Pt300to500_Subjets_ExplJTA_SV_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(),"",("btagperfcomp_Pt700toInf_Subjets_ExplJTA_SV_Pruned_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(),0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -664,8 +666,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, SV momentum)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -700,8 +702,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering, SV momentum)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -734,8 +736,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA)");
 
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_Kt_IVFCSV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -766,8 +768,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA signal only)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering, Explicit JTA bkg only)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_ExplJTA_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -798,8 +800,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering signal only)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, SV Clustering bkg only)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -830,8 +832,8 @@ void makePlotsQCD(const string & dir = "ROOT_files", const string & algo = "AK",
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering signal only)");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering bkg only)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_ExplJTA_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_ExplJTA_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_Subjets_Pruned_IVFCSV_ExplJTA_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_Subjets_Pruned_IVFCSV_ExplJTA_SV_comparison_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -857,16 +859,18 @@ void makePlotsQCDFatvsSub(const string & dir = "ROOT_files", const string & algo
   std::string flv = "";
   if( flavor=="bJets" )
     flv = "b jets";
-  else if( flavor=="bJetGSP" )
-    flv = "GSP b jets";
+  else if( flavor=="bJetsGSP" )
+    flv = "g#rightarrowb#bar{b} splitting";
   else if( flavor=="cJets" )
     flv = "c jets";
   else if( flavor=="udsJets" )
     flv = "uds jets";
   else if( flavor=="gluonJets" )
-    flv = "g jets";
+    flv = "gluon jets";
   else if( flavor=="udsgJets" )
     flv = "udsg jets";
+  else
+    flv = "Inclusive QCD";
   
   //==========================================
   // Post-BTV-13-001 setup
@@ -901,8 +905,8 @@ void makePlotsQCDFatvsSub(const string & dir = "ROOT_files", const string & algo
   if(overlayKtSubjets) orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
   //orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Optimal 2D)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -957,8 +961,8 @@ void makePlotsOtherFatvsSub(const string & dir = "ROOT_files", const string & al
   if(overlayKtSubjets) orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
   //orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Optimal 2D)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + "_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + "_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + "_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + "_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -997,8 +1001,8 @@ void makePlotsOtherFatvsSub(const string & dir = "ROOT_files", const string & al
   if(overlayKtSubjets) orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
   //orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Optimal 2D)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + "_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + "_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + "_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + "_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1037,8 +1041,8 @@ void makePlotsOtherFatvsSub(const string & dir = "ROOT_files", const string & al
   if(overlayKtSubjets) orderingPt700ToInf.push_back("Subjet IVFCSV (k_{T}, Explicit JTA, SV Clustering)");
   //orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering, Optimal 2D)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + "_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + "_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_" + algo + "_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_" + algo + "_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1061,16 +1065,18 @@ void makePlotsQCDAKvsCA(const string & dir = "ROOT_files", const double Ymin = 1
   std::string flv = "";
   if( flavor=="bJets" )
     flv = "b jets";
-  else if( flavor=="bJetGSP" )
-    flv = "GSP b jets";
+  else if( flavor=="bJetsGSP" )
+    flv = "g#rightarrowb#bar{b} splitting";
   else if( flavor=="cJets" )
     flv = "c jets";
   else if( flavor=="udsJets" )
     flv = "uds jets";
   else if( flavor=="gluonJets" )
-    flv = "g jets";
+    flv = "gluon jets";
   else if( flavor=="udsgJets" )
     flv = "udsg jets";
+  else
+    flv = "Inclusive QCD";
   
   //==========================================
   // Post-BTV-13-001 setup
@@ -1097,8 +1103,8 @@ void makePlotsQCDAKvsCA(const string & dir = "ROOT_files", const double Ymin = 1
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - AK");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - CA");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA" + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA" + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA" + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA" + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1145,8 +1151,8 @@ void makePlotsOtherAKvsCA(const string & dir = "ROOT_files", const string & ext 
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - AK");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - CA");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1177,8 +1183,8 @@ void makePlotsOtherAKvsCA(const string & dir = "ROOT_files", const string & ext 
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - AK");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - CA");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1209,8 +1215,8 @@ void makePlotsOtherAKvsCA(const string & dir = "ROOT_files", const string & ext 
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - AK");
   orderingPt700ToInf.push_back("Subjet IVFCSV (Pruned, Explicit JTA, SV Clustering) - CA");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", ("btagperfcomp_Pt300to500_FatJets_Subjets_AK_vs_CA_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "", ("btagperfcomp_Pt700toInf_FatJets_Subjets_AK_vs_CA_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1235,16 +1241,18 @@ void makePlotsQCDStdJets(const string & dir = "ROOT_files", const string & algo 
   std::string flv = "";
   if( flavor=="bJets" )
     flv = "b jets";
-  else if( flavor=="bJetGSP" )
-    flv = "GSP b jets";
+  else if( flavor=="bJetsGSP" )
+    flv = "g#rightarrowb#bar{b} splitting";
   else if( flavor=="cJets" )
     flv = "c jets";
   else if( flavor=="udsJets" )
     flv = "uds jets";
   else if( flavor=="gluonJets" )
-    flv = "g jets";
+    flv = "gluon jets";
   else if( flavor=="udsgJets" )
     flv = "udsg jets";
+  else
+    flv = "Inclusive QCD";
   
   //==========================================
   // Post-BTV-13-001 setup
@@ -1271,8 +1279,8 @@ void makePlotsQCDStdJets(const string & dir = "ROOT_files", const string & algo 
   orderingPt700ToInf.push_back("1 matched AK4 jet IVFCSV");
   orderingPt700ToInf.push_back("2 matched AK4 jets IVFCSV");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (QCD" + (flv != "" ? ", " + flv : "")  + ")").c_str(), "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", ("Misid. probability (" + flv  + ")").c_str(), "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + (flavor != "" ? "_" + flavor : "") + "." + ext).c_str(), 0, 1, Ymin, 1, Logy);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1319,8 +1327,8 @@ void makePlotsOtherStdJets(const string & dir = "ROOT_files", const string & alg
   orderingPt700ToInf.push_back("1 matched AK4 jet IVFCSV");
   orderingPt700ToInf.push_back("2 matched AK4 jets IVFCSV");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + "_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + "_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + "_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic W)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + "_Hadronic_W." + ext).c_str(), 0, 1, 1E-3, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1351,8 +1359,8 @@ void makePlotsOtherStdJets(const string & dir = "ROOT_files", const string & alg
   orderingPt700ToInf.push_back("1 matched AK4 jet IVFCSV");
   orderingPt700ToInf.push_back("2 matched AK4 jets IVFCSV");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + "_Hadronic_Z." + ext).c_str(), 0, 1, 1E-3, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + "_Hadronic_Z." + ext).c_str(), 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + "_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic Z)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + "_Hadronic_Z." + ext).c_str(), 0, 1, 1E-2, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1383,8 +1391,8 @@ void makePlotsOtherStdJets(const string & dir = "ROOT_files", const string & alg
   orderingPt700ToInf.push_back("1 matched AK4 jet IVFCSV");
   orderingPt700ToInf.push_back("2 matched AK4 jets IVFCSV");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + "_Hadronic_top." + ext).c_str(), 0, 1, 1E-3, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + "_Hadronic_top." + ext).c_str(), 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, ("#splitline{" + algo + " R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(), "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt300to500_FatJets_Subjets_StdJets_" + algo + "_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, ("#splitline{" + algo + " R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}").c_str(),     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Hadronic top)", "#DeltaR(AK4 jets,fat jet)<0.5", ("btagperfcomp_Pt700toInf_FatJets_Subjets_StdJets_" + algo + "_Hadronic_top." + ext).c_str(), 0, 1, 1E-2, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();
@@ -1427,8 +1435,8 @@ void makePlots()
   orderingPt700ToInf.push_back("Fat Jet CSV (BTV-13-001)");
   orderingPt700ToInf.push_back("Subjet CSV (BTV-13-001)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (QCD)", "", "btagperfcomp_Pt300to500_BTV-13-001.eps", 0, 1, 1E-3, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{jet}<135 GeV/c^{2} (pruned)}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (QCD)", "", "btagperfcomp_Pt700toInf_BTV-13-001.eps", 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}", "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Inclusive QCD)", "", "btagperfcomp_Pt300to500_BTV-13-001.eps", 0, 1, 1E-3, 1, 1);
+  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}",     "b-tagging efficiency (H(120)#rightarrowb#bar{b})", "Misid. probability (Inclusive QCD)", "", "btagperfcomp_Pt700toInf_BTV-13-001.eps", 0, 1, 1E-3, 1, 1);
 
   graphsPt300To500.clear();
   graphsPt700ToInf.clear();

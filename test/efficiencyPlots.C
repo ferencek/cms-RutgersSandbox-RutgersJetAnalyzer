@@ -1048,7 +1048,7 @@ void efficiency1D_overlayMulti_3(const string& fInputFile1, const string& fInput
   legend->SetTextFont(42);
   legend->SetTextSize(0.045);
   legend->AddEntry(g_efficiency3, "106<m_{jet}<135 GeV/c^{2} (pruned)","lp");
-  legend->AddEntry(g_efficiency1, "75<m_{jet}<135 GeV/c^{2} (pruned)","lp");
+  legend->AddEntry(g_efficiency1, "75<m_{pruned}<135 GeV/c^{2}","lp");
   legend->AddEntry(g_efficiency2, "75<m_{jet}<106 GeV/c^{2} (pruned)","lp");
   legend->Draw();
 
@@ -1084,7 +1084,7 @@ void efficiency1D_overlayMulti_3(const string& fInputFile1, const string& fInput
 void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInputFile2, const string& fInputFile3, const string& fInputFile4, const string& fInputFile5,
 				 const string& fDir, const string& fPlotPass, const string& fPlotTotal, const string& fTitle, const string& fXAxisTitle, const string& fYAxisTitle,
 				 const Int_t fRebinX, const Double_t fXmin, const Double_t fXmax, const Double_t fYmin, const Double_t fYmax,
-				 const string& fOutputFile, const Int_t fLogy=0, const Double_t fTitleOffsetX=1.0, const Double_t fTitleOffsetY=1.0,
+				 const string& fOutputFile, const Int_t fLogy=0, const Int_t fRemoveLast=0, const Double_t fTitleOffsetX=1.0, const Double_t fTitleOffsetY=1.0,
 				 const Double_t fLeftMargin=0.12, const Double_t fTopMargin=0.07, const Double_t fPlotWidth=0.8)
 {
   gROOT->SetBatch(kTRUE);
@@ -1194,13 +1194,16 @@ void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInput
   g_efficiency6->SetMarkerStyle(27);
   g_efficiency6->SetMarkerColor(kRed+3);
 
-  // remove last point
-  g_efficiency1->RemovePoint(g_efficiency1->GetN()-1);
-  g_efficiency2->RemovePoint(g_efficiency2->GetN()-1);
-  g_efficiency3->RemovePoint(g_efficiency3->GetN()-1);
-  g_efficiency4->RemovePoint(g_efficiency4->GetN()-1);
-  g_efficiency5->RemovePoint(g_efficiency5->GetN()-1);
-  g_efficiency6->RemovePoint(g_efficiency6->GetN()-1);
+  if(fRemoveLast)
+  {
+    // remove last point
+    g_efficiency1->RemovePoint(g_efficiency1->GetN()-1);
+    g_efficiency2->RemovePoint(g_efficiency2->GetN()-1);
+    g_efficiency3->RemovePoint(g_efficiency3->GetN()-1);
+    g_efficiency4->RemovePoint(g_efficiency4->GetN()-1);
+    g_efficiency5->RemovePoint(g_efficiency5->GetN()-1);
+    g_efficiency6->RemovePoint(g_efficiency6->GetN()-1);
+  }
 
   g_efficiency1->Draw("LP");
   g_efficiency2->Draw("LPsame");
@@ -1216,11 +1219,11 @@ void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInput
   legend->SetTextFont(42);
   legend->SetTextSize(0.04);
   legend->AddEntry(g_efficiency1, "H(120)#rightarrowb#bar{b}","lp");
-  legend->AddEntry(g_efficiency5, "QCD (GSP b jets)","lp");
-  legend->AddEntry(g_efficiency3, "Z","lp");
-  legend->AddEntry(g_efficiency4, "top","lp");
-  legend->AddEntry(g_efficiency2, "W","lp");
-  legend->AddEntry(g_efficiency6, "QCD (udsg jets)","lp");
+  legend->AddEntry(g_efficiency5, "g#rightarrowb#bar{b} splitting","lp");
+  legend->AddEntry(g_efficiency3, "Hadronic Z","lp");
+  legend->AddEntry(g_efficiency4, "Hadronic top","lp");
+  legend->AddEntry(g_efficiency2, "Hadronic W","lp");
+  legend->AddEntry(g_efficiency6, "udsg jets","lp");
   legend->Draw();
 
   TLatex l1;
@@ -1284,9 +1287,9 @@ void makePlots()
 			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVL", "h1_JetPt_BosonMatched_JetMass",
-			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVL}",
+			      "#splitline{AK R=0.8}{75<m_{pruned}<135 GeV/c^{2}, Subjet IVFCSVL}",
 			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 25, 0, 1000, 0.001, 1,
-			      "b-tag_eff_vs_FatJetPt_SubjetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
+			      "b-tag_eff_vs_FatJetPt_SubjetIVFCSVL_PrunedJetMass.eps", 1);
 
   efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/TprimeTprimeToBWBWinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
@@ -1294,9 +1297,9 @@ void makePlots()
 			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVL", "h1_nPV_BosonMatched_JetMass",
-			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVL}",
+			      "#splitline{AK R=0.8}{75<m_{pruned}<135 GeV/c^{2}, Subjet IVFCSVL}",
 			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 39.5, 0.001, 1,
-			      "b-tag_eff_vs_nPV_SubjetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
+			      "b-tag_eff_vs_nPV_SubjetIVFCSVL_PrunedJetMass.eps", 1, 1);
 
   // Subjet IVFCSVM
   efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
@@ -1305,9 +1308,9 @@ void makePlots()
 			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_SubJetMinIVFCSVM", "h1_JetPt_BosonMatched_JetMass",
-			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVM}",
+			      "#splitline{AK R=0.8}{75<m_{pruned}<135 GeV/c^{2}, Subjet IVFCSVM}",
 			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 25, 0, 1000, 0.0001, 1,
-			      "b-tag_eff_vs_FatJetPt_SubjetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
+			      "b-tag_eff_vs_FatJetPt_SubjetIVFCSVM_PrunedJetMass.eps", 1);
 
   efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/TprimeTprimeToBWBWinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
@@ -1315,9 +1318,9 @@ void makePlots()
 			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_nPV_BosonMatched_JetMass_SubJetMinIVFCSVM", "h1_nPV_BosonMatched_JetMass",
-			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Subjet IVFCSVM}",
+			      "#splitline{AK R=0.8}{75<m_{pruned}<135 GeV/c^{2}, Subjet IVFCSVM}",
 			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 39.5, 0.0001, 1,
-			      "b-tag_eff_vs_nPV_SubjetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
+			      "b-tag_eff_vs_nPV_SubjetIVFCSVM_PrunedJetMass.eps", 1, 1);
 
   // Fat jet IVFCSVL
   efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
@@ -1326,9 +1329,9 @@ void makePlots()
 			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_IVFCSVL", "h1_JetPt_BosonMatched_JetMass",
-			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVL}",
+			      "#splitline{AK R=0.8}{75<m_{pruned}<135 GeV/c^{2}, Fat jet IVFCSVL}",
 			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 25, 0, 1000, 0.1, 1,
-			      "b-tag_eff_vs_FatJetPt_FatJetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
+			      "b-tag_eff_vs_FatJetPt_FatJetIVFCSVL_PrunedJetMass.eps", 1);
 
   efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/TprimeTprimeToBWBWinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
@@ -1336,9 +1339,9 @@ void makePlots()
 			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_nPV_BosonMatched_JetMass_IVFCSVL", "h1_nPV_BosonMatched_JetMass",
-			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVL}",
+			      "#splitline{AK R=0.8}{75<m_{pruned}<135 GeV/c^{2}, Fat jet IVFCSVL}",
 			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 39.5, 0.1, 1,
-			      "b-tag_eff_vs_nPV_FatJetIVFCSVL_PrunedJetMass.eps", 1, 1., 1.);
+			      "b-tag_eff_vs_nPV_FatJetIVFCSVL_PrunedJetMass.eps", 1, 1);
 
   // Fat jet IVFCSVM
   efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
@@ -1347,9 +1350,9 @@ void makePlots()
 			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_JetPt_BosonMatched_JetMass_IVFCSVM", "h1_JetPt_BosonMatched_JetMass",
-			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVM}",
+			      "#splitline{AK R=0.8}{75<m_{pruned}<135 GeV/c^{2}, Fat jet IVFCSVM}",
 			      "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 25, 0, 1000, 0.01, 1,
-			      "b-tag_eff_vs_FatJetPt_FatJetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
+			      "b-tag_eff_vs_FatJetPt_FatJetIVFCSVM_PrunedJetMass.eps", 1);
 
   efficiency1D_overlayMulti_6("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/TprimeTprimeToBWBWinc_M-1500_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
@@ -1357,9 +1360,9 @@ void makePlots()
 			      "ROOT_files_AK8/TprimeToTHinc_M-1700_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root",
 			      "jetAnalyzerFatJets_PrunedSubjets", "h1_nPV_BosonMatched_JetMass_IVFCSVM", "h1_nPV_BosonMatched_JetMass",
-			      "#splitline{AK R=0.8}{75<m_{jet}<135 GeV/c^{2} (pruned), Fat jet IVFCSVM}",
+			      "#splitline{AK R=0.8}{75<m_{pruned}<135 GeV/c^{2}, Fat jet IVFCSVM}",
 			      "PV multiplicity", "b-tagging efficiency", 10, -0.5, 39.5, 0.01, 1,
-			      "b-tag_eff_vs_nPV_FatJetIVFCSVM_PrunedJetMass.eps", 1, 1., 1.);
+			      "b-tag_eff_vs_nPV_FatJetIVFCSVM_PrunedJetMass.eps", 1, 1);
 
   //--------------------------------------------------------------------------------------------------------------------
 }
