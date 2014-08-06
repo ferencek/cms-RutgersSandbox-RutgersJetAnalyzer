@@ -1239,8 +1239,8 @@ for m in getattr(process,'jetAnalyzerSequence').moduleNames():
         setattr( getattr(process,m), 'UseEventWeight', cms.bool(True) )
     if options.useRadionCuts:
         setattr( getattr(process,m), 'JetPtMin',   cms.double(200.) )
-        setattr( getattr(process,m), 'JetMassMin', cms.double(90.) )
-        setattr( getattr(process,m), 'JetMassMax', cms.double(150.) )
+        #setattr( getattr(process,m), 'JetMassMin', cms.double(90.) )
+        #setattr( getattr(process,m), 'JetMassMax', cms.double(150.) )
     if options.runOnWBkg:
         setattr( getattr(process,m), 'BosonPdgId', cms.int32(24) )
         setattr( getattr(process,m), 'BosonDecayProdPdgIds', cms.vint32(1,2,3,4) )
