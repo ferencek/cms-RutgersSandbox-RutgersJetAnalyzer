@@ -2394,13 +2394,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),200,400); 
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),200,400); 
 
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
@@ -2415,13 +2415,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),getHistName("Pruned","JetIVFCSV","bJets"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),getHistName("Pruned","SubJetMinIVFCSV","bJets"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","bJets"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","bJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","bJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","bJets"),200,400);
    
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
@@ -2436,13 +2436,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),getHistName("Pruned","JetIVFCSV","bJetsGSP"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),getHistName("Pruned","SubJetMinIVFCSV","bJetsGSP"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","bJetsGSP"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","bJetsGSP"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","bJetsGSP"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","bJetsGSP"),200,400);
      
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
@@ -2457,13 +2457,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),getHistName("Pruned","JetIVFCSV","cJets"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),getHistName("Pruned","SubJetMinIVFCSV","cJets"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","cJets"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","cJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","cJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","cJets"),200,400);
 
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
@@ -2477,13 +2477,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),getHistName("Pruned","JetIVFCSV","udsJets"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),getHistName("Pruned","SubJetMinIVFCSV","udsJets"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","udsJets"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","udsJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","udsJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","udsJets"),200,400);
    
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
@@ -2498,13 +2498,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),getHistName("Pruned","JetIVFCSV","gluonJets"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),getHistName("Pruned","SubJetMinIVFCSV","gluonJets"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","gluonJets"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","gluonJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","gluonJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","gluonJets"),200,400);
    
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
@@ -2519,13 +2519,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),getHistName("Pruned","JetIVFCSV","udsgJets"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),getHistName("Pruned","SubJetMinIVFCSV","udsgJets"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","udsgJets"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","udsgJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),getHistName("Pruned","StdJetIVFCSV","udsgJets"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files_AK12/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),getHistName("Pruned","StdJetMinIVFCSV","udsgJets"),200,400);
    
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
@@ -2540,13 +2540,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files/jobs_6_forApproval/JetMinMass75GeV/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/JetMinMass75GeV/TprimeTprimeToBWBWinc_M-800_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files/jobs_6_forApproval/JetMinMass75GeV/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/JetMinMass75GeV/TprimeTprimeToBWBWinc_M-800_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files/jobs_6_forApproval/JetMinMass75GeV/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/JetMinMass75GeV/TprimeTprimeToBWBWinc_M-800_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files/jobs_6_forApproval/JetMinMass75GeV/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/JetMinMass75GeV/TprimeTprimeToBWBWinc_M-800_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files/jobs_6_forApproval/JetMinMass75GeV/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/JetMinMass75GeV/TprimeTprimeToBWBWinc_M-800_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files/jobs_6_forApproval/JetMinMass75GeV/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/JetMinMass75GeV/TprimeTprimeToBWBWinc_M-800_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),200,400);
 
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
@@ -2561,13 +2561,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/BprimeBprimeToBZBZinc_M-1200_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),200,400);
 
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
@@ -2582,13 +2582,13 @@ void makePlots_AK_MatchedK4()
   //--------------------------------------------------------------------------------------------
   graphsPt200To400["Fat jet IVFCSV"]                       = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/TprimeToTHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","JetIVFCSV"),200,400);
   graphsPt200To400["Subjet IVFCSV"] = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/TprimeToTHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","SubJetMinIVFCSV"),200,400);
-  graphsPt200To400["1 matched AK4 jet IVFCSV"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/TprimeToTHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),200,400);
-  graphsPt200To400["2 matched AK4 jets IVFCSV"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/TprimeToTHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times1)"]                              = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/TprimeToTHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetIVFCSV"),200,400);
+  graphsPt200To400["Matched AK4 IVFCSV (#times2)"]                           = getEfficiencyCurve("ROOT_files_AK12/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root","ROOT_files/jobs_6_forApproval/TprimeToTHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root",getHistName("Pruned","StdJetMinIVFCSV"),200,400);
 
   orderingPt200To400.push_back("Fat jet IVFCSV");
   orderingPt200To400.push_back("Subjet IVFCSV");
-  orderingPt200To400.push_back("1 matched AK4 jet IVFCSV");
-  orderingPt200To400.push_back("2 matched AK4 jets IVFCSV");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times1)");
+  orderingPt200To400.push_back("Matched AK4 IVFCSV (#times2)");
 
   //-------------------------------------------------------------------------------------------
   
