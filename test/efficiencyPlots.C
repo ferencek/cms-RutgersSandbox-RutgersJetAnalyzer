@@ -1243,7 +1243,7 @@ void efficiency1D_overlayMulti_6(const string& fInputFile1, const string& fInput
   legend->SetFillStyle(0);
   legend->SetTextFont(42);
   legend->SetTextSize(0.04);
-  legend->AddEntry(g_efficiency1, "H(120)#rightarrowb#bar{b}","lp");
+  legend->AddEntry(g_efficiency1, "H#rightarrowb#bar{b}","lp");
   legend->AddEntry(g_efficiency5, "g#rightarrowb#bar{b} splitting","lp");
   legend->AddEntry(g_efficiency3, "Hadronic Z","lp");
   legend->AddEntry(g_efficiency4, "Hadronic top","lp");
