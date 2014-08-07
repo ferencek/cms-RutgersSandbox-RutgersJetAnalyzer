@@ -81,7 +81,7 @@ void jet_mass(const string& fFile, const string& fFileDir,
   l1.SetNDC();
   l1.SetTextSize(0.045);
   if(fTitle.find("QCD")!=string::npos) l1.DrawLatex(0.17,0.90, fTitle.c_str());
-  else                                 l1.DrawLatex(0.50,0.80, fTitle.c_str());
+  else                                 l1.DrawLatex(0.53,0.80, fTitle.c_str());
 
   l1.SetTextAlign(12);
   l1.SetTextSize(0.05);
@@ -103,19 +103,19 @@ void makePlots()
   // RadionToHH_4b_M-600
   // nPV inclusive
   jet_mass("ROOT_files/jobs_6_forApproval/RadionToHH_4b_M-600_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3_R1p2.root", "jetAnalyzerFatJets_PrunedSubjets",
-           "Pt200toInf", 0, 52, "#splitline{H#rightarrowb#bar{b}, AK R=1.2 pruned}{p_{T}>200 GeV, #DeltaR(H,jet)<0.5}",
-           0, 299.5, "Jet_mass_AK8_pruned_Pt200toInf_RadionToHH_4b_M-600.eps", 1);
+           "Pt200toInf", 0, 52, "#splitline{H(125)#rightarrowb#bar{b}, AK R=1.2}{p_{T}>200 GeV, #DeltaR(H,jet)<0.5}",
+           0, 299.5, "Jet_mass_AK12_pruned_Pt200toInf_RadionToHH_4b_M-600.eps", 1);
 
   // RadionToHH_4b_M-800
   // nPV inclusive
   jet_mass("ROOT_files_AK8/RadionToHH_4b_M-800_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets",
-           "Pt300toInf", 0, 52, "#splitline{H#rightarrowb#bar{b}, AK R=0.8 pruned}{p_{T}>300 GeV, #DeltaR(H,jet)<0.5}",
+           "Pt300toInf", 0, 52, "#splitline{H(125)#rightarrowb#bar{b}, AK R=0.8}{p_{T}>300 GeV, #DeltaR(H,jet)<0.5}",
            0, 299.5, "Jet_mass_AK8_pruned_Pt300toInf_RadionToHH_4b_M-800.eps", 1);
   
   // BprimeBprimeToBHBHinc_M-1000
   // nPV inclusive
   jet_mass("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "jetAnalyzerFatJets_PrunedSubjets",
-           "Pt300toInf", 0, 52, "#splitline{H#rightarrowb#bar{b}, AK R=0.8 pruned}{p_{T}>300 GeV, #DeltaR(H,jet)<0.5}",
+           "Pt300toInf", 0, 52, "#splitline{H(120)#rightarrowb#bar{b}, AK R=0.8}{p_{T}>300 GeV, #DeltaR(H,jet)<0.5}",
            0, 299.5, "Jet_mass_AK8_pruned_Pt300toInf_BprimeBprimeToBHBHinc_M-1000.eps", 1);
  
   // QCDPythia6
