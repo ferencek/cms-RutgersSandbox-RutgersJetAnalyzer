@@ -95,6 +95,8 @@ private:
     virtual void endRun(edm::Run const&, edm::EventSetup const&);
     virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
     virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
+    
+    virtual void getDecayProducts(const reco::Candidate*, std::vector<const reco::Candidate*> &);
 
     // ----------member data ---------------------------
     const bool             useEventWeight;
@@ -729,13 +731,13 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       int tPrimeCount = 0;
       for(reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end(); ++it)
       {
-        if( it->status() == 2 ) break; // to speed things up (only works with Pythia6)
+        //if( it->status() == 2 ) break; // to speed things up (only works with Pythia6)
         // count b' in the list of GenParticles
-        if( abs(it->pdgId()) == 7 && it->status() == 3 ) ++bPrimeCount;
+        if( abs(it->pdgId()) == 7 && ( it->status() == 3 || it->status() == 22 ) ) ++bPrimeCount;
         // count t' in the list of GenParticles
-        if( abs(it->pdgId()) == 8 && it->status() == 3 ) ++tPrimeCount;
-        // only take status=3 quarks and charged leptons that appear after b' or t' have appeared in the list
-        if( (bPrimeCount>0 || tPrimeCount>0 ) && it->status()==3 )
+        if( abs(it->pdgId()) == 8 && ( it->status() == 3 || it->status() == 22 ) ) ++tPrimeCount;
+        // only take status=3 or 23 quarks and charged leptons that appear after b' or t' have appeared in the list
+        if( (bPrimeCount>0 || tPrimeCount>0 ) && ( it->status() == 3 || it->status() == 23 ) )
         {
           int dpPdgId = abs(it->pdgId());
           if( (dpPdgId>=1 && dpPdgId<=5) || dpPdgId==11 || dpPdgId==13 || dpPdgId==15  ) resonanceDecayProducts.push_back(&(*it));
@@ -745,56 +747,30 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       // loop over GenParticles and select bosons isolated from other b' or t' decay products
       for(reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end(); ++it)
       {
-        if( it->status() == 2 ) break; // to speed things up (only works with Pythia6)
-        if( abs(it->pdgId()) == abs(bosonPdgId) && it->status() == 3 )
+        //if( it->status() == 2 ) break; // to speed things up (only works with Pythia6)
+        if( abs(it->pdgId()) == abs(bosonPdgId) && ( it->status() == 3 || it->status() == 22 ) )
         {
           h1_BosonPt->Fill( it->pt(), eventWeight );
           h1_BosonEta->Fill( it->eta(), eventWeight );
+
+          getDecayProducts(&(*it), decayProducts[&(*it)]);
 
           bool isIsolated = true;
           if( applyBosonIsolation )
           {
             for(std::vector<const reco::GenParticle*>::const_iterator dpIt = resonanceDecayProducts.begin(); dpIt != resonanceDecayProducts.end(); ++dpIt)
             {
-              if( &(*it)==(*dpIt) ) continue; // skip the boson itself (should no longer happen since now comparing only to quarks and charged leptons)
               bool isBosonDecayProduct = false;
-              if( abs(it->pdgId())==6 ) // special treatment for top quarks
+
+              for(unsigned i=0; i<decayProducts[&(*it)].size(); ++i)
               {
-                for(unsigned i=0; i<it->numberOfDaughters(); ++i)
+                if( decayProducts[&(*it)].at(i) == (*dpIt) )
                 {
-                  if( it->daughter(i)->status()==2 ) continue; // only care about status=3 daughters
-                  if( abs(it->daughter(i)->pdgId())==24 ) // if daughter is W
-                  {
-                    for(unsigned j=0; j<it->daughter(i)->numberOfDaughters(); ++j)
-                    {
-                      if( it->daughter(i)->daughter(j) == (*dpIt) )
-                      {
-                        isBosonDecayProduct = true;
-                        break;
-                      }
-                    }
-                  }
-                  else
-                  {
-                    if( it->daughter(i) == (*dpIt) )
-                    {
-                      isBosonDecayProduct = true;
-                      break;
-                    }
-                  }
+                  isBosonDecayProduct = true;
+                  break;
                 }
               }
-              else
-              {
-                for(unsigned i=0; i<it->numberOfDaughters(); ++i)
-                {
-                  if( it->daughter(i) == (*dpIt) )
-                  {
-                    isBosonDecayProduct = true;
-                    break;
-                  }
-                }
-              }
+
               if( isBosonDecayProduct ) continue; // skip the boson decay products
 
               if( reco::deltaR( it->p4(), (*dpIt)->p4() ) < jetRadius ) isIsolated = false;
@@ -810,43 +786,14 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
           {
             bool decayProductsFound = false;
 
-            if( abs(it->pdgId())==6 ) // special treatment for top quarks
+            for(unsigned i=0; i<decayProducts[&(*it)].size(); ++i)
             {
-              for(unsigned i=0; i<it->numberOfDaughters(); ++i)
+              for(std::vector<int>::const_iterator pdgIdIt = bosonDecayProdPdgIds.begin(); pdgIdIt != bosonDecayProdPdgIds.end(); ++pdgIdIt)
               {
-                if( it->daughter(i)->status()==2 ) continue; // only care about status=3 daughters
-                if( abs(it->daughter(i)->pdgId())<=5 ) decayProducts[&(*it)].push_back(it->daughter(i)); // pick up a quark from the top decay
-
-                if( abs(it->daughter(i)->pdgId())==24 ) // if top decay product is W
+                if( abs(decayProducts[&(*it)].at(i)->pdgId()) == abs(*pdgIdIt) )
                 {
-                  for(unsigned j=0; j<it->daughter(i)->numberOfDaughters(); ++j)
-                  {
-                    if( it->daughter(i)->daughter(j)->status()==2 ) continue; // only care about status=3 daughters
-                    for(std::vector<int>::const_iterator pdgIdIt = bosonDecayProdPdgIds.begin(); pdgIdIt != bosonDecayProdPdgIds.end(); ++pdgIdIt)
-                    {
-                      if( abs(it->daughter(i)->daughter(j)->pdgId()) == abs(*pdgIdIt) )
-                      {
-                        decayProductsFound = true;
-                        decayProducts[&(*it)].push_back(it->daughter(i)->daughter(j));
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            else
-            {
-              for(unsigned i=0; i<it->numberOfDaughters(); ++i)
-              {
-                if( it->daughter(i)->status()==2 ) continue; // only care about status=3 daughters
-                //std::cout << "Daughter " << i << " PDG ID: " << it->daughter(i)->pdgId() << std::endl;
-                for(std::vector<int>::const_iterator pdgIdIt = bosonDecayProdPdgIds.begin(); pdgIdIt != bosonDecayProdPdgIds.end(); ++pdgIdIt)
-                {
-                  if( abs(it->daughter(i)->pdgId()) == abs(*pdgIdIt) )
-                  {
-                    decayProductsFound = true;
-                    decayProducts[&(*it)].push_back(it->daughter(i));
-                  }
+                  decayProductsFound = true;
+                  break;
                 }
               }
             }
@@ -855,8 +802,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
             {
               if( abs(it->pdgId())==6 ) // special treatment for top quarks
               {
-                if( decayProducts[&(*it)].size()>3 ) edm::LogError("TooManyDecayProducts") << "More than three boson decay products found.";
-                else if( decayProducts[&(*it)].size()<3 ) edm::LogError("TooFewDecayProducts") << "Less than three boson decay products found.";
+                if( decayProducts[&(*it)].size()>3 ) edm::LogWarning("TooManyDecayProducts") << "More than three boson decay products found.";
+                else if( decayProducts[&(*it)].size()<3 ) edm::LogWarning("TooFewDecayProducts") << "Less than three boson decay products found.";
                 else
                 {
                   bosons.push_back(&(*it));
@@ -877,8 +824,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
               }
               else
               {
-                if( decayProducts[&(*it)].size()>2 ) edm::LogError("TooManyDecayProducts") << "More than two boson decay products found.";
-                else if( decayProducts[&(*it)].size()<2 ) edm::LogError("TooFewDecayProducts") << "Less than two boson decay products found.";
+                if( decayProducts[&(*it)].size()>2 ) edm::LogWarning("TooManyDecayProducts") << "More than two boson decay products found.";
+                else if( decayProducts[&(*it)].size()<2 ) edm::LogWarning("TooFewDecayProducts") << "Less than two boson decay products found.";
                 else
                 {
                   bosons.push_back(&(*it));
@@ -1830,6 +1777,23 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     return;
 }
 
+
+void
+RutgersJetAnalyzer::getDecayProducts(const reco::Candidate *particle, std::vector<const reco::Candidate*> & decayProducts)
+{
+    for(unsigned i=0; i<particle->numberOfDaughters(); ++i)
+    {
+      int status = particle->daughter(i)->status();
+      int dpPdgId = abs(particle->daughter(i)->pdgId());
+      if( ( status==3 || status==23 ) &&
+          ( (dpPdgId>=1 && dpPdgId<=5) || dpPdgId==11 || dpPdgId==13 || dpPdgId==15 ) )
+        decayProducts.push_back( particle->daughter(i) );
+      else if( status==1 || status==2 )
+        continue;
+      else
+        getDecayProducts(particle->daughter(i),decayProducts);
+    }
+}
 
 // ------------ method called once each job just before starting event loop  ------------
 void
