@@ -1423,26 +1423,26 @@ void makePlots()
   // BTV-13-001 setup
   //==========================================
   
-  graphsPt300To500["Fat jet CSV (BTV-13-001)"] = getEfficiencyCurve("ROOT_files_CA8/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001_PATTuple_v3.root", "ROOT_files_CA8/QCDPythia6_HiggsTagging_BTV-13-001_PATTuple_v3.root", getHistName("Pruned","JetCSV"),       300,500);
-  graphsPt300To500["Subjet CSV (BTV-13-001)"]  = getEfficiencyCurve("ROOT_files_CA8/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001_PATTuple_v3.root", "ROOT_files_CA8/QCDPythia6_HiggsTagging_BTV-13-001_PATTuple_v3.root", getHistName("Pruned","SubJetMinCSV"), 300,500);
+//   graphsPt300To500["Fat jet CSV (BTV-13-001)"] = getEfficiencyCurve("ROOT_files_CA8/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001_PATTuple_v3.root", "ROOT_files_CA8/QCDPythia6_HiggsTagging_BTV-13-001_PATTuple_v3.root", getHistName("Pruned","JetCSV"),       300,500);
+//   graphsPt300To500["Subjet CSV (BTV-13-001)"]  = getEfficiencyCurve("ROOT_files_CA8/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_BTV-13-001_PATTuple_v3.root", "ROOT_files_CA8/QCDPythia6_HiggsTagging_BTV-13-001_PATTuple_v3.root", getHistName("Pruned","SubJetMinCSV"), 300,500);
   
-  orderingPt300To500.push_back("Fat jet CSV (BTV-13-001)");
-  orderingPt300To500.push_back("Subjet CSV (BTV-13-001)");
+//   orderingPt300To500.push_back("Fat jet CSV (BTV-13-001)");
+//   orderingPt300To500.push_back("Subjet CSV (BTV-13-001)");
   //-------------------------------------------------
-  graphsPt700ToInf["Fat jet CSV (BTV-13-001)"] = getEfficiencyCurve("ROOT_files_CA8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001_PATTuple_v3.root", "ROOT_files_CA8/QCDPythia6_HiggsTagging_BTV-13-001_PATTuple_v3.root", getHistName("Pruned","JetCSV"),       700,1100);
-  graphsPt700ToInf["Subjet CSV (BTV-13-001)"]  = getEfficiencyCurve("ROOT_files_CA8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001_PATTuple_v3.root", "ROOT_files_CA8/QCDPythia6_HiggsTagging_BTV-13-001_PATTuple_v3.root", getHistName("Pruned","SubJetMinCSV"), 700,1100);
+//   graphsPt700ToInf["Fat jet CSV (BTV-13-001)"] = getEfficiencyCurve("ROOT_files_CA8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001_PATTuple_v3.root", "ROOT_files_CA8/QCDPythia6_HiggsTagging_BTV-13-001_PATTuple_v3.root", getHistName("Pruned","JetCSV"),       700,1100);
+//   graphsPt700ToInf["Subjet CSV (BTV-13-001)"]  = getEfficiencyCurve("ROOT_files_CA8/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_BTV-13-001_PATTuple_v3.root", "ROOT_files_CA8/QCDPythia6_HiggsTagging_BTV-13-001_PATTuple_v3.root", getHistName("Pruned","SubJetMinCSV"), 700,1100);
   
-  orderingPt700ToInf.push_back("Fat jet CSV (BTV-13-001)");
-  orderingPt700ToInf.push_back("Subjet CSV (BTV-13-001)");
+//   orderingPt700ToInf.push_back("Fat jet CSV (BTV-13-001)");
+//   orderingPt700ToInf.push_back("Subjet CSV (BTV-13-001)");
   //-------------------------------------------------
-  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}", "Tagging efficiency (H#rightarrowb#bar{b})", "Misid. probability (Inclusive QCD)", "", "btagperfcomp_Pt300to500_BTV-13-001.eps", 0, 1, 1E-3, 1, 1);
-  plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}",     "Tagging efficiency (H#rightarrowb#bar{b})", "Misid. probability (Inclusive QCD)", "", "btagperfcomp_Pt700toInf_BTV-13-001.eps", 0, 1, 1E-3, 1, 1);
+//   plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{CA R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}", "Tagging efficiency (H#rightarrowb#bar{b})", "Misid. probability (Inclusive QCD)", "", "btagperfcomp_Pt300to500_BTV-13-001.eps", 0, 1, 1E-3, 1, 1);
+//   plotEfficiencyCurves(graphsPt700ToInf,orderingPt700ToInf, "#splitline{CA R=0.8, p_{T}>700 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}",     "Tagging efficiency (H#rightarrowb#bar{b})", "Misid. probability (Inclusive QCD)", "", "btagperfcomp_Pt700toInf_BTV-13-001.eps", 0, 1, 1E-3, 1, 1);
 
-  graphsPt300To500.clear();
-  graphsPt700ToInf.clear();
+//   graphsPt300To500.clear();
+//   graphsPt700ToInf.clear();
 
-  orderingPt300To500.clear();
-  orderingPt700ToInf.clear();
+//   orderingPt300To500.clear();
+//   orderingPt700ToInf.clear();
 
   //==========================================
   // Post-BTV-13-001 setup
@@ -1452,19 +1452,19 @@ void makePlots()
 //   makePlotsQCD("ROOT_files", "CA");          // CA8
 //   makePlotsQCDFatvsSub("ROOT_files", "CA");  // CA8
 //   makePlotsQCD("ROOT_files", "AK");          // AK8
-  makePlotsQCDFatvsSub("ROOT_files", "AK", 1e-3, 1, "", 1);  // AK8
+//   makePlotsQCDFatvsSub("ROOT_files", "AK", 1e-3, 1, "", 1);  // AK8
 //   makePlotsQCDAKvsCA("ROOT_files");          // AK8 vs CA8
 //   makePlotsQCDStdJets("ROOT_files", "AK");   // AK8
 
   // b jets
 //   makePlotsQCD("ROOT_files", "AK", 0, 0, "bJets");          // AK8
-  makePlotsQCDFatvsSub("ROOT_files", "AK", 0, 0, "bJets");  // AK8
+//   makePlotsQCDFatvsSub("ROOT_files", "AK", 0, 0, "bJets");  // AK8
 //   makePlotsQCDAKvsCA("ROOT_files", 0, 0, "bJets");          // AK8 vs CA8
 //   makePlotsQCDStdJets("ROOT_files", "AK", 0, 0, "bJets");   // AK8
 
   // b jets from gluon splitting
 //   makePlotsQCD("ROOT_files", "AK", 0, 0, "bJetsGSP");          // AK8
-  makePlotsQCDFatvsSub("ROOT_files", "AK", 0, 0, "bJetsGSP");  // AK8
+//   makePlotsQCDFatvsSub("ROOT_files", "AK", 0, 0, "bJetsGSP");  // AK8
 //   makePlotsQCDAKvsCA("ROOT_files", 0, 0, "bJetsGSP");          // AK8 vs CA8
 //   makePlotsQCDStdJets("ROOT_files", "AK", 0, 0, "bJetsGSP");   // AK8
 
@@ -1487,14 +1487,34 @@ void makePlots()
 //   makePlotsQCDStdJets("ROOT_files", "AK", 1e-4, 1, "udsJets");   // AK8
 
   // udsg jets
-  makePlotsQCDFatvsSub("ROOT_files", "AK", 1e-4, 1, "udsgJets");  // AK8
+//   makePlotsQCDFatvsSub("ROOT_files", "AK", 1e-4, 1, "udsgJets");  // AK8
 //   makePlotsQCDAKvsCA("ROOT_files", 1e-4, 1, "udsgJets");  // AK8 vs CA8
 //   makePlotsQCDStdJets("ROOT_files", "AK", 1e-4, 1, "udsgJets");   // AK8
 
   // other backgrounds
-  makePlotsOtherFatvsSub("ROOT_files", "AK");  // AK8
+//   makePlotsOtherFatvsSub("ROOT_files", "AK");  // AK8
 //   makePlotsOtherAKvsCA("ROOT_files");  // AK8 vs CA8
-  makePlotsOtherStdJets("ROOT_files", "AK");   // AK8
+//   makePlotsOtherStdJets("ROOT_files", "AK");   // AK8
+
+  //==========================================
+  // CSA14
+  //==========================================
+  
+  graphsPt300To500["Fat jet IVFCSV (CSA14)"] = getEfficiencyCurve("ROOT_files_AK8_CSA14/BprimeBprime_M-1000_HiggsTagging_ExplicitJTA_SVClustering_CSA14.root",          "ROOT_files_AK8_CSA14/QCDPythia8_HiggsTagging_ExplicitJTA_SVClustering_CSA14.root", getHistName("Pruned","JetIVFCSV"),       300,500);
+  graphsPt300To500["Subjet IVFCSV (CSA14)"]  = getEfficiencyCurve("ROOT_files_AK8_CSA14/BprimeBprime_M-1000_HiggsTagging_ExplicitJTA_SVClustering_CSA14.root",          "ROOT_files_AK8_CSA14/QCDPythia8_HiggsTagging_ExplicitJTA_SVClustering_CSA14.root", getHistName("Pruned","SubJetMinIVFCSV"), 300,500);
+  graphsPt300To500["Fat jet IVFCSV (8 TeV)"] = getEfficiencyCurve("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", getHistName("Pruned","JetIVFCSV"),       300,500);
+  graphsPt300To500["Subjet IVFCSV (8 TeV)"]  = getEfficiencyCurve("ROOT_files_AK8/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", "ROOT_files_AK8/QCDPythia6_HiggsTagging_ExplicitJTA_SVClustering_PATTuple_v3.root", getHistName("Pruned","SubJetMinIVFCSV"), 300,500);
+
+  orderingPt300To500.push_back("Fat jet IVFCSV (CSA14)");
+  orderingPt300To500.push_back("Subjet IVFCSV (CSA14)");
+  orderingPt300To500.push_back("Fat jet IVFCSV (8 TeV)");
+  orderingPt300To500.push_back("Subjet IVFCSV (8 TeV)");
+  //-------------------------------------------------
+  plotEfficiencyCurves(graphsPt300To500,orderingPt300To500, "#splitline{AK R=0.8, 300<p_{T}<500 GeV/c}{75<m_{pruned}<135 GeV/c^{2}}", "Tagging efficiency (H#rightarrowb#bar{b})", "Misid. probability (Inclusive QCD)", "", "btagperfcomp_Pt300to500_CSA14_vs_8TeV.eps", 0, 1, 1E-3, 1, 1);
+
+  graphsPt300To500.clear();
+
+  orderingPt300To500.clear();
 
   //-------------------------------------------------
 }
