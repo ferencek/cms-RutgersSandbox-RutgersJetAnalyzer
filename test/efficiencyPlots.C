@@ -12,6 +12,7 @@
 #include "TLegend.h"
 #include "TGraphAsymmErrors.h"
 #include "exoStyle.C"
+#include "CMS_lumi.C"
 
 
 using namespace std;
@@ -676,13 +677,28 @@ void efficiency_curves_comp_xrange(const string& fFileS1, const string& fFileS2,
   l1.SetTextAlign(12);
   l1.SetTextSize(0.045);
   l1.SetTextFont(62);
-  l1.DrawLatex(0.14,0.96, "CMS Simulation Preliminary, #sqrt{s} = 8 TeV");
+  //l1.DrawLatex(0.14,0.96, "CMS Simulation Preliminary, #sqrt{s} = 8 TeV");
   //l1.DrawLatex(0.14,0.97, "CMS Simulation");
   //l1.SetTextFont(42);
   //l1.DrawLatex(0.14+0.40,0.97, "#sqrt{s} = 8 TeV");
   l1.SetTextFont(42);
   l1.SetTextSize(0.04);
   if(fOutputFile.find("JTA")!=string::npos) l1.DrawLatex(0.48,0.18, "JTA = jet-track association");
+
+  // For CMS label
+  int iPeriod = 12; // 1=7TeV, 2=8TeV, 3=7+8TeV, 7=7+8+13TeV
+
+  // second parameter is iPos, which drives the position of the CMS logo in the plot
+  // iPos=11 : top-left, left-aligned
+  // iPos=33 : top-right, right-aligned
+  // iPos=22 : center, centered
+  // more generally :
+  // iPos = 10*(alignment 1/2/3) + position (1/2/3 = left/center/right)
+
+  int iPos = 0; // out of frame (in exceptional cases)
+
+  // New Pub Comm recommendation
+  CMS_lumi( c, iPeriod, iPos );
 
 
   if(fLogy) c->SetLogy();
@@ -1209,10 +1225,26 @@ void efficiency1D_overlayMulti_5(const string& fInputFile1, const string& fInput
   l1.SetTextAlign(12);
   l1.SetTextSize(0.05);
   l1.SetTextFont(62);
-  l1.DrawLatex(fLeftMargin,0.97, "CMS Simulation Preliminary, #sqrt{s} = 8 TeV");
+  //l1.DrawLatex(fLeftMargin,0.97, "CMS Simulation Preliminary, #sqrt{s} = 8 TeV");
   //l1.DrawLatex(fLeftMargin,0.97, "CMS Simulation");
   //l1.SetTextFont(42);
   //l1.DrawLatex(fLeftMargin+0.35,0.97, "#sqrt{s} = 8 TeV");
+
+  // For CMS label
+  int iPeriod = 12; // 1=7TeV, 2=8TeV, 3=7+8TeV, 7=7+8+13TeV
+
+  // second parameter is iPos, which drives the position of the CMS logo in the plot
+  // iPos=11 : top-left, left-aligned
+  // iPos=33 : top-right, right-aligned
+  // iPos=22 : center, centered
+  // more generally :
+  // iPos = 10*(alignment 1/2/3) + position (1/2/3 = left/center/right)
+
+  int iPos = 0; // out of frame (in exceptional cases)
+
+  // New Pub Comm recommendation
+  CMS_lumi( c, iPeriod, iPos );
+
 
   //c->RedrawAxis();
   c->SetLogz();
@@ -1231,6 +1263,11 @@ void efficiency1D_overlayMulti_5(const string& fInputFile1, const string& fInput
 
 void makePlots()
 {
+  // For "CMS Simulation" label
+  writeExtraText = true;    // if extra text
+  extraText = "Simulation"; // default extra text is "Preliminary"
+  lumi_8TeV = "";           // default is "19.7 fb^{-1}"
+
   //--------------------------------------------------------------------------------------------------------------------
   //================
   // W tagging
@@ -1537,6 +1574,7 @@ void makePlots()
   //                          "Fat jet p_{T} [GeV/c]", "b-tagging efficiency", 10, 0, 1000, 0.001, 1,
   //                          "b-tag_eff_SubjetCSVL_CAPrunedJetMass_JetMassCutComparison.eps", 0, 1., 1.);
 
+  relPosX = 0.12;
   // overlay multiple backgrounds
   efficiency1D_overlayMulti_5("output_files_v2/BprimeBprimeToBHBHinc_M-1500_HiggsTagging_dRsubjetBhadron_CA8only.root",
                             "output_files_v2/QCDPythia6_HiggsTagging_dRsubjetBhadron_jetFlavor_CA8only.root",
@@ -1710,6 +1748,7 @@ void makePlots()
 
   //--------------------------------------------------------------------------------------------------------------------
 
+  relPosX = 0.15;
   // QCD background
   // b-tagging efficiency vs mistag rate (CA8 pruned jets, both subjets b-tagged)
   efficiency_curves_comp_xrange("output_files_v2/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_dRBhadron_CA8andAK5.root", "output_files_v2/BprimeBprimeToBHBHinc_M-1000_HiggsTagging_dRBhadron_CA8andAK5.root",
