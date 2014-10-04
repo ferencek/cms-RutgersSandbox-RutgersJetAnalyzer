@@ -182,6 +182,10 @@ private:
     TH1F *h1_JetEta_BosonMatched;
     TH1F *h1_JetEta_BosonMatched_JetMass;
 
+    TH2F *h2_JetPt_PrunedJetPt_BosonMatched;
+    TH2F *h2_JetPt_FilteredJetPt_BosonMatched;
+    TH2F *h2_JetPt_TrimmedJetPt_BosonMatched;
+
     TH1F *h1_nPV_BosonMatched_JetMass;
     TH1F *h1_nPV_BosonMatched_JetMass_IVFCSVL;
     TH1F *h1_nPV_BosonMatched_JetMass_IVFCSVM;
@@ -438,6 +442,10 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h1_JetEta = fs->make<TH1F>("h1_JetEta",";#eta;",etaBins,etaMin,etaMax);
     h1_JetEta_BosonMatched = fs->make<TH1F>("h1_JetEta_BosonMatched",";#eta;",etaBins,etaMin,etaMax);
     h1_JetEta_BosonMatched_JetMass = fs->make<TH1F>("h1_JetEta_BosonMatched_JetMass",";#eta;",etaBins,etaMin,etaMax);
+
+    h2_JetPt_PrunedJetPt_BosonMatched   = fs->make<TH2F>("h2_JetPt_PrunedJetPt_BosonMatched",";p_{T} [GeV];p_{T} [GeV]",ptBins,ptMin,ptMax,ptBins,ptMin,ptMax);
+    h2_JetPt_FilteredJetPt_BosonMatched = fs->make<TH2F>("h2_JetPt_FilteredJetPt_BosonMatched",";p_{T} [GeV];p_{T} [GeV]",ptBins,ptMin,ptMax,ptBins,ptMin,ptMax);
+    h2_JetPt_TrimmedJetPt_BosonMatched  = fs->make<TH2F>("h2_JetPt_TrimmedJetPt_BosonMatched",";p_{T} [GeV];p_{T} [GeV]",ptBins,ptMin,ptMax,ptBins,ptMin,ptMax);
 
     h1_nPV_BosonMatched_JetMass = fs->make<TH1F>("h1_nPV_BosonMatched_JetMass",";nPV;",pvBins,pvMin,pvMax);
     h1_nPV_BosonMatched_JetMass_IVFCSVL = fs->make<TH1F>("h1_nPV_BosonMatched_JetMass_IVFCSVL",";nPV;",pvBins,pvMin,pvMax);
@@ -1211,6 +1219,10 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h1_JetEta_BosonMatched->Fill(it->eta(), eventWeight);
       h2_JetPt_JetPtOverGenJetPt_BosonMatched->Fill(jetPt, (it->genJet()!=0 ? jetPt/(it->genJet()->pt()) : -10.), eventWeight);
       h2_JetPt_JetMass_BosonMatched->Fill(jetPt, jetMass, eventWeight);
+
+      h2_JetPt_PrunedJetPt_BosonMatched->Fill(jetPt, it->userFloat("PFJetsCHSPrunedPt"), eventWeight);
+      h2_JetPt_FilteredJetPt_BosonMatched->Fill(jetPt, it->userFloat("PFJetsCHSFilteredPt"), eventWeight);
+      h2_JetPt_TrimmedJetPt_BosonMatched->Fill(jetPt, it->userFloat("PFJetsCHSTrimmedPt"), eventWeight);
 
       // fill nPV_JetMass histograms
       std::string suffix = Form("%.0ftoInf",jetPtMin);

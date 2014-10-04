@@ -712,7 +712,28 @@ process.PFJetsCHSTrimmedMass = ca8PFJetsCHSPrunedLinks.clone(
     value = cms.string('mass')
 )
 
-process.patJets.userData.userFloats.src += ['PFJetsCHSPrunedMass','PFJetsCHSFilteredMass','PFJetsCHSTrimmedMass']
+process.PFJetsCHSPrunedPt = ca8PFJetsCHSPrunedLinks.clone(
+    src = cms.InputTag("PFJetsCHS"),
+    matched = cms.InputTag("PFJetsCHSPruned"),
+    distMax = cms.double(options.jetRadius),
+    value = cms.string('pt')
+)
+
+process.PFJetsCHSFilteredPt = ca8PFJetsCHSPrunedLinks.clone(
+    src = cms.InputTag("PFJetsCHS"),
+    matched = cms.InputTag("PFJetsCHSFiltered"),
+    distMax = cms.double(options.jetRadius),
+    value = cms.string('pt')
+)
+
+process.PFJetsCHSTrimmedPt = ca8PFJetsCHSPrunedLinks.clone(
+    src = cms.InputTag("PFJetsCHS"),
+    matched = cms.InputTag("PFJetsCHSTrimmed"),
+    distMax = cms.double(options.jetRadius),
+    value = cms.string('pt')
+)
+
+process.patJets.userData.userFloats.src += ['PFJetsCHSPrunedMass','PFJetsCHSFilteredMass','PFJetsCHSTrimmedMass','PFJetsCHSPrunedPt','PFJetsCHSFilteredPt','PFJetsCHSTrimmedPt']
 
 #-------------------------------------
 if options.useSVClustering:
@@ -1169,6 +1190,9 @@ process.jetSeq = cms.Sequence(
     + process.PFJetsCHSFilteredMass
     + process.PFJetsCHSPrunedMass
     + process.PFJetsCHSTrimmedMass
+    + process.PFJetsCHSFilteredPt
+    + process.PFJetsCHSPrunedPt
+    + process.PFJetsCHSTrimmedPt
     )
 )
 
