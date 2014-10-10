@@ -222,7 +222,7 @@ process.BTauMVAJetTagComputerRecord = cms.ESSource('PoolDBESSource',
     timetype = cms.string('runnumber'),
     toGet = cms.VPSet(cms.PSet(
         record = cms.string('BTauGenericMVAJetTagComputerRcd'),
-        tag = cms.string('MVAComputerContainer_53X_JetTags_v2')
+        tag = cms.string('MVAComputerContainer_53X_JetTags_v3')
     )),
     connect = cms.string('frontier://FrontierProd/CMS_COND_PAT_000'),
     BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')
