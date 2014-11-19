@@ -115,18 +115,17 @@ private:
     const bool             doBosonDecayProdSelection;
     const std::vector<int> bosonDecayProdPdgIds;
     const bool             calculateMassDrop;
-    const double           jetPtMin;
-    const unsigned         jetPtBins;
-    const double           jetPtBinWidth;
+    const std::vector<double> jetPtBinBoundaries;
     const double           jetAbsEtaMax;
+    const std::string      groomedJetMass;
+    const std::string      analysisMode;
     const double           jetMassMin;
     const double           jetMassMax;
     const bool             useUncorrMassForMassDrop;
     const bool             doJetFlavor;
     const std::vector<int> jetFlavorPdgIds;
     const bool             useGSPFlavor;
-    const bool             useVtxType;
-    const std::string      vtxType;
+    const bool             useGroomedKinematics;
     const bool             eventDisplayPrintout;
 
     edm::Service<TFileService> fs;
@@ -245,10 +244,8 @@ private:
     TH1F *h1_JetJBPDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMinCSVDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMaxCSVDiscr_BosonMatched_JetMass;
-    TH1F *h1_JetHybridCSVDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass;
-    TH1F *h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMinJPDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMaxJPDiscr_BosonMatched_JetMass;
     TH1F *h1_SubJetMinJBPDiscr_BosonMatched_JetMass;
@@ -259,12 +256,10 @@ private:
     TH2F *h2_JetPt_JetCSV_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMinCSV_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass;
-    TH2F *h2_JetPt_JetHybridCSV_BosonMatched_JetMass;
     // IVFCSV plots
     TH2F *h2_JetPt_JetIVFCSV_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass;
-    TH2F *h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass;
     // JP plots
     TH2F *h2_JetPt_JetJP_BosonMatched_JetMass;
     TH2F *h2_JetPt_SubJetMinJP_BosonMatched_JetMass;
@@ -361,18 +356,17 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
   doBosonDecayProdSelection(iConfig.getParameter<bool>("DoBosonDecayProdSelection")),
   bosonDecayProdPdgIds(iConfig.getParameter<std::vector<int> >("BosonDecayProdPdgIds")),
   calculateMassDrop(iConfig.getParameter<bool>("CalculateMassDrop")),
-  jetPtMin(iConfig.getParameter<double>("JetPtMin")),
-  jetPtBins(iConfig.getParameter<unsigned>("JetPtBins")),
-  jetPtBinWidth(iConfig.getParameter<double>("JetPtBinWidth")),
+  jetPtBinBoundaries(iConfig.getParameter<std::vector<double> >("JetPtBinBoundaries")),
   jetAbsEtaMax(iConfig.getParameter<double>("JetAbsEtaMax")),
+  groomedJetMass( iConfig.exists("GroomedJetMass") ? iConfig.getParameter<std::string>("GroomedJetMass") : "PFJetsCHSPrunedMass" ),
+  analysisMode( iConfig.exists("AnalysisMode") ? iConfig.getParameter<std::string>("AnalysisMode") : "" ),
   jetMassMin(iConfig.getParameter<double>("JetMassMin")),
   jetMassMax(iConfig.getParameter<double>("JetMassMax")),
   useUncorrMassForMassDrop( iConfig.exists("UseUncorrMassForMassDrop") ? iConfig.getParameter<bool>("UseUncorrMassForMassDrop") : true ),
   doJetFlavor(iConfig.getParameter<bool>("DoJetFlavor")),
   jetFlavorPdgIds(iConfig.getParameter<std::vector<int> >("JetFlavorPdgIds")),
   useGSPFlavor( iConfig.exists("UseGSPFlavor") ? iConfig.getParameter<bool>("UseGSPFlavor") : true ),
-  useVtxType( iConfig.exists("UseVtxType") ? iConfig.getParameter<bool>("UseVtxType") : false ),
-  vtxType( iConfig.exists("VtxType") ? iConfig.getParameter<std::string>("VtxType") : "" ),
+  useGroomedKinematics( iConfig.exists("UseGroomedKinematics") ? iConfig.getParameter<bool>("UseGroomedKinematics") : false ),
   eventDisplayPrintout( iConfig.exists("EventDisplayPrintout") ? iConfig.getParameter<bool>("EventDisplayPrintout") : false )
 
 {
@@ -507,10 +501,8 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h1_JetJBPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetJBPDiscr_BosonMatched_JetMass",";Jet JBP Discr;",100,0.,10.);
     h1_SubJetMinCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinCSVDiscr_BosonMatched_JetMass",";Subjet min CSV Discr;",404,0.,1.01);
     h1_SubJetMaxCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxCSVDiscr_BosonMatched_JetMass",";Subjet max CSV Discr;",404,0.,1.01);
-    h1_JetHybridCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetHybridCSVDiscr_BosonMatched_JetMass",";Jet Hybrid CSV Discr;",404,0.,1.01);
     h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass",";Subjet min IVFCSV Discr;",404,0.,1.01);
     h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass",";Subjet max IVFCSV Discr;",404,0.,1.01);
-    h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass",";Jet Hybrid IVFCSV Discr;",404,0.,1.01);
     h1_SubJetMinJPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinJPDiscr_BosonMatched_JetMass",";Subjet min JP Discr;",100,0.,2.);
     h1_SubJetMaxJPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMaxJPDiscr_BosonMatched_JetMass",";Subjet max JP Discr;",100,0.,2.);
     h1_SubJetMinJBPDiscr_BosonMatched_JetMass = fs->make<TH1F>("h1_SubJetMinJBPDiscr_BosonMatched_JetMass",";Subjet min JBP Discr;",100,0.,10.);
@@ -520,12 +512,10 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
     h2_JetPt_JetCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
     h2_JetPt_SubJetMinCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet min CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
     h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet max CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
-    h2_JetPt_JetHybridCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetHybridCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet Hybrid CSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
 
     h2_JetPt_JetIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet IVFCSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
     h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet min IVFCSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
     h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Subjet max IVFCSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
-    h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass",";p_{T} [GeV];Jet Hybrid IVFCSV Discr",ptBins,ptMin,ptMax,404,0.,1.01);
 
     h2_JetPt_JetJP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_JetJP_BosonMatched_JetMass",";p_{T} [GeV];Jet JP Discr",ptBins,ptMin,ptMax,100,0.,2.);
     h2_JetPt_SubJetMinJP_BosonMatched_JetMass = fs->make<TH2F>("h2_JetPt_SubJetMinJP_BosonMatched_JetMass",";p_{T} [GeV];Subjet min JP Discr",ptBins,ptMin,ptMax,100,0.,2.);
@@ -560,14 +550,14 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
 
     h2_SubJet1Flavor_SubJet2Flavor_BosonMatched_JetMass_2bHadrons = fs->make<TH2F>("h2_SubJet1Flavor_SubJet2Flavor_BosonMatched_JetMass_2bHadrons",";Subjet_{1} is b;Subjet_{2} is b",2,-0.5,1.5,2,-0.5,1.5);
 
-    for(unsigned i=0; i<=(jetPtBins+1); ++i)
+    for(unsigned i=0; i<=jetPtBinBoundaries.size(); ++i)
     {
       std::string suffix, title;
 
       if(i==0)
       {
-        suffix = Form("%.0ftoInf",(jetPtMin + jetPtBinWidth*i));
-        title = Form("p_{T}>%.0f GeV",(jetPtMin + jetPtBinWidth*i));
+        suffix = Form("%.0ftoInf",jetPtBinBoundaries.at(i));
+        title = Form("p_{T}>%.0f GeV",jetPtBinBoundaries.at(i));
 
         h2_nPV_JetMass_Pt[suffix]         = fs->make<TH2F>(("h2_nPV_JetMass_Pt" + suffix).c_str(),(title + ";nPV;m_{jet} [GeV]").c_str(),pvBins,pvMin,pvMax,massBins,massMin,massMax);
         h2_nPV_tau1_Pt[suffix]            = fs->make<TH2F>(("h2_nPV_tau1_Pt" + suffix).c_str(),(title + ";nPV;#tau_{1}").c_str(),pvBins,pvMin,pvMax,tauBins,tauMin,tauMax);
@@ -598,10 +588,10 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
         h2_SubJet1JP_SubJet2JP_BosonMatched_JetMass_Pt[suffix]         = fs->make<TH2F>(("h2_SubJet1JP_SubJet2JP_BosonMatched_JetMass_Pt" + suffix).c_str(),(title + ";Subjet_{1} Discr;Subjet_{2} Discr").c_str(),100,0.,2.,100,0.,2.);
         h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_Pt[suffix]       = fs->make<TH2F>(("h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_Pt" + suffix).c_str(),(title + ";Subjet_{1} Discr;Subjet_{2} Discr").c_str(),100,0.,10.,100,0.,10.);
       }
-      else if(i==(jetPtBins+1))
+      else if(i==jetPtBinBoundaries.size())
       {
-        suffix = Form("%.0ftoInf",(jetPtMin + jetPtBinWidth*(i-1)));
-        title = Form("p_{T}>%.0f GeV",(jetPtMin + jetPtBinWidth*(i-1)));
+        suffix = Form("%.0ftoInf",jetPtBinBoundaries.at(i-1));
+        title = Form("p_{T}>%.0f GeV",jetPtBinBoundaries.at(i-1));
 
         h2_nPV_JetMass_Pt[suffix]         = fs->make<TH2F>(("h2_nPV_JetMass_Pt" + suffix).c_str(),(title + ";nPV;m_{jet} [GeV]").c_str(),pvBins,pvMin,pvMax,massBins,massMin,massMax);
         h2_nPV_tau1_Pt[suffix]            = fs->make<TH2F>(("h2_nPV_tau1_Pt" + suffix).c_str(),(title + ";nPV;#tau_{1}").c_str(),pvBins,pvMin,pvMax,tauBins,tauMin,tauMax);
@@ -634,8 +624,8 @@ RutgersJetAnalyzer::RutgersJetAnalyzer(const edm::ParameterSet& iConfig) :
       }
       else
       {
-        suffix = Form("%.0fto%.0f",(jetPtMin + jetPtBinWidth*(i-1)),(jetPtMin + jetPtBinWidth*i));
-        title = Form("%.0f<p_{T}<%.0f GeV",(jetPtMin + jetPtBinWidth*(i-1)),(jetPtMin + jetPtBinWidth*i));
+        suffix = Form("%.0fto%.0f",jetPtBinBoundaries.at(i-1),jetPtBinBoundaries.at(i));
+        title = Form("%.0f<p_{T}<%.0f GeV",jetPtBinBoundaries.at(i-1),jetPtBinBoundaries.at(i));
 
         h2_nPV_JetMass_Pt[suffix]         = fs->make<TH2F>(("h2_nPV_JetMass_Pt" + suffix).c_str(),(title + ";nPV;m_{jet} [GeV]").c_str(),pvBins,pvMin,pvMax,massBins,massMin,massMax);
         h2_nPV_tau1_Pt[suffix]            = fs->make<TH2F>(("h2_nPV_tau1_Pt" + suffix).c_str(),(title + ";nPV;#tau_{1}").c_str(),pvBins,pvMin,pvMax,tauBins,tauMin,tauMax);
@@ -952,8 +942,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     for(PatJetCollection::const_iterator it = jets->begin(); it != jets->end(); ++it)
     {
       double jetPt = it->pt();
-      // skip the jet if it does not pass pT and eta cuts
-      if( !(jetPt > jetPtMin && fabs(it->eta()) < jetAbsEtaMax) ) continue;
+      double jetEta = it->eta();
 
       int jetFlavor = it->partonFlavour();
       if( useGSPFlavor ) // use gluon splitting b-jet flavor based on the number of b hadrons inside the jet cone
@@ -1002,6 +991,17 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
           groomedBasicJetMatchFound = true;
         }
       }
+
+      if( useGroomedKinematics && groomedBasicJetMatchFound )
+      {
+        jetPt = groomedBasicJetMatch->pt();
+        jetEta = groomedBasicJetMatch->eta();
+      }
+
+      // skip the jet if it does not pass pT and eta cuts
+      if( !(jetPt > jetPtBinBoundaries.front() && fabs(jetEta) < jetAbsEtaMax) ) continue;
+
+
       // vector of pointers to subjets
       std::vector<const pat::Jet*> subjets;
       if( useSubJets )
@@ -1014,7 +1014,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
           for(unsigned d=0; d<groomedBasicJetMatch->numberOfDaughters(); ++d)
           {
             //std::cout << "subjet " << d << ": pt=" << groomedBasicJetMatch->daughter(d)->p4().pt()  << " eta=" << groomedBasicJetMatch->daughter(d)->p4().eta()  << " phi=" << groomedBasicJetMatch->daughter(d)->p4().phi() << std::endl;
-            const reco::Candidate *subjet =  groomedBasicJetMatch->daughter(d);
+            const reco::Candidate *subjet = groomedBasicJetMatch->daughter(d);
             const pat::Jet *patsubjet = dynamic_cast<const pat::Jet*>(subjet);
             subjets.push_back(patsubjet);
           }
@@ -1051,7 +1051,21 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         }
       }
 
-      // vector of pointers to matching Std jets (matching radius is 0.6)
+      // sort subjets by increasing b-tag discriminator
+      std::vector<unsigned> sortedSubjetsIdx;
+      if( subjets.size()>1 )
+      {
+        std::multimap<double, unsigned> sortedSubjets;
+        for(unsigned i = 0; i<subjets.size(); ++i)
+          sortedSubjets.insert(std::make_pair(subjets.at(i)->bDiscriminator("combinedSecondaryVertexV2BJetTags"), i));
+
+        for(std::multimap<double, unsigned>::const_iterator it = sortedSubjets.begin(); it != sortedSubjets.end(); ++it)
+          sortedSubjetsIdx.push_back(it->second);
+      }
+      else if (subjets.size()==1 )
+        sortedSubjetsIdx.push_back(0);
+
+      // vector of pointers to matching Std jets
       std::vector<const pat::Jet*> matchedStdJets;
       if( useStdJets )
       {
@@ -1091,77 +1105,75 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       *  - NotDefined   : if anything went wrong, set to this value
       */
       //-----------------------------------------------------------
-      int jet_CSV_VtxType = -1, jet_IVFCSV_VtxType = -1;
-      // Jet CSV
-      std::vector<const reco::BaseTagInfo*>  baseTagInfosJetCSV;
-      JetTagComputer::TagInfoHelper helperJetCSV(baseTagInfosJetCSV);
-      baseTagInfosJetCSV.push_back( it->tagInfoTrackIP("impactParameter") );
-      baseTagInfosJetCSV.push_back( it->tagInfoSecondaryVertex("secondaryVertex") );
-      // Jet CSV TaggingVariables
-      reco::TaggingVariableList varsJetCSV = computer->taggingVariables(helperJetCSV);
-      if(varsJetCSV.checkTag(reco::btau::vertexCategory)) jet_CSV_VtxType = int(varsJetCSV.get(reco::btau::vertexCategory));
-      // Jet IVFCSV
-      std::vector<const reco::BaseTagInfo*>  baseTagInfosJetIVFCSV;
-      JetTagComputer::TagInfoHelper helperJetIVFCSV(baseTagInfosJetIVFCSV);
-      baseTagInfosJetIVFCSV.push_back( it->tagInfoTrackIP("impactParameter") );
-      baseTagInfosJetIVFCSV.push_back( it->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
-      // Jet IVFCSV TaggingVariables
-      reco::TaggingVariableList varsJetIVFCSV = computer->taggingVariables(helperJetIVFCSV);
-      if(varsJetIVFCSV.checkTag(reco::btau::vertexCategory)) jet_IVFCSV_VtxType = int(varsJetIVFCSV.get(reco::btau::vertexCategory));
-      //std::cout << jet_CSV_VtxType << " " << jet_IVFCSV_VtxType << std::endl;
-
-      int subjet1_CSV_VtxType = -1, subjet2_CSV_VtxType = -1, subjet1_IVFCSV_VtxType = -1, subjet2_IVFCSV_VtxType = -1;
-      if( subjets.size()>1 )
-      {
-        // SubJet1 CSV
-        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1CSV;
-        JetTagComputer::TagInfoHelper helperSubJet1CSV(baseTagInfosSubJet1CSV);
-        baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
-        baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("secondaryVertex") );
-        // SubJet1 CSV TaggingVariables
-        reco::TaggingVariableList varsSubJet1CSV = computer->taggingVariables(helperSubJet1CSV);
-        if(varsSubJet1CSV.checkTag(reco::btau::vertexCategory)) subjet1_CSV_VtxType = int(varsSubJet1CSV.get(reco::btau::vertexCategory));
-        // SubJet2 CSV
-        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2CSV;
-        JetTagComputer::TagInfoHelper helperSubJet2CSV(baseTagInfosSubJet2CSV);
-        baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
-        baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("secondaryVertex") );
-        // SubJet2 CSV TaggingVariables
-        reco::TaggingVariableList varsSubJet2CSV = computer->taggingVariables(helperSubJet2CSV);
-        if(varsSubJet2CSV.checkTag(reco::btau::vertexCategory)) subjet2_CSV_VtxType = int(varsSubJet2CSV.get(reco::btau::vertexCategory));
-        // SubJet1 IVFCSV
-        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1IVFCSV;
-        JetTagComputer::TagInfoHelper helperSubJet1IVFCSV(baseTagInfosSubJet1IVFCSV);
-        baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
-        baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
-        // SubJet1 IVFCSV TaggingVariables
-        reco::TaggingVariableList varsSubJet1IVFCSV = computer->taggingVariables(helperSubJet1IVFCSV);
-        if(varsSubJet1IVFCSV.checkTag(reco::btau::vertexCategory)) subjet1_IVFCSV_VtxType = int(varsSubJet1IVFCSV.get(reco::btau::vertexCategory));
-        // SubJet2 IVFCSV
-        std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2IVFCSV;
-        JetTagComputer::TagInfoHelper helperSubJet2IVFCSV(baseTagInfosSubJet2IVFCSV);
-        baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
-        baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
-        // SubJet2 IVFCSV TaggingVariables
-        reco::TaggingVariableList varsSubJet2IVFCSV = computer->taggingVariables(helperSubJet2IVFCSV);
-        if(varsSubJet2IVFCSV.checkTag(reco::btau::vertexCategory)) subjet2_IVFCSV_VtxType = int(varsSubJet2IVFCSV.get(reco::btau::vertexCategory));
-      }
+//       int jet_CSV_VtxType = -1, jet_IVFCSV_VtxType = -1;
+//       // Jet CSV
+//       std::vector<const reco::BaseTagInfo*>  baseTagInfosJetCSV;
+//       JetTagComputer::TagInfoHelper helperJetCSV(baseTagInfosJetCSV);
+//       baseTagInfosJetCSV.push_back( it->tagInfoTrackIP("impactParameter") );
+//       baseTagInfosJetCSV.push_back( it->tagInfoSecondaryVertex("secondaryVertex") );
+//       // Jet CSV TaggingVariables
+//       reco::TaggingVariableList varsJetCSV = computer->taggingVariables(helperJetCSV);
+//       if(varsJetCSV.checkTag(reco::btau::vertexCategory)) jet_CSV_VtxType = int(varsJetCSV.get(reco::btau::vertexCategory));
+//       // Jet IVFCSV
+//       std::vector<const reco::BaseTagInfo*>  baseTagInfosJetIVFCSV;
+//       JetTagComputer::TagInfoHelper helperJetIVFCSV(baseTagInfosJetIVFCSV);
+//       baseTagInfosJetIVFCSV.push_back( it->tagInfoTrackIP("impactParameter") );
+//       baseTagInfosJetIVFCSV.push_back( it->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
+//       // Jet IVFCSV TaggingVariables
+//       reco::TaggingVariableList varsJetIVFCSV = computer->taggingVariables(helperJetIVFCSV);
+//       if(varsJetIVFCSV.checkTag(reco::btau::vertexCategory)) jet_IVFCSV_VtxType = int(varsJetIVFCSV.get(reco::btau::vertexCategory));
+//       //std::cout << jet_CSV_VtxType << " " << jet_IVFCSV_VtxType << std::endl;
+// 
+//       int subjet1_CSV_VtxType = -1, subjet2_CSV_VtxType = -1, subjet1_IVFCSV_VtxType = -1, subjet2_IVFCSV_VtxType = -1;
+//       if( subjets.size()>1 )
+//       {
+//         // SubJet1 CSV
+//         std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1CSV;
+//         JetTagComputer::TagInfoHelper helperSubJet1CSV(baseTagInfosSubJet1CSV);
+//         baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
+//         baseTagInfosSubJet1CSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("secondaryVertex") );
+//         // SubJet1 CSV TaggingVariables
+//         reco::TaggingVariableList varsSubJet1CSV = computer->taggingVariables(helperSubJet1CSV);
+//         if(varsSubJet1CSV.checkTag(reco::btau::vertexCategory)) subjet1_CSV_VtxType = int(varsSubJet1CSV.get(reco::btau::vertexCategory));
+//         // SubJet2 CSV
+//         std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2CSV;
+//         JetTagComputer::TagInfoHelper helperSubJet2CSV(baseTagInfosSubJet2CSV);
+//         baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
+//         baseTagInfosSubJet2CSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("secondaryVertex") );
+//         // SubJet2 CSV TaggingVariables
+//         reco::TaggingVariableList varsSubJet2CSV = computer->taggingVariables(helperSubJet2CSV);
+//         if(varsSubJet2CSV.checkTag(reco::btau::vertexCategory)) subjet2_CSV_VtxType = int(varsSubJet2CSV.get(reco::btau::vertexCategory));
+//         // SubJet1 IVFCSV
+//         std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet1IVFCSV;
+//         JetTagComputer::TagInfoHelper helperSubJet1IVFCSV(baseTagInfosSubJet1IVFCSV);
+//         baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoTrackIP("impactParameter") );
+//         baseTagInfosSubJet1IVFCSV.push_back( subjets.at(0)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
+//         // SubJet1 IVFCSV TaggingVariables
+//         reco::TaggingVariableList varsSubJet1IVFCSV = computer->taggingVariables(helperSubJet1IVFCSV);
+//         if(varsSubJet1IVFCSV.checkTag(reco::btau::vertexCategory)) subjet1_IVFCSV_VtxType = int(varsSubJet1IVFCSV.get(reco::btau::vertexCategory));
+//         // SubJet2 IVFCSV
+//         std::vector<const reco::BaseTagInfo*>  baseTagInfosSubJet2IVFCSV;
+//         JetTagComputer::TagInfoHelper helperSubJet2IVFCSV(baseTagInfosSubJet2IVFCSV);
+//         baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoTrackIP("impactParameter") );
+//         baseTagInfosSubJet2IVFCSV.push_back( subjets.at(1)->tagInfoSecondaryVertex("inclusiveSecondaryVertexFinder") );
+//         // SubJet2 IVFCSV TaggingVariables
+//         reco::TaggingVariableList varsSubJet2IVFCSV = computer->taggingVariables(helperSubJet2IVFCSV);
+//         if(varsSubJet2IVFCSV.checkTag(reco::btau::vertexCategory)) subjet2_IVFCSV_VtxType = int(varsSubJet2IVFCSV.get(reco::btau::vertexCategory));
+//       }
       //std::cout << subjet1_CSV_VtxType << " " << subjet2_CSV_VtxType << " " << subjet1_IVFCSV_VtxType << " " << subjet2_IVFCSV_VtxType << std::endl;
-
-      // skip the jet if it does not belong to the requested vertex type
-      if( useVtxType )
-      {
-        if( vtxType=="RecoVertex" && !(jet_IVFCSV_VtxType==0 && subjet1_IVFCSV_VtxType==0 && subjet2_IVFCSV_VtxType==0) ) continue;
-        else if( vtxType=="PseudoVertex" && !(jet_IVFCSV_VtxType==1) ) continue;
-        else if( vtxType=="NoVertex" && !(jet_IVFCSV_VtxType==2 && (subjet1_IVFCSV_VtxType==2 || subjet1_IVFCSV_VtxType==-1) && (subjet2_IVFCSV_VtxType==2 || subjet2_IVFCSV_VtxType==-1)) ) continue;
-      }
 
       // fill jet pT and eta histograms
       h1_JetPt->Fill(jetPt, eventWeight);
       h1_JetEta->Fill(it->eta(), eventWeight);
 
       // get groomed jet mass
-      double jetMass = it->userFloat("PFJetsCHSPrunedMass");
+      double jetMass = it->userFloat(groomedJetMass);
+      if( analysisMode=="B2G-14-002" && subjets.size()>1 )
+      {
+        reco::Candidate::LorentzVector momentum = subjets.at(0)->correctedJet("Uncorrected").p4();
+        momentum += subjets.at(1)->correctedJet("Uncorrected").p4();
+        jetMass = momentum.mass();
+      }
 
       h2_JetPt_JetPtOverGenJetPt->Fill(jetPt, (it->genJet()!=0 ? jetPt/(it->genJet()->pt()) : -10.), eventWeight);
       h2_JetPt_JetMass->Fill(jetPt, jetMass, eventWeight);
@@ -1216,7 +1228,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 
       h1_JetPt_BosonMatched->Fill(jetPt, eventWeight);
-      h1_JetEta_BosonMatched->Fill(it->eta(), eventWeight);
+      h1_JetEta_BosonMatched->Fill(jetEta, eventWeight);
       h2_JetPt_JetPtOverGenJetPt_BosonMatched->Fill(jetPt, (it->genJet()!=0 ? jetPt/(it->genJet()->pt()) : -10.), eventWeight);
       h2_JetPt_JetMass_BosonMatched->Fill(jetPt, jetMass, eventWeight);
 
@@ -1225,19 +1237,19 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h2_JetPt_TrimmedJetPt_BosonMatched->Fill(jetPt, it->userFloat("PFJetsCHSTrimmedPt"), eventWeight);
 
       // fill nPV_JetMass histograms
-      std::string suffix = Form("%.0ftoInf",jetPtMin);
+      std::string suffix = Form("%.0ftoInf",jetPtBinBoundaries.front());
       h2_nPV_JetMass_Pt[suffix]->Fill(nPV, jetMass, eventWeight);
-      for(unsigned i=0; i<jetPtBins; ++i)
+      for(unsigned i=0; i<(jetPtBinBoundaries.size()-1); ++i)
       {
-        if( jetPt>(jetPtMin + jetPtBinWidth*i) && jetPt<=(jetPtMin + jetPtBinWidth*(i+1)) )
+        if( jetPt>jetPtBinBoundaries.at(i) && jetPt<=jetPtBinBoundaries.at(i+1) )
         {
-          suffix = Form("%.0fto%.0f",(jetPtMin + jetPtBinWidth*i),(jetPtMin + jetPtBinWidth*(i+1)));
+          suffix = Form("%.0fto%.0f",jetPtBinBoundaries.at(i),jetPtBinBoundaries.at(i+1));
           h2_nPV_JetMass_Pt[suffix]->Fill(nPV, jetMass, eventWeight);
         }
       }
-      if( jetPt>(jetPtMin+jetPtBinWidth*jetPtBins))
+      if( jetPt>jetPtBinBoundaries.back())
       {
-        suffix = Form("%.0ftoInf",(jetPtMin+jetPtBinWidth*jetPtBins));
+        suffix = Form("%.0ftoInf",jetPtBinBoundaries.back());
         h2_nPV_JetMass_Pt[suffix]->Fill(nPV, jetMass, eventWeight);
       }
 
@@ -1341,6 +1353,12 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         subJet1_IVFCSV_discr = subjets.at(0)->bDiscriminator("combinedSecondaryVertexV2BJetTags");
         subJet2_IVFCSV_discr = subjets.at(1)->bDiscriminator("combinedSecondaryVertexV2BJetTags");
 
+        if( analysisMode=="B2G-14-002")
+        {
+          subJet1_IVFCSV_discr = subjets.at(sortedSubjetsIdx.back())->bDiscriminator("combinedSecondaryVertexV2BJetTags");
+          subJet2_IVFCSV_discr = subjets.at(sortedSubjetsIdx.at(subjets.size()-2))->bDiscriminator("combinedSecondaryVertexV2BJetTags");
+        }
+
         subJet1_JP_discr = subjets.at(0)->bDiscriminator("jetProbabilityBJetTags");
         subJet2_JP_discr = subjets.at(1)->bDiscriminator("jetProbabilityBJetTags");
 
@@ -1364,16 +1382,6 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       double subJet_maxJBP_discr = std::max(subJet1_JBP_discr, subJet2_JBP_discr);
       double minStdJets_IVFCSV_discr = std::min(stdJet1_IVFCSV_discr, stdJet2_IVFCSV_discr);
       double jet_DoubleB_discr = it->bDiscriminator("doubleSecondaryVertexHighEffBJetTags");
-      // Define hybrid CSV discriminator
-      double jet_HybridCSV_discr = subJet_minCSV_discr;
-      if( (subjet1_CSV_VtxType==2 || subjet1_CSV_VtxType==-1) && (subjet2_CSV_VtxType==2 || subjet2_CSV_VtxType==-1) ) jet_HybridCSV_discr = jet_CSV_discr;
-      else if( subjet1_CSV_VtxType==-1 && !(subjet2_CSV_VtxType==2 || subjet2_CSV_VtxType==-1) ) jet_HybridCSV_discr = ( jet_CSV_VtxType!=-1 ? std::min(jet_CSV_discr,subJet2_CSV_discr) : subJet2_CSV_discr );
-      else if( !(subjet1_CSV_VtxType==2 || subjet1_CSV_VtxType==-1) && subjet2_CSV_VtxType==-1 ) jet_HybridCSV_discr = ( jet_CSV_VtxType!=-1 ? std::min(jet_CSV_discr,subJet1_CSV_discr) : subJet1_CSV_discr );
-      // Define hybrid IVFCSV discriminator
-      double jet_HybridIVFCSV_discr = subJet_minIVFCSV_discr;
-      if( (subjet1_IVFCSV_VtxType==2 || subjet1_IVFCSV_VtxType==-1) && (subjet2_IVFCSV_VtxType==2 || subjet2_IVFCSV_VtxType==-1) ) jet_HybridIVFCSV_discr = jet_IVFCSV_discr;
-      else if( subjet1_IVFCSV_VtxType==-1 && !(subjet2_IVFCSV_VtxType==2 || subjet2_IVFCSV_VtxType==-1) ) jet_HybridIVFCSV_discr = ( jet_IVFCSV_VtxType!=-1 ? std::min(jet_IVFCSV_discr,subJet2_IVFCSV_discr) : subJet2_IVFCSV_discr );
-      else if( !(subjet1_IVFCSV_VtxType==2 || subjet1_IVFCSV_VtxType==-1) && subjet2_IVFCSV_VtxType==-1 ) jet_HybridIVFCSV_discr = ( jet_IVFCSV_VtxType!=-1 ? std::min(jet_IVFCSV_discr,subJet1_IVFCSV_discr) : subJet1_IVFCSV_discr );
 
       if( subJet_minCSV_discr>0.244 )
       {
@@ -1387,7 +1395,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 
       h1_JetPt_BosonMatched_JetMass->Fill(jetPt, eventWeight);
-      h1_JetEta_BosonMatched_JetMass->Fill(it->eta(), eventWeight);
+      h1_JetEta_BosonMatched_JetMass->Fill(jetEta, eventWeight);
       h1_nPV_BosonMatched_JetMass->Fill(nPV, eventWeight);
 
       h2_JetPt_mindRjetBhadron_BosonMatched_JetMass->    Fill(jetPt, (mindRfatjet<999.  ? mindRfatjet  : -99.), eventWeight);
@@ -1564,10 +1572,8 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h1_JetJBPDiscr_BosonMatched_JetMass->Fill( jet_JBP_discr, eventWeight);
       h1_SubJetMinCSVDiscr_BosonMatched_JetMass->Fill( subJet_minCSV_discr, eventWeight);
       h1_SubJetMaxCSVDiscr_BosonMatched_JetMass->Fill( subJet_maxCSV_discr, eventWeight);
-      h1_JetHybridCSVDiscr_BosonMatched_JetMass->Fill( jet_HybridCSV_discr, eventWeight);
       h1_SubJetMinIVFCSVDiscr_BosonMatched_JetMass->Fill( subJet_minIVFCSV_discr, eventWeight);
       h1_SubJetMaxIVFCSVDiscr_BosonMatched_JetMass->Fill( subJet_maxIVFCSV_discr, eventWeight);
-      h1_JetHybridIVFCSVDiscr_BosonMatched_JetMass->Fill( jet_HybridIVFCSV_discr, eventWeight);
       h1_SubJetMinJPDiscr_BosonMatched_JetMass->Fill( subJet_minJP_discr, eventWeight);
       h1_SubJetMaxJPDiscr_BosonMatched_JetMass->Fill( subJet_maxJP_discr, eventWeight);
       h1_SubJetMinJBPDiscr_BosonMatched_JetMass->Fill( subJet_minJBP_discr, eventWeight);
@@ -1577,12 +1583,10 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h2_JetPt_JetCSV_BosonMatched_JetMass->Fill(jetPt, jet_CSV_discr, eventWeight);
       h2_JetPt_SubJetMinCSV_BosonMatched_JetMass->Fill(jetPt, subJet_minCSV_discr, eventWeight);
       h2_JetPt_SubJetMaxCSV_BosonMatched_JetMass->Fill(jetPt, subJet_maxCSV_discr, eventWeight);
-      h2_JetPt_JetHybridCSV_BosonMatched_JetMass->Fill(jetPt, jet_HybridCSV_discr, eventWeight);
 
       h2_JetPt_JetIVFCSV_BosonMatched_JetMass->Fill(jetPt, jet_IVFCSV_discr, eventWeight);
       h2_JetPt_SubJetMinIVFCSV_BosonMatched_JetMass->Fill(jetPt, subJet_minIVFCSV_discr, eventWeight);
       h2_JetPt_SubJetMaxIVFCSV_BosonMatched_JetMass->Fill(jetPt, subJet_maxIVFCSV_discr, eventWeight);
-      h2_JetPt_JetHybridIVFCSV_BosonMatched_JetMass->Fill(jetPt, jet_HybridIVFCSV_discr, eventWeight);
 
       h2_JetPt_JetJP_BosonMatched_JetMass->Fill(jetPt, jet_JP_discr, eventWeight);
       h2_JetPt_SubJetMinJP_BosonMatched_JetMass->Fill(jetPt, subJet_minJP_discr, eventWeight);
@@ -1718,7 +1722,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       selectedTrackJetWidth/=selectedTrackPtSum;
 
       // fill various 2D histograms
-      suffix = Form("%.0ftoInf",jetPtMin);
+      suffix = Form("%.0ftoInf",jetPtBinBoundaries.front());
       h2_nPV_tau1_Pt[suffix]->Fill(nPV, tau1, eventWeight);
       h2_nPV_tau2_Pt[suffix]->Fill(nPV, tau2, eventWeight);
       h2_nPV_tau2tau1_Pt[suffix]->Fill(nPV, tau2overtau1, eventWeight);
@@ -1744,11 +1748,11 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h2_SubJet1IVFCSV_SubJet2IVFCSV_BosonMatched_JetMass_Pt[suffix]->Fill(subJet1_IVFCSV_discr, subJet2_IVFCSV_discr, eventWeight);
       h2_SubJet1JP_SubJet2JP_BosonMatched_JetMass_Pt[suffix]->Fill(subJet1_JP_discr, subJet2_JP_discr, eventWeight);
       h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_Pt[suffix]->Fill(subJet1_JBP_discr, subJet2_JBP_discr, eventWeight);
-      for(unsigned i=0; i<jetPtBins; ++i)
+      for(unsigned i=0; i<(jetPtBinBoundaries.size()-1); ++i)
       {
-        if( jetPt>(jetPtMin + jetPtBinWidth*i) && jetPt<=(jetPtMin + jetPtBinWidth*(i+1)) )
+        if( jetPt>jetPtBinBoundaries.at(i) && jetPt<=jetPtBinBoundaries.at(i+1) )
         {
-          suffix = Form("%.0fto%.0f",(jetPtMin + jetPtBinWidth*i),(jetPtMin + jetPtBinWidth*(i+1)));
+          suffix = Form("%.0fto%.0f",jetPtBinBoundaries.at(i),jetPtBinBoundaries.at(i+1));
           h2_nPV_tau1_Pt[suffix]->Fill(nPV, tau1, eventWeight);
           h2_nPV_tau2_Pt[suffix]->Fill(nPV, tau2, eventWeight);
           h2_nPV_tau2tau1_Pt[suffix]->Fill(nPV, tau2overtau1, eventWeight);
@@ -1776,9 +1780,9 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
           h2_SubJet1JBP_SubJet2JBP_BosonMatched_JetMass_Pt[suffix]->Fill(subJet1_JBP_discr, subJet2_JBP_discr, eventWeight);
         }
       }
-      if( jetPt>(jetPtMin+jetPtBinWidth*jetPtBins))
+      if( jetPt>jetPtBinBoundaries.back())
       {
-        suffix = Form("%.0ftoInf",(jetPtMin+jetPtBinWidth*jetPtBins));
+        suffix = Form("%.0ftoInf",jetPtBinBoundaries.back());
         h2_nPV_tau1_Pt[suffix]->Fill(nPV, tau1, eventWeight);
         h2_nPV_tau2_Pt[suffix]->Fill(nPV, tau2, eventWeight);
         h2_nPV_tau2tau1_Pt[suffix]->Fill(nPV, tau2overtau1, eventWeight);
@@ -1818,21 +1822,21 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         }
         double massDrop = ( jetMass>0. ? subjetMass/fatJetMass : -10.);
         // fill nPV_MassDrop histograms
-        suffix = Form("%.0ftoInf",jetPtMin);
+        suffix = Form("%.0ftoInf",jetPtBinBoundaries.front());
         h2_nPV_MassDrop_Pt[suffix]->Fill(nPV, massDrop, eventWeight);
         //h2_JetMass_MassDrop_Pt[suffix]->Fill(jetMass, massDrop, eventWeight);
-        for(unsigned i=0; i<jetPtBins; ++i)
+        for(unsigned i=0; i<(jetPtBinBoundaries.size()-1); ++i)
         {
-          if( jetPt>(jetPtMin + jetPtBinWidth*i) && jetPt<=(jetPtMin + jetPtBinWidth*(i+1)) )
+          if( jetPt>jetPtBinBoundaries.at(i) && jetPt<=jetPtBinBoundaries.at(i+1) )
           {
-            suffix = Form("%.0fto%.0f",(jetPtMin + jetPtBinWidth*i),(jetPtMin + jetPtBinWidth*(i+1)));
+            suffix = Form("%.0fto%.0f",jetPtBinBoundaries.at(i),jetPtBinBoundaries.at(i+1));
             h2_nPV_MassDrop_Pt[suffix]->Fill(nPV, massDrop, eventWeight);
             //h2_JetMass_MassDrop_Pt[suffix]->Fill(jetMass, massDrop, eventWeight);
           }
         }
-        if( jetPt>(jetPtMin+jetPtBinWidth*jetPtBins))
+        if( jetPt>jetPtBinBoundaries.back())
         {
-          suffix = Form("%.0ftoInf",(jetPtMin+jetPtBinWidth*jetPtBins));
+          suffix = Form("%.0ftoInf",jetPtBinBoundaries.back());
           h2_nPV_MassDrop_Pt[suffix]->Fill(nPV, massDrop, eventWeight);
           //h2_JetMass_MassDrop_Pt[suffix]->Fill(jetMass, massDrop, eventWeight);
         }
