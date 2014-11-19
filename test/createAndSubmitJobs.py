@@ -68,7 +68,6 @@ Queue DUMMY_NJOBS
 """
 
 jdl_template_fnal = """universe = vanilla
-Requirements = Memory >= 199 && OpSys == "LINUX" && (Arch != "DUMMY" )
 Should_Transfer_Files = YES
 WhenToTransferOutput = ON_EXIT
 Notification = never
