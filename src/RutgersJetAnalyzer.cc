@@ -1057,7 +1057,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       {
         std::multimap<double, unsigned> sortedSubjets;
         for(unsigned i = 0; i<subjets.size(); ++i)
-          sortedSubjets.insert(std::make_pair(subjets.at(i)->bDiscriminator("combinedSecondaryVertexV2BJetTags"), i));
+          sortedSubjets.insert(std::make_pair(subjets.at(i)->bDiscriminator( (analysisMode=="B2G-14-002" ? "combinedSecondaryVertexBJetTags" : "combinedSecondaryVertexV2BJetTags") ), i));
 
         for(std::multimap<double, unsigned>::const_iterator it = sortedSubjets.begin(); it != sortedSubjets.end(); ++it)
           sortedSubjetsIdx.push_back(it->second);
@@ -1081,7 +1081,7 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       {
         std::multimap<double, unsigned> sortedMatchedStdJets;
         for(unsigned i = 0; i<matchedStdJets.size(); ++i)
-          sortedMatchedStdJets.insert(std::make_pair(matchedStdJets.at(i)->bDiscriminator("combinedSecondaryVertexV2BJetTags"), i));
+          sortedMatchedStdJets.insert(std::make_pair(matchedStdJets.at(i)->bDiscriminator( (analysisMode=="B2G-14-002" ? "combinedSecondaryVertexBJetTags" : "combinedSecondaryVertexV2BJetTags") ), i));
 
         for(std::multimap<double, unsigned>::const_iterator it = sortedMatchedStdJets.begin(); it != sortedMatchedStdJets.end(); ++it)
           sortedMatchedStdJetsIdx.push_back(it->second);
@@ -1350,14 +1350,14 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         subJet1_CSV_discr = subjets.at(0)->bDiscriminator("combinedSecondaryVertexBJetTags");
         subJet2_CSV_discr = subjets.at(1)->bDiscriminator("combinedSecondaryVertexBJetTags");
 
+        if( analysisMode=="B2G-14-002" )
+        {
+          subJet1_CSV_discr = subjets.at(sortedSubjetsIdx.back())->bDiscriminator("combinedSecondaryVertexBJetTags");
+          subJet2_CSV_discr = subjets.at(sortedSubjetsIdx.at(subjets.size()-2))->bDiscriminator("combinedSecondaryVertexBJetTags");
+        }
+
         subJet1_IVFCSV_discr = subjets.at(0)->bDiscriminator("combinedSecondaryVertexV2BJetTags");
         subJet2_IVFCSV_discr = subjets.at(1)->bDiscriminator("combinedSecondaryVertexV2BJetTags");
-
-        if( analysisMode=="B2G-14-002")
-        {
-          subJet1_IVFCSV_discr = subjets.at(sortedSubjetsIdx.back())->bDiscriminator("combinedSecondaryVertexV2BJetTags");
-          subJet2_IVFCSV_discr = subjets.at(sortedSubjetsIdx.at(subjets.size()-2))->bDiscriminator("combinedSecondaryVertexV2BJetTags");
-        }
 
         subJet1_JP_discr = subjets.at(0)->bDiscriminator("jetProbabilityBJetTags");
         subJet2_JP_discr = subjets.at(1)->bDiscriminator("jetProbabilityBJetTags");
@@ -1366,11 +1366,11 @@ RutgersJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         subJet2_JBP_discr = subjets.at(1)->bDiscriminator("jetBProbabilityBJetTags");
       }
       if( matchedStdJets.size()>0 )
-        stdJet_IVFCSV_discr = matchedStdJets.at(sortedMatchedStdJetsIdx.back())->bDiscriminator("combinedSecondaryVertexV2BJetTags");
+        stdJet_IVFCSV_discr = matchedStdJets.at(sortedMatchedStdJetsIdx.back())->bDiscriminator( (analysisMode=="B2G-14-002" ? "combinedSecondaryVertexBJetTags" : "combinedSecondaryVertexV2BJetTags") );
       if( matchedStdJets.size()>1 )
       {
-        stdJet1_IVFCSV_discr = matchedStdJets.at(sortedMatchedStdJetsIdx.back())->bDiscriminator("combinedSecondaryVertexV2BJetTags");
-        stdJet2_IVFCSV_discr = matchedStdJets.at(sortedMatchedStdJetsIdx.at(matchedStdJets.size()-2))->bDiscriminator("combinedSecondaryVertexV2BJetTags");
+        stdJet1_IVFCSV_discr = matchedStdJets.at(sortedMatchedStdJetsIdx.back())->bDiscriminator( (analysisMode=="B2G-14-002" ? "combinedSecondaryVertexBJetTags" : "combinedSecondaryVertexV2BJetTags") );
+        stdJet2_IVFCSV_discr = matchedStdJets.at(sortedMatchedStdJetsIdx.at(matchedStdJets.size()-2))->bDiscriminator( (analysisMode=="B2G-14-002" ? "combinedSecondaryVertexBJetTags" : "combinedSecondaryVertexV2BJetTags") );
       }
       double subJet_minCSV_discr = std::min(subJet1_CSV_discr, subJet2_CSV_discr);
       double subJet_maxCSV_discr = std::max(subJet1_CSV_discr, subJet2_CSV_discr);
